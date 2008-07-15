@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<jnlp spec="1.0+"
+      codebase="file:///Users/aanand/src/jruby/tank/webstart"
+      href="tank.jnlp">
+
+  <information>
+    <title>Tank</title>
+    <vendor>Aanand Prasad</vendor>
+  </information> 
+
+  <resources>
+    <j2se href="http://java.sun.com/products/autodl/j2se" version="1.5+" max-heap-size="128m"/>
+    
+    <jar href="jruby-complete.jar"/>
+    <jar href="tank.jar"/>
+    <jar href="phys2d.jar"/>
+    
+    <extension href="http://slick.cokeandcode.com/demos/slick.jnlp" version="b236"/>
+  </resources>
+
+  <security>
+    <all-permissions/>
+  </security>
+  
+  <application-desc main-class="org.jruby.Main">
+      <argument>run.rb</argument>
+  </application-desc>
+</jnlp>

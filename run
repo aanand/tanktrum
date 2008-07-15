@@ -1,0 +1,13 @@
+#!/bin/sh
+
+case `uname`
+in
+    Darwin) SUBDIR='macosx';;
+    *) SUBDIR='linux';;
+esac
+
+LIBRARY_PATH="lib/lwjgl/$SUBDIR"
+
+CLASSPATH='classes:lib/scala-library.jar:lib/slick.jar:lib/phys2d.jar:lib/lwjgl.jar'
+
+java -cp $CLASSPATH -Djava.library.path=$LIBRARY_PATH Main

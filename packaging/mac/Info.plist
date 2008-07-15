@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleName</key>
+	<string>Tank</string>
+	<key>CFBundleVersion</key>
+	<string>100.0</string>
+	<key>CFBundleAllowMixedLocalizations</key>
+	<string>true</string>
+	<key>CFBundleExecutable</key>
+	<string>JavaApplicationStub</string>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>English</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>CFBundleSignature</key>
+	<string>????</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundleIconFile</key>
+	<string>GenericJavaApp.icns</string>
+	<key>Java</key>
+	<dict>
+        <key>MainClass</key>
+        <string>Main</string>
+        <key>Arguments</key>
+        <string>$JAVAROOT/src/run.rb</string>
+        <key>JVMVersion</key>
+        <string>1.5*</string>
+        <key>ClassPath</key>
+        <array>
+            <string>$JAVAROOT/lib/tank.jar</string>
+            <string>$JAVAROOT/lib/scala-library.jar</string>
+            <string>$JAVAROOT/lib/lwjgl.jar</string>
+            <string>$JAVAROOT/lib/slick.jar</string>
+            <string>$JAVAROOT/lib/phys2d.jar</string>
+        </array>
+        <key>Properties</key>
+        <dict>
+          <key>com.apple.mrj.application.apple.menu.about.name</key>
+          <string>Tank</string>
+          <key>apple.laf.useScreenMenuBar</key>
+          <string>true</string>
+          <key>com.apple.macos.useScreenMenuBar</key>
+          <string>true</string>
+          <key>java.library.path</key>
+          <string>$JAVAROOT/lib/lwjgl/macosx</string>
+        </dict>
+	</dict>
+</dict>
+</plist>
