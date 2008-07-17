@@ -32,7 +32,8 @@ class PerlinNoise(size: Int, layers: Int, pers: float) {
     noise = noise.map((i) => i/weight).toArray
     noise
   }
-
+  
+  //Interpolates between a and b based on x.
   def interpolate(a: float, b: float, x: float) = {
     a*(1-x) + b*x
   }
