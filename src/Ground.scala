@@ -9,7 +9,7 @@ class Ground(session : Session, width : Int, height : Int) {
 
   val color = new slick.Color(0.6f, 0.5f, 0.0f)
   
-  var points : Seq[slick.geom.Vector2f] = _
+  var points : Seq[Vector2f] = _
   var drawShape : Shape = _
 
   def buildPoints() {
@@ -41,6 +41,18 @@ class Ground(session : Session, width : Int, height : Int) {
   }
   
   def serialise() = {
-    Operations.toByteArray(points.map((p) => p.getX).toArray)
+    Operations.toByteArray(points.map((p) => p.getY).toArray)
+  }
+  
+  def loadFrom(data: Array[byte]) = {
+    val floatPoints = Operations.fromByteArray[Array[float]](data)
+    var i = 0f
+    points = floatPoints.map((f) => {
+        val v = new Vector2f(i, f)
+        i += granularity
+        v
+      }
+    )
+    initPoints()
   }
 }

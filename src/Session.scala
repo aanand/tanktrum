@@ -1,23 +1,24 @@
-import org.newdawn.slick
-import net.phys2d
+import org.newdawn.slick._
+import net.phys2d.math._
+import net.phys2d.raw._
 
 abstract class Session {
-  val world = new phys2d.raw.World(new phys2d.math.Vector2f(0.0f, 100.0f), 10)
+  val world = new World(new Vector2f(0.0f, 100.0f), 10)
   
   var ground : Ground = _
   
-  def enter(container : slick.GameContainer) {
+  def enter(container: GameContainer) {
   }
   
   def leave() {
   }
   
-  def render(container : slick.GameContainer, g : slick.Graphics) {
+  def render(container: GameContainer, g: Graphics) {
     if (ground != null) {
       ground.render(g)
     }
   }
   
-  def update(container : slick.GameContainer, delta : Int) {
+  def update(container: GameContainer, delta: Int) {
   }
 }

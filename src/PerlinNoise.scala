@@ -1,6 +1,6 @@
 import java.util.Random
 
-class PerlinNoise(size: int, layers: int, pers: float) {
+class PerlinNoise(size: Int, layers: Int, pers: float) {
   val rand = new Random
   var noise = new Array[float](size+1)
   

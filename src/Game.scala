@@ -1,27 +1,27 @@
-import org.newdawn.slick
+import org.newdawn.slick._
 
-class Game(title : String) extends slick.BasicGame(title) {
-  var state : Option[Session] = None
-  var error : Option[String] = None
+class Game(title : String) extends BasicGame(title) {
+  var state: Session = _
+  var error: String = _
   
-  var container : Option[slick.GameContainer] = None
+  var container: GameContainer = _
   
-  def init(container : slick.GameContainer) {
-    this.container = Some(container)
-    this.state = Some(new Server(10000))
+  def init(container: GameContainer) {
+    this.container = container
+    this.state = new Server(10000)
     
-    state.get.enter(container)
+    state.enter(container)
   }
 
-  def update(container : slick.GameContainer, delta : Int) {
-    if (!state.isEmpty) {
-      state.get.update(container, delta)
+  def update(container: GameContainer, delta: Int) {
+    if (state != null) {
+      state.update(container, delta)
     }
   }
 
-  def render(container : slick.GameContainer, graphics : slick.Graphics) {
-    if (!state.isEmpty) {
-      state.get.render(container, graphics)
+  def render(container: GameContainer, graphics: Graphics) {
+    if (state != null) {
+      state.render(container, graphics)
     }
   }
 }
