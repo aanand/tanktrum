@@ -8,6 +8,6 @@ esac
 
 LIBRARY_PATH="lib/lwjgl/$SUBDIR"
 
-CLASSPATH='classes:lib/scala-library.jar:lib/slick.jar:lib/phys2d.jar:lib/lwjgl.jar'
+CLASSPATH='classes:lib/scala-library.jar:lib/slick.jar:lib/phys2d.jar:lib/lwjgl.jar:lib/sbinary-0.2.1.jar'
 
 java -cp $CLASSPATH -Djava.library.path=$LIBRARY_PATH Main

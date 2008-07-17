@@ -6,17 +6,42 @@ directory 'classes'
 directory 'tmp'
 directory 'lib'
 
-task :compile => 'classes' do
-  sh "scalac -classpath lib/scala-library.jar:lib/slick.jar:lib/phys2d.jar:lib/lwjgl.jar src/**.scala -d classes"
+CLASSPATH = %w'scala-library slick phys2d lwjgl sbinary'.map{|lib| "lib/#{lib}.jar"}.join(":")
+case `uname`
+when /Darwin/i
+  SUBDIR = 'macosx'
+when /Linux/i
+  SUBDIR = 'linux'
+else
+  SUBDIR = 'win32'
+end
+LIBPATH = "lib/lwjgl/#{SUBDIR}"
+
+TARGETS = Dir['src/**.scala'].map{|f| f.sub(/^src/, 'classes').sub(/scala$/, 'class')}
+
+TARGETS.each do |target|
+  file target => Dir['src/**.scala'] do
+    sh "scalac -classpath #{CLASSPATH} src/**.scala -d classes"
+  end
+end
+
+task :compile => ['classes'] + TARGETS
+
+task :run => 'compile' do
+  sh "java -classpath classes:#{CLASSPATH} -Djava.library.path=#{LIBPATH} Main"
 end
 
 task :jar => ['lib', 'classes'] do
   sh "jar -cf lib/tank.jar -C classes ."
 end
 
+#task :run => :compile do
+#  sh "./run"
+#end
+
 namespace :install do
   desc "install dependencies"
-  task :deps => [:scala, :slick, :phys2d, :lwjgl]
+  task :deps => [:scala, :slick, :phys2d, :lwjgl, :sbinary]
 
   task :clobber do
     rm_rf 'lib'
@@ -33,6 +58,10 @@ namespace :install do
   
   task :phys2d do
     download_file 'lib/phys2d.jar', 'http://www.cokeandcode.com/phys2d/source/builds/phys2d-060408.jar'
+  end
+
+  task :sbinary do
+    download_file 'lib/sbinary.jar', 'http://sbinary.googlecode.com/files/sbinary-0.2.1.jar'
   end
   
   task :lwjgl => ['tmp', 'lib'] do

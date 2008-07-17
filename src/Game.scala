@@ -8,7 +8,7 @@ class Game(title : String) extends slick.BasicGame(title) {
   
   def init(container : slick.GameContainer) {
     this.container = Some(container)
-    this.state = Some(new Server())
+    this.state = Some(new Server(10000))
     
     state.get.enter(container)
   }
