@@ -9,7 +9,6 @@ class Game(title : String) extends BasicGame(title) {
   def init(container: GameContainer) {
     this.container = container
     this.state = new Server(10000)
-    
     state.enter(container)
   }
 
