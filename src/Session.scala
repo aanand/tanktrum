@@ -21,4 +21,7 @@ abstract class Session {
   
   def update(container: GameContainer, delta: Int) {
   }
+  
+  def keyPressed(key : Int, char : Char) {
+  }
 }
