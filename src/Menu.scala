@@ -9,7 +9,7 @@ class Menu(tree : List[(String, MenuItem)]) {
   var editing = false
   
   val path = new Stack[Int]
-  path.push(0)
+  var selection = 0
 
   def render(container : GameContainer, g : Graphics) {
     if (!showing) return;
@@ -44,7 +44,7 @@ class Menu(tree : List[(String, MenuItem)]) {
           currentItem.perform(this)
         }
         case Input.KEY_ESCAPE => {
-          path.pop()
+          selection = path.pop()
           
           if (path.isEmpty) {
             hide()
@@ -57,7 +57,7 @@ class Menu(tree : List[(String, MenuItem)]) {
   
   def show() {
     path.clear()
-    path.push(0)
+    selection = 0
     
     showing = true
   }
@@ -67,7 +67,7 @@ class Menu(tree : List[(String, MenuItem)]) {
   }
   
   def subTree : List[(String, MenuItem)] = {
-    path.slice(0, path.length-1).foldLeft(tree)((list, i) => {
+    path.foldLeft(tree)((list, i) => {
       val (key, item) = list(i)
       
       item match {
@@ -75,9 +75,6 @@ class Menu(tree : List[(String, MenuItem)]) {
       }
     })
   }
-  
-  def selection = path.top
-  def selection_=(s : Int) = { path.pop(); path.push(s) }
   
   def currentItem = {
     val (key, item) = subTree(selection)
