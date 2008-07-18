@@ -11,10 +11,12 @@ class Game(title : String) extends BasicGame(title) {
   def init(container: GameContainer) {
     this.container = container
 
+    val serverPort = MenuEditable("10000");
+
     this.menu = new Menu(List(
       ("start server", Submenu(List(
-        ("port", MenuEditable("10000")),
-        ("ok", MenuCommand(Unit => startServer(10000)))))),
+        ("port", serverPort),
+        ("ok", MenuCommand(Unit => startServer(serverPort.value.toInt)))))),
       ("quit", MenuCommand(Unit => container.exit()))))
   }
 
@@ -40,7 +42,7 @@ class Game(title : String) extends BasicGame(title) {
       state = null
     }
     
-    state = new Server(10000)
+    state = new Server(port)
     state.enter(container)
   }
   
