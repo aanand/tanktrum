@@ -44,14 +44,14 @@ class Ground(session : Session, width : Int, height : Int) {
   }
   
   def serialise() = {
-    Operations.toByteArray(points.map((p) => p.getY).toArray)
+    Operations.toByteArray(points.map((p) => p.getY.toShort).toArray)
   }
   
   def loadFrom(data: Array[byte]) = {
-    val floatPoints = Operations.fromByteArray[Array[float]](data)
+    val shortPoints = Operations.fromByteArray[Array[short]](data)
     var i = 0f
-    points = floatPoints.map((f) => {
-        val v = new Vector2f(i, f)
+    points = shortPoints.map((s) => {
+        val v = new Vector2f(i, s.toFloat)
         i += granularity
         v
       }

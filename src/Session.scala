@@ -3,10 +3,6 @@ import net.phys2d.math._
 import net.phys2d.raw._
 
 abstract class Session {
-  val HELLO = 'h'
-  val PING  = 'p'
-  val GROUND = 'g'
-  
   val world = new World(new Vector2f(0.0f, 100.0f), 10)
   var ground : Ground = _
   var active = false

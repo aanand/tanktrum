@@ -33,7 +33,7 @@ class Server(port: Int) extends Session {
     if (addr != null) {
       val command = data.get().toChar
 
-      if (command == HELLO) {
+      if (command == Commands.HELLO) {
         addPlayer(addr)
       }
       else {
@@ -82,7 +82,7 @@ class Server(port: Int) extends Session {
 
   def processCommand(command: char, addr: SocketAddress) {
     command match {
-      case PING => {
+      case Commands.PING => {
         players(addr).resetTimeout
         sendPong(addr)
       }
@@ -93,11 +93,11 @@ class Server(port: Int) extends Session {
     * is a ground array. (I guess scala does some kind of javadoc thing like this?)
     */
   def sendGround(groundData: Array[byte], addr: SocketAddress) = {
-    send(charToByteArray(GROUND) ++ groundData, addr)
+    send(charToByteArray(Commands.GROUND) ++ groundData, addr)
   }
 
   def sendPong(addr: SocketAddress) = {
-    send(charToByteArray(PING), addr)
+    send(charToByteArray(Commands.PING), addr)
   }
 
   def send(data: Array[byte], addr: SocketAddress) = {

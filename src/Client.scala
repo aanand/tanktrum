@@ -37,8 +37,8 @@ class Client (hostname: String, port: Int, name: String) extends Session {
 
   def processCommand(command: Char) {
     command match {
-      case GROUND => {loadGround}
-      case PING   => {resetTimeout}
+      case Commands.GROUND => {loadGround}
+      case Commands.PING   => {resetTimeout}
     }
   }
   
@@ -67,11 +67,11 @@ class Client (hostname: String, port: Int, name: String) extends Session {
   }
 
   def sendHello = {
-    send(charToByteArray(HELLO) ++ name.getBytes)
+    send(charToByteArray(Commands.HELLO) ++ name.getBytes)
   }
 
   def sendPing = {
-    send(charToByteArray(PING))
+    send(charToByteArray(Commands.PING))
   }
 
   def send(data: Array[byte]) {
