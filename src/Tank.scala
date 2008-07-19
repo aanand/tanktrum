@@ -204,6 +204,7 @@ class Tank (game: Session) extends Collider {
   
   def loadFrom(data: Array[Byte]) = {
     val values = Operations.fromByteArray[Array[short]](data)
+    
     x = values(0)
     y = values(1)
     angle = values(2)
@@ -213,8 +214,7 @@ class Tank (game: Session) extends Collider {
     thrust = values(6)
     gunAngleChange = values(7)
     gunPowerChange = values(8)
-    color.r = values(9)
-    color.g = values(10)
-    color.b = values(11)
+    
+    color = new slick.Color(values(9).toFloat, values(10).toFloat, values(11).toFloat)
   }
 }

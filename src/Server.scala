@@ -7,6 +7,9 @@ import java.util.Random
 
 import scala.collection.mutable.HashMap
 
+import sbinary.Operations
+import sbinary.Instances._
+
 class Server(port: Int, userName: String, container: GameContainer) extends Session(container) {
   var channel: DatagramChannel = _
   val players = new HashMap[SocketAddress, Player]
@@ -49,6 +52,16 @@ class Server(port: Int, userName: String, container: GameContainer) extends Sess
       }
     }
   }
+  
+  def broadcastUpdate() {
+    broadcast(tankPositionData)
+  }
+  
+  def tankPositionData = {
+    val tankDataList : List[Array[Byte]] = me.tank.serialise :: players.values.map(p => p.tank.serialise).toList
+
+    charToByteArray(Commands.UPDATE) ++ Operations.toByteArray(tankDataList)
+  }
 
   def checkTimeouts() = {
     for (addr <- players.keys) {
@@ -69,12 +82,12 @@ class Server(port: Int, userName: String, container: GameContainer) extends Sess
       val name = new String(nameArray)
       println("Adding player: " + name)
 
-      //TODO: Track player ids.
       players.put(addr, new Player(createTank, name, 0))
 
       if (ground.initialised) {
         println("Sending ground to " + players(addr).getName)
         sendGround(ground.serialise(), addr)
+        send(tankPositionData, addr)
       }
       true
     }
@@ -86,7 +99,7 @@ class Server(port: Int, userName: String, container: GameContainer) extends Sess
   def createTank = {
     println("Creating a tank.")
     val tank = new Tank(this)
-    val loc = rand.nextFloat * container.getWidth
+    val loc = rand.nextFloat * (container.getWidth - 200) + 100
     tank.create(loc, new Color(1.0f, 0.0f, 0.0f))
     tank.reposition
     tanks += tank
@@ -115,6 +128,12 @@ class Server(port: Int, userName: String, container: GameContainer) extends Sess
 
   def sendPong(addr: SocketAddress) = {
     send(charToByteArray(Commands.PING), addr)
+  }
+  
+  def broadcast(data : Array[byte]) {
+    for (addr <- players.keys) {
+      send(data, addr)
+    }
   }
 
   def send(data: Array[byte], addr: SocketAddress) = {

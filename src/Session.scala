@@ -4,6 +4,10 @@ import scala.collection.mutable.HashMap
 import scala.collection.mutable.HashSet
 
 abstract class Session(container: slick.GameContainer) extends phys2d.raw.CollisionListener {
+  val BROADCAST_INTERVAL = 0.1
+
+  var timeToUpdate = BROADCAST_INTERVAL
+
   val world = new phys2d.raw.World(new phys2d.math.Vector2f(0.0f, 100.0f), 10)
   world.addListener(this)
 
@@ -45,7 +49,16 @@ abstract class Session(container: slick.GameContainer) extends phys2d.raw.Collis
     for (p <- projectiles) {
       p.update(container, delta)
     }
+    
+    timeToUpdate = timeToUpdate - delta/1000.0
+
+    if (timeToUpdate < 0) {
+      broadcastUpdate()
+      timeToUpdate = BROADCAST_INTERVAL
+    }
   }
+  
+  def broadcastUpdate()
   
   def keyPressed(key : Int, char : Char) {
     if (me == null) return

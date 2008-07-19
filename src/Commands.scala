@@ -10,4 +10,6 @@ object Commands {
   val AIM_ANTICLOCKWISE = 'a'
 
   val FIRE = 'f'
+  
+  val UPDATE = 'u'
 }
