@@ -1,6 +1,6 @@
 import org.newdawn.slick._
 
-class Game(title : String) extends BasicGame(title) {
+class Game(title: String) extends BasicGame(title) {
   var state: Session = _
   var error: String = _
   
@@ -29,13 +29,13 @@ class Game(title : String) extends BasicGame(title) {
 
   def update(container: GameContainer, delta: Int) {
     if (state != null && state.isActive) {
-      state.update(container, delta)
+      state.update(delta)
     }
   }
 
   def render(container: GameContainer, graphics: Graphics) {
     if (state != null && state.isActive) {
-      state.render(container, graphics)
+      state.render(graphics)
     }
     
     if (menu != null) {
@@ -49,8 +49,8 @@ class Game(title : String) extends BasicGame(title) {
       state = null
     }
     
-    state = new Server(port)
-    state.enter(container)
+    state = new Server(port, container)
+    state.enter()
   }
 
   def startClient(address: String, port: Int, username: String) = {
@@ -59,8 +59,8 @@ class Game(title : String) extends BasicGame(title) {
       state = null
     }
 
-    state = new Client(address, port, username)
-    state.enter(container)
+    state = new Client(address, port, username, container)
+    state.enter()
   }
   
   override def keyPressed(key : Int, char : Char) {

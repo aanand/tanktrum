@@ -1,13 +1,15 @@
-import org.newdawn.slick
+import org.newdawn.slick._
+import org.newdawn.slick.geom._
+
 import java.util.Random
-import slick.geom._
+
 import sbinary.Instances._
 import sbinary.Operations
 
 class Ground(session : Session, width : Int, height : Int) {
   val granularity = 1
 
-  val color = new slick.Color(0.6f, 0.5f, 0.0f)
+  val color = new Color(0.6f, 0.5f, 0.0f)
   
   var points : Seq[Vector2f] = _
   var drawShape : Shape = _
@@ -38,7 +40,7 @@ class Ground(session : Session, width : Int, height : Int) {
     initialised = true
   }
   
-  def render(g : slick.Graphics) {
+  def render(g: Graphics) {
     g.setColor(color)
     g.fill(drawShape)
   }

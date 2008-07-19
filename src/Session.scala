@@ -2,12 +2,12 @@ import org.newdawn.slick._
 import net.phys2d.math._
 import net.phys2d.raw._
 
-abstract class Session {
+abstract class Session(container: GameContainer) {
   val world = new World(new Vector2f(0.0f, 100.0f), 10)
   var ground : Ground = _
   var active = false
   
-  def enter(container: GameContainer) {
+  def enter() {
     ground = new Ground(this, container.getWidth(), container.getHeight())
     active = true
   }
@@ -16,13 +16,13 @@ abstract class Session {
     active = false
   }
   
-  def render(container: GameContainer, g: Graphics) {
+  def render(g: Graphics) {
     if (ground.initialised) {
       ground.render(g)
     }
   }
   
-  def update(container: GameContainer, delta: Int) {
+  def update(delta: Int) {
   }
   
   def keyPressed(key : Int, char : Char) {

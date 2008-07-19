@@ -4,13 +4,13 @@ import java.nio._
 import java.net._
 import scala.collection.mutable.HashMap
 
-class Server(port: Int) extends Session {
+class Server(port: Int, container: GameContainer) extends Session(container) {
   var channel: DatagramChannel = _
   val players = new HashMap[SocketAddress, Player]
   val data = ByteBuffer.allocate(1000)
 
-  override def enter(container : GameContainer) = {
-    super.enter(container)
+  override def enter() = {
+    super.enter()
     
     ground.buildPoints()
     
@@ -23,8 +23,8 @@ class Server(port: Int) extends Session {
     //println(new String(data.array))
   }
 
-  override def update(container: GameContainer, delta: Int) = {
-    super.update(container, delta)
+  override def update(delta: Int) = {
+    super.update(delta)
     checkTimeouts()
 
     data.rewind()
@@ -67,7 +67,11 @@ class Server(port: Int) extends Session {
       //need some inner ones to pass it a tuple.  A thing on the internet
       //suggests that players += foo -> bar should work, but it doesn't seem
       //to.
-      players += ((addr, new Player(new Tank(), name)))
+      
+      val tank = new Tank(container)
+
+      //TODO: Track player ids.
+      players += ((addr, new Player(tank, name, 0)))
 
       if (ground.initialised) {
         println("Sending ground to " + players(addr).getName)

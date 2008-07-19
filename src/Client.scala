@@ -4,7 +4,7 @@ import java.nio._
 import java.net._
 import java.util.Date
 
-class Client (hostname: String, port: Int, name: String) extends Session {
+class Client (hostname: String, port: Int, name: String, container: GameContainer) extends Session(container) {
   val PING_PERIOD = 1000
   val SERVER_TIMEOUT = 10000
 
@@ -13,8 +13,8 @@ class Client (hostname: String, port: Int, name: String) extends Session {
   var lastPing = new Date()
   var lastPong = new Date()
 
-  override def enter(container: GameContainer) = {
-    super.enter(container)
+  override def enter() = {
+    super.enter()
     channel = DatagramChannel.open()
     channel.connect(new InetSocketAddress(hostname, port))
     channel.configureBlocking(false)
@@ -22,8 +22,8 @@ class Client (hostname: String, port: Int, name: String) extends Session {
     sendHello
   }
 
-  override def update(container: GameContainer, delta: Int) {
-    super.update(container, delta)
+  override def update(delta: Int) {
+    super.update(delta)
     ping
     checkTimeout
 
