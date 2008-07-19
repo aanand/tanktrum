@@ -1,18 +1,24 @@
 import org.newdawn.slick._
+
 import java.nio.channels._
 import java.nio._
 import java.net._
+import java.util.Random
+
 import scala.collection.mutable.HashMap
 
-class Server(port: Int, container: GameContainer) extends Session(container) {
+class Server(port: Int, userName: String, container: GameContainer) extends Session(container) {
   var channel: DatagramChannel = _
   val players = new HashMap[SocketAddress, Player]
   val data = ByteBuffer.allocate(1000)
+  val rand = new Random()
 
   override def enter() = {
     super.enter()
-    
+
     ground.buildPoints()
+    
+    val me = new Player(createTank, userName, 0)
     
     channel = DatagramChannel.open()
     channel.socket.bind(new InetSocketAddress(port))
@@ -63,15 +69,8 @@ class Server(port: Int, container: GameContainer) extends Session(container) {
       val name = new String(nameArray)
       println("Adding player: " + name)
 
-      //Whee, brackets.  Outer ones get eaten by += as a method call, then we
-      //need some inner ones to pass it a tuple.  A thing on the internet
-      //suggests that players += foo -> bar should work, but it doesn't seem
-      //to.
-      
-      val tank = new Tank(container)
-
       //TODO: Track player ids.
-      players += ((addr, new Player(tank, name, 0)))
+      players.put(addr, new Player(createTank, name, 0))
 
       if (ground.initialised) {
         println("Sending ground to " + players(addr).getName)
@@ -82,6 +81,15 @@ class Server(port: Int, container: GameContainer) extends Session(container) {
     else {
       false
     }
+  }
+  
+  def createTank = {
+    println("Creating a tank.")
+    val tank = new Tank(this)
+    val loc = rand.nextFloat * container.getWidth
+    tank.create(loc, new Color(1.0f, 0.0f, 0.0f))
+    tanks += tank
+    tank
   }
 
   def processCommand(command: char, addr: SocketAddress) {

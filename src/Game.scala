@@ -19,7 +19,7 @@ class Game(title: String) extends BasicGame(title) {
       ("name", userName),
       ("start server", Submenu(List(
         ("port", serverPort),
-        ("ok", MenuCommand(Unit => startServer(serverPort.value.toInt)))))),
+        ("ok", MenuCommand(Unit => startServer(serverPort.value.toInt, userName.value)))))),
       ("connect", Submenu(List(
         ("hostname", serverHostname),
         ("port", serverPort),
@@ -43,13 +43,13 @@ class Game(title: String) extends BasicGame(title) {
     }
   }
   
-  def startServer(port : Int) {
+  def startServer(port : Int, userName : String) {
     if (state != null) {
       state.leave()
       state = null
     }
     
-    state = new Server(port, container)
+    state = new Server(port, userName, container)
     state.enter()
   }
 

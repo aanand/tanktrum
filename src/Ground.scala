@@ -1,8 +1,6 @@
 import org.newdawn.slick._
 import org.newdawn.slick.geom._
 
-import java.util.Random
-
 import sbinary.Instances._
 import sbinary.Operations
 
@@ -59,5 +57,20 @@ class Ground(session : Session, width : Int, height : Int) {
       }
     )
     initPoints()
+  }
+
+  def heightAt(x: Float) = {
+    val h1 = points((x/granularity).toInt).y
+    val h2 = points((x/granularity + 1).toInt).y
+
+    val r: Float = x % granularity
+
+    val f = r/granularity
+
+    h1*(1-r) + h2*r
+  }
+
+  def normalAt(x: Float) = {
+    0f
   }
 }

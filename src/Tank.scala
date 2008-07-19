@@ -9,7 +9,7 @@ import net.phys2d
 import sbinary.Instances._
 import sbinary.Operations
 
-class Tank (container: GameContainer) {
+class Tank (game: Session) {
   val WIDTH = 40f
   val HEIGHT = 20f
   val TAPER = 5f
@@ -62,11 +62,12 @@ class Tank (container: GameContainer) {
   var health = 100
 
   def create(x: Float, color: Color) = {
-    //y = container.ground.heightAt(x)
-    //angle = container.ground.normalAt(x)
+    this.x = x
+    y = game.getGround.heightAt(x)
+    angle = game.getGround.normalAt(x)
     this.color = color
-    //body.setPosition(x, y)
-    //container.addBody(this, body)
+    body.setPosition(x, y)
+    game.addBody(this, body)
     reposition
   }
   
@@ -91,7 +92,7 @@ class Tank (container: GameContainer) {
     !isAlive
   }
   
-  def update(container: GameContainer, delta: Int): Unit = {
+  def update(delta: Int): Unit = {
     if (isDead) {
       return
     }
@@ -113,17 +114,15 @@ class Tank (container: GameContainer) {
     }
   }
   
-  //TODO: Got to here.
-
   def reposition = {
     /*var xLeft  = x - WIDTH/2 * Math.cos(angle.toRadians)
     var xRight = x + WIDTH/2 * Math.cos(angle.toRadians)
     
-    yLeft   = container.ground.heightAt(xLeft)
-    yRight  = container.ground.heightAt(xRight)
+    yLeft   = game.getGround.heightAt(xLeft)
+    yRight  = game.getGround.heightAt(xRight)
     
     yAvg    = (yLeft + yRight) / 2.0
-    yMiddle = container.ground.heightAt(x)
+    yMiddle = game.getGround.heightAt(x)
 
     y = [yAvg, yMiddle].min
     
@@ -136,7 +135,7 @@ class Tank (container: GameContainer) {
     if (isDead) return
     
     if (gunReady) {
-      //container.addProjectile(self, gunX, gunY, angle+gunAngle, gunPower, true)
+      //game.addProjectile(self, gunX, gunY, angle+gunAngle, gunPower, true)
       gunTimer = GUN_RELOAD_TIME
     }
   }
@@ -150,7 +149,7 @@ class Tank (container: GameContainer) {
   }
   
   def die = {
-    //container.removeBody(body)
+    //game.removeBody(body)
   }
   
   def render(g: Graphics): Unit = {
