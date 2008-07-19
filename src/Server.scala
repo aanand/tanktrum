@@ -5,10 +5,6 @@ import java.net._
 import scala.collection.mutable.HashMap
 
 class Server(port: Int) extends Session {
-  def HELLO = 'h'
-  def PING  = 'p'
-  def GROUND = 'g'
-
   var channel: DatagramChannel = _
   val players = new HashMap[SocketAddress, Player]
   val data = ByteBuffer.allocate(1000)
@@ -16,7 +12,6 @@ class Server(port: Int) extends Session {
   override def enter(container : GameContainer) = {
     super.enter(container)
     
-    ground = new Ground(this, container.getWidth(), container.getHeight())
     ground.buildPoints()
     
     channel = DatagramChannel.open()
@@ -29,6 +24,7 @@ class Server(port: Int) extends Session {
   }
 
   override def update(container: GameContainer, delta: Int) = {
+    super.update(container, delta)
     checkTimeouts()
 
     data.rewind()
@@ -42,8 +38,7 @@ class Server(port: Int) extends Session {
       }
       else {
         if (players.isDefinedAt(addr)) {
-          val player = players(addr)
-          processCommand(command, player)
+          processCommand(command, addr)
         }
       }
     }
@@ -52,7 +47,7 @@ class Server(port: Int) extends Session {
   def checkTimeouts() = {
     for (addr <- players.keys) {
       if (players(addr).timedOut) {
-        println(players(addr) + " timed out.")
+        println(players(addr).getName + " timed out.")
         players -= addr
       }
     }
@@ -74,7 +69,8 @@ class Server(port: Int) extends Session {
       //to.
       players += ((addr, new Player(new Tank(), name)))
 
-      if (ground != null) {
+      if (ground.initialised) {
+        println("Sending ground to " + players(addr).getName)
         sendGround(ground.serialise(), addr)
       }
       true
@@ -84,10 +80,12 @@ class Server(port: Int) extends Session {
     }
   }
 
-  def processCommand(command: char, player: Player) {
-    println(player)
-    if (command == PING) {
-      player.resetTimeout()
+  def processCommand(command: char, addr: SocketAddress) {
+    command match {
+      case PING => {
+        players(addr).resetTimeout
+        sendPong(addr)
+      }
     }
   }
 
@@ -95,9 +93,11 @@ class Server(port: Int) extends Session {
     * is a ground array. (I guess scala does some kind of javadoc thing like this?)
     */
   def sendGround(groundData: Array[byte], addr: SocketAddress) = {
-    val a = new Array[byte](1)
-    a(0) = GROUND.toByte
-    send(a ++ groundData, addr)
+    send(charToByteArray(GROUND) ++ groundData, addr)
+  }
+
+  def sendPong(addr: SocketAddress) = {
+    send(charToByteArray(PING), addr)
   }
 
   def send(data: Array[byte], addr: SocketAddress) = {

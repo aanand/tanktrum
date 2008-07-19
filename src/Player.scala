@@ -2,7 +2,7 @@ import java.net._
 import java.util.Date
 
 class Player (tank: Tank, name: String) {
-  val TIMEOUT = 6000 //in milliseconds
+  val TIMEOUT = 10000 //in milliseconds
 
   var lastPing = new Date()
 
@@ -16,5 +16,5 @@ class Player (tank: Tank, name: String) {
     (new Date().getTime() - lastPing.getTime()) > TIMEOUT
   }
 
-  def getName() = name
+  def getName = name
 }

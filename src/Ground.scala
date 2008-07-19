@@ -12,6 +12,8 @@ class Ground(session : Session, width : Int, height : Int) {
   var points : Seq[Vector2f] = _
   var drawShape : Shape = _
 
+  var initialised = false
+
   def buildPoints() {
     val rand = new Random()
     var x = 0f
@@ -33,6 +35,7 @@ class Ground(session : Session, width : Int, height : Int) {
     val drawShapePoints = shapePoints.foldLeft[List[Float]](List())((list, v) => list ++ List(v.getX(), v.getY()))
     
     drawShape = new Polygon(drawShapePoints.toArray)
+    initialised = true
   }
   
   def render(g : slick.Graphics) {

@@ -12,27 +12,29 @@ class Game(title : String) extends BasicGame(title) {
     this.container = container
 
     val serverPort = MenuEditable("10000");
-    val serverAddress = MenuEditable("localhost");
+    val serverHostname = MenuEditable("localhost")
+    val userName = MenuEditable("Player")
 
     this.menu = new Menu(List(
+      ("name", userName),
       ("start server", Submenu(List(
         ("port", serverPort),
         ("ok", MenuCommand(Unit => startServer(serverPort.value.toInt)))))),
       ("connect", Submenu(List(
-        ("address", serverAddress),
+        ("hostname", serverHostname),
         ("port", serverPort),
-        ("join", MenuCommand(Unit => startClient(serverAddress.value, serverPort.value.toInt)))))),
+        ("join", MenuCommand(Unit => startClient(serverHostname.value, serverPort.value.toInt, userName.value)))))),
       ("quit", MenuCommand(Unit => container.exit()))))
   }
 
   def update(container: GameContainer, delta: Int) {
-    if (state != null) {
+    if (state != null && state.isActive) {
       state.update(container, delta)
     }
   }
 
   def render(container: GameContainer, graphics: Graphics) {
-    if (state != null) {
+    if (state != null && state.isActive) {
       state.render(container, graphics)
     }
     
@@ -51,13 +53,13 @@ class Game(title : String) extends BasicGame(title) {
     state.enter(container)
   }
 
-  def startClient(address: String, port : Int) = {
+  def startClient(address: String, port: Int, username: String) = {
     if (state != null) {
       state.leave()
       state = null
     }
 
-    state = new Client(address, port)
+    state = new Client(address, port, username)
     state.enter(container)
   }
   
