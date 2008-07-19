@@ -173,7 +173,7 @@ class Tank (game: Session) extends Collider {
     
     g.translate(GUN_OFFSET_X, GUN_OFFSET_Y)
     g.rotate(0, 0, gunAngle)
-    g.scale(gunPower/GUN_POWER_SCALE, gunPower/GUN_POWER_SCALE)
+    g.scale(1, gunPower/GUN_POWER_SCALE)
     g.setColor(if (gunReady) GUN_READY_COLOR else GUN_LOADING_COLOR)
     g.fill(arrowShape)
       
