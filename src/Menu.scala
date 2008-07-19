@@ -8,7 +8,7 @@ class Menu(tree : List[(String, MenuItem)]) {
   var showing = true
   var editing = false
   
-  val path = new Stack[Int]
+  val path = new Stack[Submenu]
   var selection = 0
 
   def render(container : GameContainer, g : Graphics) {
@@ -44,10 +44,12 @@ class Menu(tree : List[(String, MenuItem)]) {
           currentItem.perform(this)
         }
         case Input.KEY_ESCAPE => {
-          selection = path.pop()
-          
           if (path.isEmpty) {
             hide()
+          }
+          else {
+            val subMenu = path.pop()
+            selection = subTree.indexOf(subTree.find((item) => {item._2 == subMenu}).get)
           }
         }
         case _ => {}
@@ -66,14 +68,13 @@ class Menu(tree : List[(String, MenuItem)]) {
     showing = false
   }
   
-  def subTree : List[(String, MenuItem)] = {
-    path.foldLeft(tree)((list, i) => {
-      val (key, item) = list(i)
-      
-      item match {
-        case Submenu(st) => st
-      }
-    })
+  def subTree = {
+    if (path.isEmpty) {
+      tree
+    }
+    else {
+      path.top.tree
+    }
   }
   
   def currentItem = {
@@ -128,6 +129,7 @@ case class MenuCommand(callback : Unit => Unit) extends MenuItem {
 
 case class Submenu(tree : List[(String, MenuItem)]) extends MenuItem {
   override def perform(menu : Menu) {
-    menu.path.push(0)
+    menu.path.push(this)
+    menu.selection = 0
   }
 }
