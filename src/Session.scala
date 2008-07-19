@@ -100,16 +100,16 @@ abstract class Session(container: slick.GameContainer) extends phys2d.raw.Collis
     bodies -= body
   }
   
-  def addProjectile(tank : Tank, x : Float, y : Float, angle : Float, speed : Float, broadcast : Boolean) {
+  def addProjectile(tank : Tank, x : Double, y : Double, angle : Double, speed : Double, broadcast : Boolean) {
     val radians = Math.toRadians(angle-90)
-    val velocity = new phys2d.math.Vector2f(speed * Math.cos(radians).toFloat, speed * Math.sin(radians).toFloat)
+    val velocity = new phys2d.math.Vector2f((speed * Math.cos(radians)).toFloat, (speed * Math.sin(radians)).toFloat)
     
     val radius = 3f
     
     val shape = new phys2d.raw.shapes.Circle(radius)
 
     val body = new phys2d.raw.Body(shape, 1.0f)
-    body.setPosition(x, y)
+    body.setPosition(x.toFloat, y.toFloat)
     body.adjustVelocity(velocity)
     
     val p = new Projectile(this, tank, body, radius)

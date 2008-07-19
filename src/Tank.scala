@@ -47,9 +47,9 @@ class Tank (game: Session) extends Collider {
   val physShape = new phys2d.raw.shapes.Polygon(physShapePoints.toArray)
   val body = new phys2d.raw.StaticBody(physShape)
 
-  var x: Float = _
-  var y: Float = _
-  var angle: Float = _
+  var x: Double = _
+  var y: Double = _
+  var angle: Double = _
   var color: Color = _
 
   var thrust = 0
@@ -67,7 +67,7 @@ class Tank (game: Session) extends Collider {
     y = game.getGround.heightAt(x)
     angle = game.getGround.normalAt(x)
     this.color = color
-    body.setPosition(x, y)
+    body.setPosition(x.toFloat, y.toFloat)
     game.addBody(this, body)
     reposition
   }
@@ -76,12 +76,12 @@ class Tank (game: Session) extends Collider {
     gunTimer <= 0
   }
   
-  def gunX : Float = {
-    x - GUN_OFFSET_X * Math.cos(angle.toRadians).toFloat - GUN_OFFSET_Y * Math.sin(angle.toRadians).toFloat
+  def gunX = {
+    x - GUN_OFFSET_X * Math.cos(angle.toRadians) - GUN_OFFSET_Y * Math.sin(angle.toRadians)
   }
   
-  def gunY : Float = {
-    y - GUN_OFFSET_X * Math.sin(angle.toRadians).toFloat + GUN_OFFSET_Y * Math.cos(angle.toRadians).toFloat
+  def gunY = {
+    y - GUN_OFFSET_X * Math.sin(angle.toRadians) + GUN_OFFSET_Y * Math.cos(angle.toRadians)
   }
   
   def isAlive = {
@@ -98,7 +98,7 @@ class Tank (game: Session) extends Collider {
     }
     
     if (thrust != 0) {
-      x = x + thrust * SPEED * delta / 1000.0f * Math.cos(Math.toRadians(angle)).toFloat
+      x = x + thrust * SPEED * delta / 1000.0f * Math.cos(Math.toRadians(angle))
       reposition
     }
     
@@ -123,17 +123,17 @@ class Tank (game: Session) extends Collider {
     val xLeft  = x - WIDTH/2 * Math.cos(angle.toRadians)
     val xRight = x + WIDTH/2 * Math.cos(angle.toRadians)
     
-    val yLeft   = game.getGround.heightAt(xLeft.toFloat)
-    val yRight  = game.getGround.heightAt(xRight.toFloat)
+    val yLeft   = game.getGround.heightAt(xLeft)
+    val yRight  = game.getGround.heightAt(xRight)
     
     val yAvg    = (yLeft + yRight) / 2.0
     val yMiddle = game.getGround.heightAt(x)
 
-    y = Math.min(yAvg.toFloat, yMiddle.toFloat)
+    y = Math.min(yAvg, yMiddle)
     
-    angle = Math.toDegrees(Math.atan((yRight - yLeft) / (xRight - xLeft))).toFloat
+    angle = Math.toDegrees(Math.atan((yRight - yLeft) / (xRight - xLeft)))
     
-    body.setPosition(x, y)
+    body.setPosition(x.toFloat, y.toFloat)
   }
   
   def fire() {
@@ -166,8 +166,8 @@ class Tank (game: Session) extends Collider {
     
     //g.fillRect(10 + (playerId-1)*110, 10, health, 10)
     
-    g.translate(x, y)
-    g.rotate(0, 0, angle)
+    g.translate(x.toFloat, y.toFloat)
+    g.rotate(0, 0, angle.toFloat)
     
     g.fill(tankShape)
     

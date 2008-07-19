@@ -63,7 +63,7 @@ class Ground(session : Session, width : Int, height : Int) extends Collider {
     val shortPoints = Operations.fromByteArray[Array[short]](data)
     var i = 0f
     points = shortPoints.map((s) => {
-        val v = new Vector2f(i, s.toFloat)
+        val v = new Vector2f(i, s)
         i += granularity
         v
       }
@@ -71,12 +71,12 @@ class Ground(session : Session, width : Int, height : Int) extends Collider {
     initPoints()
   }
 
-  def heightAt(x: Float) = {
+  def heightAt(x: Double) = {
     val h1 = points((x/granularity).toInt).y
     val h2 = points((x/granularity + 1).toInt).y
 
-    val r: Float = x % granularity
-
+    val r = x % granularity
+    
     val f = r/granularity
 
     h1*(1-r) + h2*r
