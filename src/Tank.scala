@@ -9,7 +9,7 @@ import net.phys2d
 import sbinary.Instances._
 import sbinary.Operations
 
-class Tank (game: Session) {
+class Tank (game: Session) extends Collider {
   val WIDTH = 40f
   val HEIGHT = 20f
   val TAPER = 5f
@@ -76,13 +76,12 @@ class Tank (game: Session) {
     gunTimer <= 0
   }
   
-  //TODO: Do these:
-  def gunX = {
-    //x - GUN_OFFSET_X * Math.cos(angle.toRadians) - GUN_OFFSET_Y * Math.sin(angle.toRadians)
+  def gunX : Float = {
+    x - GUN_OFFSET_X * Math.cos(angle.toRadians).toFloat - GUN_OFFSET_Y * Math.sin(angle.toRadians).toFloat
   }
   
-  def gunY = {
-    //y - GUN_OFFSET_X * Math.sin(angle.toRadians) + GUN_OFFSET_Y * Math.cos(angle.toRadians)
+  def gunY : Float = {
+    y - GUN_OFFSET_X * Math.sin(angle.toRadians).toFloat + GUN_OFFSET_Y * Math.cos(angle.toRadians).toFloat
   }
   
   def isAlive = {
@@ -141,7 +140,7 @@ class Tank (game: Session) {
     if (isDead) return
     
     if (gunReady) {
-      //game.addProjectile(self, gunX, gunY, angle+gunAngle, gunPower, true)
+      game.addProjectile(this, gunX, gunY, angle+gunAngle, gunPower, true)
       gunTimer = GUN_RELOAD_TIME
     }
   }

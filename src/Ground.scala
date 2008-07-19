@@ -1,16 +1,20 @@
 import org.newdawn.slick._
 import org.newdawn.slick.geom._
 
+import net.phys2d
+
 import sbinary.Instances._
 import sbinary.Operations
 
-class Ground(session : Session, width : Int, height : Int) {
+class Ground(session : Session, width : Int, height : Int) extends Collider {
   val granularity = 1
 
   val color = new Color(0.6f, 0.5f, 0.0f)
   
   var points : Seq[Vector2f] = _
   var drawShape : Shape = _
+  var physShape : phys2d.raw.shapes.Shape = _
+  var body : phys2d.raw.Body = _
 
   var initialised = false
 
@@ -35,6 +39,14 @@ class Ground(session : Session, width : Int, height : Int) {
     val drawShapePoints = shapePoints.foldLeft[List[Float]](List())((list, v) => list ++ List(v.getX(), v.getY()))
     
     drawShape = new Polygon(drawShapePoints.toArray)
+    
+    val physShapePoints = shapePoints.map(p => new phys2d.math.Vector2f(p.x, p.y))
+    
+    physShape = new phys2d.raw.shapes.Polygon(physShapePoints.toArray)
+    
+    body = new phys2d.raw.StaticBody(physShape)
+    session.addBody(this, body)
+    
     initialised = true
   }
   

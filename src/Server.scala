@@ -88,6 +88,7 @@ class Server(port: Int, userName: String, container: GameContainer) extends Sess
     val tank = new Tank(this)
     val loc = rand.nextFloat * container.getWidth
     tank.create(loc, new Color(1.0f, 0.0f, 0.0f))
+    tank.reposition
     tanks += tank
     tank
   }
@@ -106,6 +107,10 @@ class Server(port: Int, userName: String, container: GameContainer) extends Sess
     */
   def sendGround(groundData: Array[byte], addr: SocketAddress) = {
     send(charToByteArray(Commands.GROUND) ++ groundData, addr)
+  }
+
+  def broadcastDamageUpdate(tank : Tank, damage : Int) {
+    println("broadcasting damage update: " + tank.toString + ", " + damage.toString)
   }
 
   def sendPong(addr: SocketAddress) = {
