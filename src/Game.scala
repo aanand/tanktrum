@@ -72,4 +72,10 @@ class Game(title: String) extends BasicGame(title) {
       state.keyPressed(key, char)
     }
   }
+  
+  override def keyReleased(key : Int, char : Char) {
+    if (state != null) {
+      state.keyReleased(key, char)
+    }
+  }
 }

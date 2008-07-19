@@ -51,12 +51,13 @@ class Tank (game: Session) {
   var y: Float = _
   var angle: Float = _
   var color: Color = _
+
   var thrust = 0
-  
   var gunAngleChange = 0
   var gunPowerChange = 0
-  var gunAngle = 0
-  var gunPower = 0
+
+  var gunAngle = 0f
+  var gunPower = 200f
   var gunTimer = 0f
 
   var health = 100
@@ -98,16 +99,21 @@ class Tank (game: Session) {
     }
     
     if (thrust != 0) {
-      //x += thrust * SPEED * delta / 1000.0f * Math.cos(angle.toRadians)
+      x = x + thrust * SPEED * delta / 1000.0f * Math.cos(Math.toRadians(angle)).toFloat
       reposition
     }
     
     if (gunAngleChange != 0) {
-      //gunAngle = (gunAngle + gunAngleChange * GUN_ANGLE_SPEED * delta / 1000.0f).constrain(GUN_ANGLE_RANGE)
+      val newAngle = gunAngle + gunAngleChange * GUN_ANGLE_SPEED * delta / 1000.0f
+      
+      gunAngle = Math.max(GUN_ANGLE_RANGE.start, Math.min(GUN_ANGLE_RANGE.end, newAngle))
     }
     
-    if (gunPowerChange != 0)
-      //gunPower = (gunPower + gunPowerChange * GUN_POWER_SPEED * delta / 1000.0).constrain(GUN_POWER_RANGE)
+    if (gunPowerChange != 0) {
+      val newPower = gunPower + gunPowerChange * GUN_POWER_SPEED * delta / 1000.0f
+      
+      gunPower = Math.max(GUN_POWER_RANGE.start, Math.min(GUN_POWER_RANGE.end, newPower))
+    }
     
     if (!gunReady) {
       gunTimer -= delta / 1000.0f
@@ -115,23 +121,23 @@ class Tank (game: Session) {
   }
   
   def reposition = {
-    /*var xLeft  = x - WIDTH/2 * Math.cos(angle.toRadians)
-    var xRight = x + WIDTH/2 * Math.cos(angle.toRadians)
+    val xLeft  = x - WIDTH/2 * Math.cos(angle.toRadians)
+    val xRight = x + WIDTH/2 * Math.cos(angle.toRadians)
     
-    yLeft   = game.getGround.heightAt(xLeft)
-    yRight  = game.getGround.heightAt(xRight)
+    val yLeft   = game.getGround.heightAt(xLeft.toFloat)
+    val yRight  = game.getGround.heightAt(xRight.toFloat)
     
-    yAvg    = (yLeft + yRight) / 2.0
-    yMiddle = game.getGround.heightAt(x)
+    val yAvg    = (yLeft + yRight) / 2.0
+    val yMiddle = game.getGround.heightAt(x)
 
-    y = [yAvg, yMiddle].min
+    y = Math.min(yAvg.toFloat, yMiddle.toFloat)
     
-    angle = Math.atan((yRight - yLeft) / (xRight - xLeft)).to_degrees
+    angle = Math.toDegrees(Math.atan((yRight - yLeft) / (xRight - xLeft))).toFloat
     
-    body.setPosition(x, y)*/
+    body.setPosition(x, y)
   }
   
-  def fire: Unit = {
+  def fire() {
     if (isDead) return
     
     if (gunReady) {
@@ -169,7 +175,7 @@ class Tank (game: Session) {
     g.translate(GUN_OFFSET_X, GUN_OFFSET_Y)
     g.rotate(0, 0, gunAngle)
     g.scale(gunPower/GUN_POWER_SCALE, gunPower/GUN_POWER_SCALE)
-    //g.setColor(gunReady ? GUN_READY_COLOR : GUN_LOADING_COLOR)
+    g.setColor(if (gunReady) GUN_READY_COLOR else GUN_LOADING_COLOR)
     g.fill(arrowShape)
       
     g.resetTransform

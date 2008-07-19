@@ -1,7 +1,7 @@
 import java.net._
 import java.util.Date
 
-class Player (tank: Tank, name: String, id: Int) {
+class Player (val tank: Tank, name: String, id: Int) {
   val TIMEOUT = 10000 //in milliseconds
 
   var lastPing = new Date()

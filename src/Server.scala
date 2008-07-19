@@ -18,7 +18,7 @@ class Server(port: Int, userName: String, container: GameContainer) extends Sess
 
     ground.buildPoints()
     
-    val me = new Player(createTank, userName, 0)
+    me = new Player(createTank, userName, 0)
     
     channel = DatagramChannel.open()
     channel.socket.bind(new InetSocketAddress(port))
