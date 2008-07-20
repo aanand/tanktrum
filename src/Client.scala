@@ -76,7 +76,7 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
     val byteArray = new Array[byte](data.remaining)
     data.get(byteArray)
     
-    val tankDataList : List[Array[byte]] = Operations.fromByteArray[List[Array[byte]]](byteArray)
+    val tankDataList = Operations.fromByteArray[List[Array[byte]]](byteArray)
 
     tanks = tankDataList.map(tankData => {
       val t = new Tank(this)
