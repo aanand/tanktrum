@@ -97,7 +97,7 @@ abstract class Session(container: slick.GameContainer) extends phys2d.raw.Collis
     }
   }
 
-  def charToByteArray(c: Char) = {
+  def byteToArray(c: Byte) = {
     val a = new Array[byte](1)
     a(0) = c.toByte
     a

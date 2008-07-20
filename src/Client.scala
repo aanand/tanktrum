@@ -48,6 +48,39 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
     }
   }
   
+  override def keyPressed(key : Int, char : Char) {
+    char match {
+      case 'a' => { sendCommand(Commands.MOVE_LEFT) }
+      case 'd' => { sendCommand(Commands.MOVE_RIGHT) }
+      case _ => {
+        key match {
+          case Input.KEY_LEFT  => { sendCommand(Commands.AIM_ANTICLOCKWISE) }
+          case Input.KEY_RIGHT => { sendCommand(Commands.AIM_CLOCKWISE) }
+          case Input.KEY_UP    => { sendCommand(Commands.POWER_UP) }
+          case Input.KEY_DOWN  => { sendCommand(Commands.POWER_DOWN) }
+          case Input.KEY_SPACE => { sendCommand(Commands.FIRE) }
+          case _ => {}
+        }
+      }
+    }
+  }
+  
+  override def keyReleased(key : Int, char : Char) {
+    char match {
+      case 'a' => { sendCommand(Commands.STOP_MOVE_LEFT) }
+      case 'd' => { sendCommand(Commands.STOP_MOVE_RIGHT) }
+      case _ => {
+        key match {
+          case Input.KEY_LEFT  => { sendCommand(Commands.STOP_AIM_ANTICLOCKWISE) }
+          case Input.KEY_RIGHT => { sendCommand(Commands.STOP_AIM_CLOCKWISE) }
+          case Input.KEY_UP    => { sendCommand(Commands.STOP_POWER_UP) }
+          case Input.KEY_DOWN  => { sendCommand(Commands.STOP_POWER_DOWN) }
+          case _ => {}
+        }
+      }
+    }
+  }
+  
   def ping = {
     if (new Date().getTime - lastPing.getTime > PING_PERIOD) {
       sendPing
@@ -85,12 +118,16 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
     })
   }
 
+  def sendCommand(command: Byte) {
+    send(byteToArray(command))
+  }
+
   def sendHello = {
-    send(charToByteArray(Commands.HELLO) ++ name.getBytes)
+    send(byteToArray(Commands.HELLO) ++ name.getBytes)
   }
 
   def sendPing = {
-    send(charToByteArray(Commands.PING))
+    send(byteToArray(Commands.PING))
   }
 
   def send(data: Array[byte]) {

@@ -1,16 +1,31 @@
 object Commands {
-  val HELLO = 'h'
-  val PING  = 'p'
-  val GROUND = 'g'
-  val TANK = 't'
+  var i: Byte = 0
+  def nextI() = {
+    i = (i + 1).toByte
+    i
+  }
 
-  val MOVE_LEFT = 'l'
-  val MOVE_RIGHT = 'r'
+  val HELLO = nextI
+  val PING  = nextI
+  val GROUND = nextI
+  val TANK = nextI
 
-  val AIM_CLOCKWISE = 'c'
-  val AIM_ANTICLOCKWISE = 'a'
+  val MOVE_LEFT = nextI
+  val STOP_MOVE_LEFT = nextI
+  val MOVE_RIGHT = nextI
+  val STOP_MOVE_RIGHT = nextI
 
-  val FIRE = 'f'
+  val AIM_CLOCKWISE = nextI
+  val STOP_AIM_CLOCKWISE = nextI
+  val AIM_ANTICLOCKWISE = nextI
+  val STOP_AIM_ANTICLOCKWISE = nextI
+
+  val POWER_UP = nextI
+  val STOP_POWER_UP = nextI
+  val POWER_DOWN = nextI
+  val STOP_POWER_DOWN = nextI
+
+  val FIRE = nextI
   
-  val UPDATE = 'u'
+  val UPDATE = nextI
 }

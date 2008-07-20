@@ -64,7 +64,7 @@ class Server(port: Int, userName: String, container: GameContainer) extends Sess
   def tankPositionData = {
     val tankDataList : List[Array[Byte]] = me.tank.serialise :: players.values.map(p => p.tank.serialise).toList
 
-    charToByteArray(Commands.UPDATE) ++ Operations.toByteArray(tankDataList)
+    byteToArray(Commands.UPDATE) ++ Operations.toByteArray(tankDataList)
   }
 
   def checkTimeouts() = {
@@ -112,11 +112,29 @@ class Server(port: Int, userName: String, container: GameContainer) extends Sess
   }
 
   def processCommand(command: char, addr: SocketAddress) {
+    val player = players(addr)
     command match {
       case Commands.PING => {
-        players(addr).resetTimeout
+        player.resetTimeout
         sendPong(addr)
       }
+
+      case Commands.MOVE_LEFT => { player.tank.thrust = -1 }
+      case Commands.STOP_MOVE_LEFT => { player.tank.thrust = 0 }
+      case Commands.MOVE_RIGHT => { player.tank.thrust = 1 }
+      case Commands.STOP_MOVE_RIGHT => { player.tank.thrust = 0 }
+
+      case Commands.AIM_CLOCKWISE => { player.tank.gunAngleChange = 1 }
+      case Commands.STOP_AIM_CLOCKWISE => { player.tank.gunAngleChange = 0 }
+      case Commands.AIM_ANTICLOCKWISE => { player.tank.gunAngleChange = -1 }
+      case Commands.STOP_AIM_ANTICLOCKWISE => { player.tank.gunAngleChange = 1 }
+
+      case Commands.POWER_UP => { player.tank.gunPowerChange = 1 }
+      case Commands.STOP_POWER_UP => { player.tank.gunPowerChange = 0 }
+      case Commands.POWER_DOWN => { player.tank.gunPowerChange = -1 }
+      case Commands.STOP_POWER_DOWN => { player.tank.gunPowerChange = 0 }
+
+      case Commands.FIRE => { println("firing"); player.tank.fire() }
     }
   }
 
@@ -124,7 +142,7 @@ class Server(port: Int, userName: String, container: GameContainer) extends Sess
     * is a ground array. (I guess scala does some kind of javadoc thing like this?)
     */
   def sendGround(groundData: Array[byte], addr: SocketAddress) = {
-    send(charToByteArray(Commands.GROUND) ++ groundData, addr)
+    send(byteToArray(Commands.GROUND) ++ groundData, addr)
   }
 
   def broadcastDamageUpdate(tank : Tank, damage : Int) {
@@ -132,7 +150,7 @@ class Server(port: Int, userName: String, container: GameContainer) extends Sess
   }
 
   def sendPong(addr: SocketAddress) = {
-    send(charToByteArray(Commands.PING), addr)
+    send(byteToArray(Commands.PING), addr)
   }
   
   def broadcast(data : Array[byte]) {
