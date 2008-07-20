@@ -4,6 +4,9 @@ import java.nio._
 import java.net._
 import java.util.Date
 
+import sbinary.Operations
+import sbinary.Instances._
+
 class Client (hostname: String, port: Int, name: String, container: GameContainer) extends Session(container) {
   val PING_PERIOD = 1000
   val SERVER_TIMEOUT = 10000
@@ -34,12 +37,14 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
       processCommand(command)
     }
   }
+  
+  override def broadcastUpdate() {}
 
   def processCommand(command: Char) {
     command match {
       case Commands.GROUND => {loadGround}
       case Commands.PING   => {resetTimeout}
-      case Commands.TANK   => {loadTank}
+      case Commands.UPDATE => {processUpdate}
     }
   }
   
@@ -67,17 +72,17 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
     ground.loadFrom(groundArray)
   }
   
-  def loadTank = {
-    val tankArray = new Array[byte](data.remaining)
-    data.get(tankArray)
-    val tank = new Tank(this)
-    tank.loadFrom(tankArray)
-    if (tanks.length > tank.getId) {
-      tanks(tank.getId).loadFrom(tankArray)
-    }
-    else {
-      tanks += tank
-    }
+  def processUpdate = {
+    val byteArray = new Array[byte](data.remaining)
+    data.get(byteArray)
+    
+    val tankDataList = Operations.fromByteArray[List[Array[byte]]](byteArray)
+
+    tanks = tankDataList.map(tankData => {
+      val t = new Tank(this)
+      t.loadFrom(tankData)
+      t
+    })
   }
 
   def sendHello = {

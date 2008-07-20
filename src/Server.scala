@@ -8,6 +8,9 @@ import java.util.Date
 
 import scala.collection.mutable.HashMap
 
+import sbinary.Operations
+import sbinary.Instances._
+
 class Server(port: Int, userName: String, container: GameContainer) extends Session(container) {
   var channel: DatagramChannel = _
   val players = new HashMap[SocketAddress, Player]
@@ -32,7 +35,7 @@ class Server(port: Int, userName: String, container: GameContainer) extends Sess
   override def update(delta: Int) = {
     super.update(delta)
     checkTimeouts()
-    sendUpdate()
+    broadcastUpdate()
 
     data.rewind()
     val addr = channel.receive(data)
@@ -50,16 +53,18 @@ class Server(port: Int, userName: String, container: GameContainer) extends Sess
       }
     }
   }
-
-  def sendUpdate() = {
-    if (new Date().getTime > lastUpdate.getTime + UPDATE_PERIOD){
-      for (addr <- players.keys) {
-        for (tank <- tanks) {
-          sendTank(addr, tank)
-        }
-      }
-      lastUpdate =  new Date()
+  
+  def broadcastUpdate() {
+    if (new Date().getTime() > lastUpdate.getTime() + UPDATE_PERIOD) {
+      broadcast(tankPositionData)
+      lastUpdate = new Date()
     }
+  }
+  
+  def tankPositionData = {
+    val tankDataList : List[Array[Byte]] = me.tank.serialise :: players.values.map(p => p.tank.serialise).toList
+
+    charToByteArray(Commands.UPDATE) ++ Operations.toByteArray(tankDataList)
   }
 
   def checkTimeouts() = {
@@ -82,12 +87,12 @@ class Server(port: Int, userName: String, container: GameContainer) extends Sess
       val name = new String(nameArray)
       println("Adding player: " + name)
 
-      //TODO: Track player ids.
       players.put(addr, new Player(createTank, name, 0))
 
       if (ground.initialised) {
         println("Sending ground to " + players(addr).getName)
         sendGround(ground.serialise(), addr)
+        send(tankPositionData, addr)
       }
       true
     }
@@ -99,8 +104,8 @@ class Server(port: Int, userName: String, container: GameContainer) extends Sess
   def createTank = {
     println("Creating a tank.")
     val tank = new Tank(this)
-    val loc = rand.nextFloat * container.getWidth
-    tank.create(loc, new Color(1.0f, 0.0f, 0.0f), tanks.length)
+    val loc = rand.nextFloat * (container.getWidth - 200) + 100
+    tank.create(loc, new Color(1.0f, 0.0f, 0.0f))
     tank.reposition
     tanks += tank
     tank
@@ -129,9 +134,11 @@ class Server(port: Int, userName: String, container: GameContainer) extends Sess
   def sendPong(addr: SocketAddress) = {
     send(charToByteArray(Commands.PING), addr)
   }
-
-  def sendTank(addr: SocketAddress, tank: Tank) {
-    send(charToByteArray(Commands.TANK) ++ tank.serialise, addr)
+  
+  def broadcast(data : Array[byte]) {
+    for (addr <- players.keys) {
+      send(data, addr)
+    }
   }
 
   def send(data: Array[byte], addr: SocketAddress) = {

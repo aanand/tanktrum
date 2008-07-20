@@ -9,7 +9,7 @@ import net.phys2d
 import sbinary.Instances._
 import sbinary.Operations
 
-class Tank (game: Session) extends Collider {
+class Tank (session: Session) extends Collider {
   val WIDTH = 40f
   val HEIGHT = 20f
   val TAPER = 5f
@@ -47,10 +47,10 @@ class Tank (game: Session) extends Collider {
   val physShape = new phys2d.raw.shapes.Polygon(physShapePoints.toArray)
   val body = new phys2d.raw.StaticBody(physShape)
 
-  var x: Float = _
-  var y: Float = _
-  var angle: Float = _
-  var color = new Color(1f, 1f, 1f)
+  var x: Double = _
+  var y: Double = _
+  var angle: Double = _
+  var color: Color = _
 
   var thrust = 0
   var gunAngleChange = 0
@@ -62,16 +62,13 @@ class Tank (game: Session) extends Collider {
 
   var health = 100
 
-  var id: Int = _
-
-  def create(x: Float, color: Color, id: Int) = {
+  def create(x: Float, color: Color) = {
     this.x = x
-    this.id = id
-    y = game.getGround.heightAt(x)
-    angle = game.getGround.normalAt(x)
+    y = session.getGround.heightAt(x)
+    angle = session.getGround.normalAt(x)
     this.color = color
-    body.setPosition(x, y)
-    game.addBody(this, body)
+    body.setPosition(x.toFloat, y.toFloat)
+    session.addBody(this, body)
     reposition
   }
   
@@ -79,12 +76,12 @@ class Tank (game: Session) extends Collider {
     gunTimer <= 0
   }
   
-  def gunX : Float = {
-    x - GUN_OFFSET_X * Math.cos(angle.toRadians).toFloat - GUN_OFFSET_Y * Math.sin(angle.toRadians).toFloat
+  def gunX = {
+    x - GUN_OFFSET_X * Math.cos(angle.toRadians) - GUN_OFFSET_Y * Math.sin(angle.toRadians)
   }
   
-  def gunY : Float = {
-    y - GUN_OFFSET_X * Math.sin(angle.toRadians).toFloat + GUN_OFFSET_Y * Math.cos(angle.toRadians).toFloat
+  def gunY = {
+    y - GUN_OFFSET_X * Math.sin(angle.toRadians) + GUN_OFFSET_Y * Math.cos(angle.toRadians)
   }
   
   def isAlive = {
@@ -101,7 +98,7 @@ class Tank (game: Session) extends Collider {
     }
     
     if (thrust != 0) {
-      x = x + thrust * SPEED * delta / 1000.0f * Math.cos(Math.toRadians(angle)).toFloat
+      x = x + thrust * SPEED * delta / 1000.0f * Math.cos(Math.toRadians(angle))
       reposition
     }
     
@@ -126,38 +123,38 @@ class Tank (game: Session) extends Collider {
     val xLeft  = x - WIDTH/2 * Math.cos(angle.toRadians)
     val xRight = x + WIDTH/2 * Math.cos(angle.toRadians)
     
-    val yLeft   = game.getGround.heightAt(xLeft.toFloat)
-    val yRight  = game.getGround.heightAt(xRight.toFloat)
+    val yLeft   = session.getGround.heightAt(xLeft)
+    val yRight  = session.getGround.heightAt(xRight)
     
     val yAvg    = (yLeft + yRight) / 2.0
-    val yMiddle = game.getGround.heightAt(x)
+    val yMiddle = session.getGround.heightAt(x)
 
-    y = Math.min(yAvg.toFloat, yMiddle.toFloat)
+    y = Math.min(yAvg, yMiddle)
     
-    angle = Math.toDegrees(Math.atan((yRight - yLeft) / (xRight - xLeft))).toFloat
+    angle = Math.toDegrees(Math.atan((yRight - yLeft) / (xRight - xLeft)))
     
-    body.setPosition(x, y)
+    body.setPosition(x.toFloat, y.toFloat)
   }
   
   def fire() {
     if (isDead) return
     
     if (gunReady) {
-      game.addProjectile(this, gunX, gunY, angle+gunAngle, gunPower, true)
+      session.addProjectile(this, gunX, gunY, angle+gunAngle, gunPower, true)
       gunTimer = GUN_RELOAD_TIME
     }
   }
   
-  def damage(d: Int) = {
+  def damage(d: Int) {
     health -= d
     
-    if (d < 0) {
+    if (isDead) {
       die
     }
   }
   
   def die = {
-    game.removeBody(body)
+    session.removeBody(body)
   }
   
   def render(g: Graphics): Unit = {
@@ -169,8 +166,8 @@ class Tank (game: Session) extends Collider {
     //g.fillRect(10 + (playerId-1)*110, 10, health, 10)
     
     g.setColor(color)
-    g.translate(x, y)
-    g.rotate(0, 0, angle)
+    g.translate(x.toFloat, y.toFloat)
+    g.rotate(0, 0, angle.toFloat)
     
     g.fill(tankShape)
     
@@ -182,7 +179,7 @@ class Tank (game: Session) extends Collider {
 
     g.translate(GUN_OFFSET_X, GUN_OFFSET_Y)
     g.rotate(0, 0, gunAngle)
-    g.scale(gunPower/GUN_POWER_SCALE, gunPower/GUN_POWER_SCALE)
+    g.scale(1, gunPower/GUN_POWER_SCALE)
     g.setColor(if (gunReady) GUN_READY_COLOR else GUN_LOADING_COLOR)
     g.fill(arrowShape)
     
@@ -191,8 +188,6 @@ class Tank (game: Session) extends Collider {
     g.resetTransform
   }
   
-  def getId = id
-
   def serialise = {
     Operations.toByteArray(List[Short](
       x.toShort, 
@@ -207,12 +202,12 @@ class Tank (game: Session) extends Collider {
       color.r.toShort,
       color.g.toShort,
       color.b.toShort,
-      id.toShort
     ).toArray)
   }
   
   def loadFrom(data: Array[Byte]) = {
     val values = Operations.fromByteArray[Array[short]](data)
+    
     x = values(0)
     y = values(1)
     angle = values(2)
@@ -222,9 +217,7 @@ class Tank (game: Session) extends Collider {
     thrust = values(6)
     gunAngleChange = values(7)
     gunPowerChange = values(8)
-    color.r = values(9)
-    color.g = values(10)
-    color.b = values(11)
-    id = values(12)
+    
+    color = new slick.Color(values(9).toFloat, values(10).toFloat, values(11).toFloat)
   }
 }

@@ -4,6 +4,10 @@ import scala.collection.mutable.HashMap
 import scala.collection.mutable.HashSet
 
 abstract class Session(container: slick.GameContainer) extends phys2d.raw.CollisionListener {
+  val BROADCAST_INTERVAL = 0.1
+
+  var timeToUpdate = BROADCAST_INTERVAL
+
   val world = new phys2d.raw.World(new phys2d.math.Vector2f(0.0f, 100.0f), 10)
   world.addListener(this)
 
@@ -45,7 +49,16 @@ abstract class Session(container: slick.GameContainer) extends phys2d.raw.Collis
     for (p <- projectiles) {
       p.update(container, delta)
     }
+    
+    timeToUpdate = timeToUpdate - delta/1000.0
+
+    if (timeToUpdate < 0) {
+      broadcastUpdate()
+      timeToUpdate = BROADCAST_INTERVAL
+    }
   }
+  
+  def broadcastUpdate()
   
   def keyPressed(key : Int, char : Char) {
     if (me == null) return
@@ -100,16 +113,16 @@ abstract class Session(container: slick.GameContainer) extends phys2d.raw.Collis
     bodies -= body
   }
   
-  def addProjectile(tank : Tank, x : Float, y : Float, angle : Float, speed : Float, broadcast : Boolean) {
+  def addProjectile(tank : Tank, x : Double, y : Double, angle : Double, speed : Double, broadcast : Boolean) {
     val radians = Math.toRadians(angle-90)
-    val velocity = new phys2d.math.Vector2f(speed * Math.cos(radians).toFloat, speed * Math.sin(radians).toFloat)
+    val velocity = new phys2d.math.Vector2f((speed * Math.cos(radians)).toFloat, (speed * Math.sin(radians)).toFloat)
     
     val radius = 3f
     
     val shape = new phys2d.raw.shapes.Circle(radius)
 
     val body = new phys2d.raw.Body(shape, 1.0f)
-    body.setPosition(x, y)
+    body.setPosition(x.toFloat, y.toFloat)
     body.adjustVelocity(velocity)
     
     val p = new Projectile(this, tank, body, radius)
