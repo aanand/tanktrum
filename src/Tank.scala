@@ -9,7 +9,7 @@ import net.phys2d
 import sbinary.Instances._
 import sbinary.Operations
 
-class Tank (game: Session) extends Collider {
+class Tank (session: Session) extends Collider {
   val WIDTH = 40f
   val HEIGHT = 20f
   val TAPER = 5f
@@ -64,11 +64,11 @@ class Tank (game: Session) extends Collider {
 
   def create(x: Float, color: Color) = {
     this.x = x
-    y = game.getGround.heightAt(x)
-    angle = game.getGround.normalAt(x)
+    y = session.getGround.heightAt(x)
+    angle = session.getGround.normalAt(x)
     this.color = color
     body.setPosition(x.toFloat, y.toFloat)
-    game.addBody(this, body)
+    session.addBody(this, body)
     reposition
   }
   
@@ -123,11 +123,11 @@ class Tank (game: Session) extends Collider {
     val xLeft  = x - WIDTH/2 * Math.cos(angle.toRadians)
     val xRight = x + WIDTH/2 * Math.cos(angle.toRadians)
     
-    val yLeft   = game.getGround.heightAt(xLeft)
-    val yRight  = game.getGround.heightAt(xRight)
+    val yLeft   = session.getGround.heightAt(xLeft)
+    val yRight  = session.getGround.heightAt(xRight)
     
     val yAvg    = (yLeft + yRight) / 2.0
-    val yMiddle = game.getGround.heightAt(x)
+    val yMiddle = session.getGround.heightAt(x)
 
     y = Math.min(yAvg, yMiddle)
     
@@ -140,21 +140,17 @@ class Tank (game: Session) extends Collider {
     if (isDead) return
     
     if (gunReady) {
-      game.addProjectile(this, gunX, gunY, angle+gunAngle, gunPower, true)
+      session.addProjectile(this, gunX, gunY, angle+gunAngle, gunPower, true)
       gunTimer = GUN_RELOAD_TIME
     }
   }
   
-  def damage(d: Int) = {
+  def damage(d: Int) {
     health -= d
     
-    if (d < 0) {
-      die
+    if (isDead) {
+      session.removeBody(body)
     }
-  }
-  
-  def die = {
-    //game.removeBody(body)
   }
   
   def render(g: Graphics): Unit = {
