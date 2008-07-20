@@ -140,7 +140,7 @@ class Tank (session: Session) extends Collider {
     if (isDead) return
     
     if (gunReady) {
-      session.addProjectile(this, gunX, gunY, angle+gunAngle, gunPower, true)
+      session.addProjectile(this, gunX, gunY, angle+gunAngle, gunPower)
       gunTimer = GUN_RELOAD_TIME
     }
   }
@@ -202,11 +202,11 @@ class Tank (session: Session) extends Collider {
       color.r.toShort,
       color.g.toShort,
       color.b.toShort,
-    ).toArray)
+    ))
   }
   
   def loadFrom(data: Array[Byte]) = {
-    val values = Operations.fromByteArray[Array[short]](data)
+    val values = Operations.fromByteArray[List[short]](data)
     
     x = values(0)
     y = values(1)

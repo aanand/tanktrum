@@ -8,7 +8,8 @@ object Commands {
   val HELLO = nextI
   val PING  = nextI
   val GROUND = nextI
-  val TANK = nextI
+  val TANKS = nextI
+  val PROJECTILE = nextI
 
   val MOVE_LEFT = nextI
   val STOP_MOVE_LEFT = nextI
@@ -27,5 +28,4 @@ object Commands {
 
   val FIRE = nextI
   
-  val UPDATE = nextI
 }

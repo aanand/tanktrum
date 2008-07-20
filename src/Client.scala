@@ -44,7 +44,8 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
     command match {
       case Commands.GROUND => {loadGround}
       case Commands.PING   => {resetTimeout}
-      case Commands.UPDATE => {processUpdate}
+      case Commands.TANKS => {processUpdate}
+      case Commands.PROJECTILE => {loadProjectile}
     }
   }
   
@@ -103,6 +104,12 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
     val groundArray = new Array[byte](data.remaining)
     data.get(groundArray)
     ground.loadFrom(groundArray)
+  }
+
+  def loadProjectile = {
+    val projArray = new Array[byte](data.remaining)
+    data.get(projArray)
+    addProjectile(tanks(0), 0, 0, 0, 0).loadFrom(projArray)
   }
   
   def processUpdate = {

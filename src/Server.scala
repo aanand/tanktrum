@@ -35,7 +35,6 @@ class Server(port: Int, userName: String, container: GameContainer) extends Sess
   override def update(delta: Int) = {
     super.update(delta)
     checkTimeouts()
-    broadcastUpdate()
 
     data.rewind()
     val addr = channel.receive(data)
@@ -53,18 +52,25 @@ class Server(port: Int, userName: String, container: GameContainer) extends Sess
       }
     }
   }
+
+  override def addProjectile(tank : Tank, x : Double, y : Double, angle : Double, speed : Double) = {
+    val p = super.addProjectile(tank, x, y, angle, speed)
+    broadcast(projectileData(p))
+    p
+  }
   
   def broadcastUpdate() {
-    if (new Date().getTime() > lastUpdate.getTime() + UPDATE_PERIOD) {
-      broadcast(tankPositionData)
-      lastUpdate = new Date()
-    }
+    broadcast(tankPositionData)
   }
   
   def tankPositionData = {
     val tankDataList : List[Array[Byte]] = me.tank.serialise :: players.values.map(p => p.tank.serialise).toList
 
-    byteToArray(Commands.UPDATE) ++ Operations.toByteArray(tankDataList)
+    byteToArray(Commands.TANKS) ++ Operations.toByteArray(tankDataList)
+  }
+
+  def projectileData(p: Projectile) = {
+    byteToArray(Commands.PROJECTILE) ++ p.serialise
   }
 
   def checkTimeouts() = {
@@ -127,14 +133,14 @@ class Server(port: Int, userName: String, container: GameContainer) extends Sess
       case Commands.AIM_CLOCKWISE => { player.tank.gunAngleChange = 1 }
       case Commands.STOP_AIM_CLOCKWISE => { player.tank.gunAngleChange = 0 }
       case Commands.AIM_ANTICLOCKWISE => { player.tank.gunAngleChange = -1 }
-      case Commands.STOP_AIM_ANTICLOCKWISE => { player.tank.gunAngleChange = 1 }
+      case Commands.STOP_AIM_ANTICLOCKWISE => { player.tank.gunAngleChange = 0 }
 
       case Commands.POWER_UP => { player.tank.gunPowerChange = 1 }
       case Commands.STOP_POWER_UP => { player.tank.gunPowerChange = 0 }
       case Commands.POWER_DOWN => { player.tank.gunPowerChange = -1 }
       case Commands.STOP_POWER_DOWN => { player.tank.gunPowerChange = 0 }
 
-      case Commands.FIRE => { println("firing"); player.tank.fire() }
+      case Commands.FIRE => { player.tank.fire() }
     }
   }
 

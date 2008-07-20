@@ -1,5 +1,7 @@
 import org.newdawn.slick
 import net.phys2d
+import sbinary.Instances._
+import sbinary.Operations
 
 class Projectile(session : Session, tank : Tank, val body : phys2d.raw.Body, radius : Float) extends Collider {
   val COLOR = new slick.Color(1.0f, 1.0f, 1.0f)
@@ -28,5 +30,20 @@ class Projectile(session : Session, tank : Tank, val body : phys2d.raw.Body, rad
       tank.damage(20)
       server.broadcastDamageUpdate(tank, 20)
     }
+  }
+
+  def serialise = {
+    Operations.toByteArray(List[Float](
+      x,
+      y,
+      body.getVelocity.getX,
+      body.getVelocity.getY
+    ))
+  }
+
+  def loadFrom(data: Array[byte]) =  {
+    val values = Operations.fromByteArray[List[Float]](data)
+    body.setPosition(values(0), values(1))
+    body.adjustVelocity(new phys2d.math.Vector2f(values(2), values(3)))
   }
 }

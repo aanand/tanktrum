@@ -113,7 +113,7 @@ abstract class Session(container: slick.GameContainer) extends phys2d.raw.Collis
     bodies -= body
   }
   
-  def addProjectile(tank : Tank, x : Double, y : Double, angle : Double, speed : Double, broadcast : Boolean) {
+  def addProjectile(tank : Tank, x : Double, y : Double, angle : Double, speed : Double) = {
     val radians = Math.toRadians(angle-90)
     val velocity = new phys2d.math.Vector2f((speed * Math.cos(radians)).toFloat, (speed * Math.sin(radians)).toFloat)
     
@@ -131,11 +131,8 @@ abstract class Session(container: slick.GameContainer) extends phys2d.raw.Collis
     
     projectiles += p
     
-    if (broadcast) {
-      // self.broadcast({:type => :projectile, :player_id => tank.player_id, :x => x, :y => y, :angle => angle, :speed => speed})
-    }
-    
     println("added projectile at " + p.x + ", " + p.y + ", " + angle + ", " + speed)
+    p
   }
   
   def removeProjectile(p : Projectile) {
