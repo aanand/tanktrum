@@ -4,6 +4,7 @@ import java.nio.channels._
 import java.nio._
 import java.net._
 import java.util.Random
+import java.util.Date
 
 import scala.collection.mutable.HashMap
 
@@ -12,6 +13,9 @@ class Server(port: Int, userName: String, container: GameContainer) extends Sess
   val players = new HashMap[SocketAddress, Player]
   val data = ByteBuffer.allocate(1000)
   val rand = new Random()
+
+  var lastUpdate = new Date()
+  val UPDATE_PERIOD = 100
 
   override def enter() = {
     super.enter()
@@ -23,15 +27,12 @@ class Server(port: Int, userName: String, container: GameContainer) extends Sess
     channel = DatagramChannel.open()
     channel.socket.bind(new InetSocketAddress(port))
     channel.configureBlocking(false)
-    
-    //var data = ByteBuffer.allocate(100)
-    //channel.receive(data)
-    //println(new String(data.array))
   }
 
   override def update(delta: Int) = {
     super.update(delta)
     checkTimeouts()
+    sendUpdate()
 
     data.rewind()
     val addr = channel.receive(data)
@@ -50,10 +51,22 @@ class Server(port: Int, userName: String, container: GameContainer) extends Sess
     }
   }
 
+  def sendUpdate() = {
+    if (new Date().getTime > lastUpdate.getTime + UPDATE_PERIOD){
+      for (addr <- players.keys) {
+        for (tank <- tanks) {
+          sendTank(addr, tank)
+        }
+      }
+      lastUpdate =  new Date()
+    }
+  }
+
   def checkTimeouts() = {
     for (addr <- players.keys) {
       if (players(addr).timedOut) {
         println(players(addr).getName + " timed out.")
+        players(addr).tank.die
         players -= addr
       }
     }
@@ -87,7 +100,7 @@ class Server(port: Int, userName: String, container: GameContainer) extends Sess
     println("Creating a tank.")
     val tank = new Tank(this)
     val loc = rand.nextFloat * container.getWidth
-    tank.create(loc, new Color(1.0f, 0.0f, 0.0f))
+    tank.create(loc, new Color(1.0f, 0.0f, 0.0f), tanks.length)
     tank.reposition
     tanks += tank
     tank
@@ -115,6 +128,10 @@ class Server(port: Int, userName: String, container: GameContainer) extends Sess
 
   def sendPong(addr: SocketAddress) = {
     send(charToByteArray(Commands.PING), addr)
+  }
+
+  def sendTank(addr: SocketAddress, tank: Tank) {
+    send(charToByteArray(Commands.TANK) ++ tank.serialise, addr)
   }
 
   def send(data: Array[byte], addr: SocketAddress) = {

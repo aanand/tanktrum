@@ -39,6 +39,7 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
     command match {
       case Commands.GROUND => {loadGround}
       case Commands.PING   => {resetTimeout}
+      case Commands.TANK   => {loadTank}
     }
   }
   
@@ -64,6 +65,19 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
     val groundArray = new Array[byte](data.remaining)
     data.get(groundArray)
     ground.loadFrom(groundArray)
+  }
+  
+  def loadTank = {
+    val tankArray = new Array[byte](data.remaining)
+    data.get(tankArray)
+    val tank = new Tank(this)
+    tank.loadFrom(tankArray)
+    if (tanks.length > tank.getId) {
+      tanks(tank.getId).loadFrom(tankArray)
+    }
+    else {
+      tanks += tank
+    }
   }
 
   def sendHello = {

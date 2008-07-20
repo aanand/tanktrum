@@ -50,7 +50,7 @@ class Tank (game: Session) extends Collider {
   var x: Float = _
   var y: Float = _
   var angle: Float = _
-  var color: Color = _
+  var color = new Color(1f, 1f, 1f)
 
   var thrust = 0
   var gunAngleChange = 0
@@ -62,8 +62,11 @@ class Tank (game: Session) extends Collider {
 
   var health = 100
 
-  def create(x: Float, color: Color) = {
+  var id: Int = _
+
+  def create(x: Float, color: Color, id: Int) = {
     this.x = x
+    this.id = id
     y = game.getGround.heightAt(x)
     angle = game.getGround.normalAt(x)
     this.color = color
@@ -154,7 +157,7 @@ class Tank (game: Session) extends Collider {
   }
   
   def die = {
-    //game.removeBody(body)
+    game.removeBody(body)
   }
   
   def render(g: Graphics): Unit = {
@@ -162,28 +165,33 @@ class Tank (game: Session) extends Collider {
       return
     }
     
-    g.setColor(color)
     
     //g.fillRect(10 + (playerId-1)*110, 10, health, 10)
     
+    g.setColor(color)
     g.translate(x, y)
     g.rotate(0, 0, angle)
     
     g.fill(tankShape)
     
+    /*
+    This would draw a health bar under the tank:
+    g.setColor(new Color(0f, 0f, 1f, 0.5f))
+    g.fillRect(-WIDTH/2, 15, (100f/health)*WIDTH, 10)
+    */
+
     g.translate(GUN_OFFSET_X, GUN_OFFSET_Y)
     g.rotate(0, 0, gunAngle)
     g.scale(gunPower/GUN_POWER_SCALE, gunPower/GUN_POWER_SCALE)
     g.setColor(if (gunReady) GUN_READY_COLOR else GUN_LOADING_COLOR)
     g.fill(arrowShape)
+    
+    //draw healthbar
       
     g.resetTransform
   }
   
-  /*
-  def collide (obj: Int, event: Int)
-  end
-  */
+  def getId = id
 
   def serialise = {
     Operations.toByteArray(List[Short](
@@ -198,7 +206,8 @@ class Tank (game: Session) extends Collider {
       gunPowerChange.toShort,
       color.r.toShort,
       color.g.toShort,
-      color.b.toShort
+      color.b.toShort,
+      id.toShort
     ).toArray)
   }
   
@@ -216,5 +225,6 @@ class Tank (game: Session) extends Collider {
     color.r = values(9)
     color.g = values(10)
     color.b = values(11)
+    id = values(12)
   }
 }

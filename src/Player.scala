@@ -17,4 +17,5 @@ class Player (val tank: Tank, name: String, id: Int) {
   }
 
   def getName = name
+  def getTank = tank
 }
