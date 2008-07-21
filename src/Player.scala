@@ -1,4 +1,5 @@
 import java.net._
+import org.newdawn.slick._
 import java.util.Date
 
 class Player (val tank: Tank, name: String, id: Int) {

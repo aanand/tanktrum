@@ -6,10 +6,15 @@ import sbinary.Operations
 class Projectile(session : Session, tank : Tank, val body : phys2d.raw.Body, radius : Float) extends Collider {
   val COLOR = new slick.Color(1.0f, 1.0f, 1.0f)
   
+  var destroy = false
+
   def x = body.getPosition.getX
   def y = body.getPosition.getY
   
   def update(container : slick.GameContainer, delta : Int) {
+    if (destroy) {
+      session.removeProjectile(this)
+    }
     if (x < 0 || x > container.getWidth || y > container.getHeight) {
       session.removeProjectile(this)
     }
@@ -21,7 +26,7 @@ class Projectile(session : Session, tank : Tank, val body : phys2d.raw.Body, rad
   }
   
   override def collide(obj : Collider, event : phys2d.raw.CollisionEvent) {
-    session.removeProjectile(this)
+    destroy = true
     
     if (obj.isInstanceOf[Tank] && session.isInstanceOf[Server]) {
       val tank = obj.asInstanceOf[Tank]

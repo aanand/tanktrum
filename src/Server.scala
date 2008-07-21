@@ -18,7 +18,7 @@ class Server(port: Int, userName: String, container: GameContainer) extends Sess
   val rand = new Random()
 
   var lastUpdate = new Date()
-  val UPDATE_PERIOD = 100
+  val UPDATE_PERIOD = 15
 
   override def enter() = {
     super.enter()
@@ -77,7 +77,7 @@ class Server(port: Int, userName: String, container: GameContainer) extends Sess
     for (addr <- players.keys) {
       if (players(addr).timedOut) {
         println(players(addr).getName + " timed out.")
-        players(addr).tank.die
+        players(addr).tank.kill
         players -= addr
       }
     }
@@ -112,7 +112,6 @@ class Server(port: Int, userName: String, container: GameContainer) extends Sess
     val tank = new Tank(this)
     val loc = rand.nextFloat * (container.getWidth - 200) + 100
     tank.create(loc, new Color(1.0f, 0.0f, 0.0f))
-    tank.reposition
     tanks += tank
     tank
   }
