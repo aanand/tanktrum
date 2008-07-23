@@ -113,13 +113,16 @@ class Ground(session : Session, width : Int, height : Int) extends Collider {
   }
 
   def heightAt(x: Double): Double = {
-    val h1 = points((x/granularity).toInt).y
+    val i = (x/granularity).toInt
     
-    if (x/granularity + 1 > points.length) {
-      return h1
+    if (i < 0) {
+      return heightAt(0)
+    } else if (i >= points.length) {
+      return heightAt(points.length-1)
     }
-
-    val h2 = points((x/granularity + 1).toInt).y
+    
+    val h1 = points(i).y
+    val h2 = points(i+1).y
 
     val r = x % granularity
     
