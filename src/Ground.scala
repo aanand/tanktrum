@@ -16,7 +16,7 @@ class Ground(session : Session, width : Int, height : Int) extends Collider {
   var physShape : phys2d.raw.shapes.Shape = _
   var body : phys2d.raw.Body = _
 
-  var doDeform: (Int, Int) = _
+  var doDeform: (Int, Int, Int) = _
 
   var initialised = false
 
@@ -53,22 +53,34 @@ class Ground(session : Session, width : Int, height : Int) extends Collider {
     initialised = true
   }
 
-  def deform(x: Int, radius: Int) {
-    doDeform = (x, radius)
+  def deform(x: Int, y : Int, radius: Int) {
+    doDeform = (x, y, radius)
   }
   
   def render(g: Graphics) {
     //TODO: This is messy and really in the wrong place...
     if (doDeform != null) {
-      val x = doDeform._1
-      val radius = doDeform._2
+      val (x, y, radius) = doDeform
+
       session.removeBody(body)
+
       val point = points(x/granularity)
       
       for (i <- -radius until radius) {
         if (x+i >= 0 && x+i < points.length) {
-          val dist = (radius - Math.pow(i, 2)/radius.toFloat).toFloat
-          points(x+i).y += dist
+          val groundHeight = heightAt(x+i)
+
+          val yOffset = Math.sqrt(Math.pow(radius,2) - Math.pow(i,2))
+          val yTop = y - yOffset
+          val yBottom = y + yOffset
+
+          if (yBottom > groundHeight) {
+            if (yTop < groundHeight) {
+              points(x+i).y += (yBottom - groundHeight).toFloat
+            } else {
+              points(x+i).y += (yBottom - yTop).toFloat
+            }
+          }
         }
       }
       initPoints()

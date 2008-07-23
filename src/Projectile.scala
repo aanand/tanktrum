@@ -25,7 +25,7 @@ class Projectile(session : Session, tank : Tank, val body : phys2d.raw.Body, rad
   override def collide(obj : Collider, event : phys2d.raw.CollisionEvent) {
     if (!obj.isInstanceOf[Projectile]) {
       destroy = true
-      session.ground.deform(body.getPosition.getX.toInt, 20)
+      session.ground.deform(x.toInt, y.toInt, 20)
     }
     
     if (obj.isInstanceOf[Tank] && session.isInstanceOf[Server]) {
