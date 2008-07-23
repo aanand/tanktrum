@@ -21,7 +21,7 @@ TARGETS = Dir['src/**.scala'].map{|f| f.sub(/^src/, 'classes').sub(/scala$/, 'cl
 
 TARGETS.each do |target|
   file target => Dir['src/**.scala'] do
-    sh "scalac -classpath #{CLASSPATH} src/**.scala -d classes"
+    sh "scalac -deprecation -classpath #{CLASSPATH} src/**.scala -d classes"
   end
 end
 

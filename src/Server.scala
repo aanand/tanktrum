@@ -97,7 +97,7 @@ class Server(port: Int, userName: String, container: GameContainer) extends Sess
 
       if (ground.initialised) {
         println("Sending ground to " + players(addr).getName)
-        sendGround(ground.serialise(), addr)
+        sendGround(addr)
         send(tankPositionData, addr)
       }
       true
@@ -146,8 +146,12 @@ class Server(port: Int, userName: String, container: GameContainer) extends Sess
   /** Send the ground array, preceded by something telling the client that this
     * is a ground array. (I guess scala does some kind of javadoc thing like this?)
     */
-  def sendGround(groundData: Array[byte], addr: SocketAddress) = {
-    send(byteToArray(Commands.GROUND) ++ groundData, addr)
+  def sendGround(addr: SocketAddress) = {
+    send(byteToArray(Commands.GROUND) ++ ground.serialise, addr)
+  }
+
+  def broadcastGround() = {
+    broadcast(byteToArray(Commands.GROUND) ++ ground.serialise)
   }
 
   def broadcastDamageUpdate(tank : Tank, damage : Int) {

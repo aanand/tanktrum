@@ -151,7 +151,5 @@ abstract class Session(container: slick.GameContainer) extends phys2d.raw.Collis
     bodies(b).collide(bodies(a), event)
   }
 
-  def getGround = ground
-
   def isActive = active
 }

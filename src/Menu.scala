@@ -38,7 +38,13 @@ class Menu(tree : List[(String, MenuItem)]) {
       currentItem.keyPressed(key, char, this)
     } else {
       key match {
-        case Input.KEY_UP   => { selection = (selection-1) % subTree.length }
+        case Input.KEY_UP   => { 
+          selection = (selection-1) % subTree.length
+          //Java modulo on a negative number returns a negative number, stupidly.
+          if (selection < 0) {
+            selection = subTree.length - 1
+          }
+        }
         case Input.KEY_DOWN => { selection = (selection+1) % subTree.length }
         case Input.KEY_RETURN => {
           currentItem.perform(this)

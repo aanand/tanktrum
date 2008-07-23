@@ -14,7 +14,7 @@ class Tank (session: Session) extends Collider {
   val HEIGHT = 20f
   val TAPER = 5f
 
-  val SPEED = 100f
+  val SPEED = 200f
   
   val GUN_ANGLE_SPEED = 20 // degrees/second
   val GUN_POWER_SPEED = 50 // pixels/second/second
@@ -48,6 +48,8 @@ class Tank (session: Session) extends Collider {
   val physShapePoints = shapePoints.map((point) => new phys2d.math.Vector2f(point.x, point.y))
   val physShape = new phys2d.raw.shapes.Polygon(physShapePoints.toArray)
   val body = new phys2d.raw.Body(physShape, 1.0f)
+  body.setFriction(0.8f)
+  //body.setMaxVelocity(20f, 20f)
 
   var color: Color = _
 
@@ -61,12 +63,17 @@ class Tank (session: Session) extends Collider {
 
   var health = 100
 
+  def grounded = {
+    val g = body.getTouching.contains(session.ground.body)
+    g
+  }
+
   def angle = body.getRotation.toDegrees
   def x = body.getPosition.getX.toDouble
   def y = body.getPosition.getY.toDouble
 
   def create(x: Float, color: Color) = {
-    val y = session.getGround.heightAt(x)
+    val y = session.ground.heightAt(x)
     this.color = color
     body.setPosition(x.toFloat, y.toFloat - 100f)
     session.addBody(this, body)
@@ -98,8 +105,12 @@ class Tank (session: Session) extends Collider {
     }
     
     if (thrust != 0) {
+      //body.setFriction(0f)
       body.addForce(new phys2d.math.Vector2f(SPEED*Math.cos(body.getRotation).toFloat*thrust, SPEED*Math.sin(body.getRotation).toFloat*thrust))
-      body.addForce(new phys2d.math.Vector2f(0, 5f))
+      //body.addForce(new phys2d.math.Vector2f(0, -95f))
+    }
+    else {
+      //body.setFriction(0.9f)
     }
     
     if (gunAngleChange != 0) {
@@ -197,4 +208,5 @@ class Tank (session: Session) extends Collider {
     
     color = new slick.Color(values(9).toFloat, values(10).toFloat, values(11).toFloat)
   }
+
 }

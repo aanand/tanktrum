@@ -12,10 +12,7 @@ class Projectile(session : Session, tank : Tank, val body : phys2d.raw.Body, rad
   def y = body.getPosition.getY
   
   def update(container : slick.GameContainer, delta : Int) {
-    if (destroy) {
-      session.removeProjectile(this)
-    }
-    if (x < 0 || x > container.getWidth || y > container.getHeight) {
+    if (x < 0 || x > container.getWidth || y > container.getHeight || destroy) {
       session.removeProjectile(this)
     }
   }
@@ -26,7 +23,10 @@ class Projectile(session : Session, tank : Tank, val body : phys2d.raw.Body, rad
   }
   
   override def collide(obj : Collider, event : phys2d.raw.CollisionEvent) {
-    destroy = true
+    if (!obj.isInstanceOf[Projectile]) {
+      destroy = true
+      session.ground.deform(body.getPosition.getX.toInt, 20)
+    }
     
     if (obj.isInstanceOf[Tank] && session.isInstanceOf[Server]) {
       val tank = obj.asInstanceOf[Tank]

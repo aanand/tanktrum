@@ -16,6 +16,8 @@ class Ground(session : Session, width : Int, height : Int) extends Collider {
   var physShape : phys2d.raw.shapes.Shape = _
   var body : phys2d.raw.Body = _
 
+  var doDeform: (Int, Int) = _
+
   var initialised = false
 
   def buildPoints() {
@@ -45,12 +47,37 @@ class Ground(session : Session, width : Int, height : Int) extends Collider {
     physShape = new phys2d.raw.shapes.Polygon(physShapePoints.toArray)
     
     body = new phys2d.raw.StaticBody(physShape)
+    body.setFriction(1f)
     session.addBody(this, body)
     
     initialised = true
   }
+
+  def deform(x: Int, radius: Int) {
+    doDeform = (x, radius)
+  }
   
   def render(g: Graphics) {
+    //TODO: This is messy and really in the wrong place...
+    if (doDeform != null) {
+      val x = doDeform._1
+      val radius = doDeform._2
+      session.removeBody(body)
+      val point = points(x/granularity)
+      
+      for (i <- -radius until radius) {
+        if (x+i >= 0 && x+i < points.length) {
+          val dist = (radius - Math.pow(i, 2)/radius.toFloat).toFloat
+          points(x+i).y += dist
+        }
+      }
+      initPoints()
+      doDeform = null
+      if (session.isInstanceOf[Server]) {
+        session.asInstanceOf[Server].broadcastGround()
+      }
+    }
+    
     g.setColor(color)
     g.fill(drawShape)
   }

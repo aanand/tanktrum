@@ -117,12 +117,23 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
     data.get(byteArray)
     
     val tankDataList = Operations.fromByteArray[List[Array[byte]]](byteArray)
-
-    tanks = tankDataList.map(tankData => {
-      val t = new Tank(this)
-      t.loadFrom(tankData)
-      t
-    })
+  
+    if (tanks.length == tankDataList.length) {
+      for (i <- 0 until tanks.length) {
+        tanks(i).loadFrom(tankDataList(i))
+      }
+    }
+    else {
+      for (tank <- tanks) {
+        removeBody(tank.body)
+      }
+      tanks = tankDataList.map(tankData => {
+        val t = new Tank(this)
+        t.create(0, null)
+        t.loadFrom(tankData)
+        t
+      })
+    }
   }
 
   def sendCommand(command: Byte) {
