@@ -16,10 +16,7 @@ class Server(port: Int, userName: String, container: GameContainer) extends Sess
   val players = new HashMap[SocketAddress, Player]
   val data = ByteBuffer.allocate(1000)
   val rand = new Random()
-
-  var lastUpdate = new Date()
-  val UPDATE_PERIOD = 15
-
+  
   override def enter() = {
     super.enter()
 

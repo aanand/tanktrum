@@ -5,7 +5,8 @@ import sbinary.Operations
 
 class Projectile(session : Session, tank : Tank, val body : phys2d.raw.Body, radius : Float) extends Collider {
   val COLOR = new slick.Color(1.0f, 1.0f, 1.0f)
-  
+  val EXPLOSION_RADIUS = 20f
+
   var destroy = false
 
   def x = body.getPosition.getX
@@ -23,9 +24,15 @@ class Projectile(session : Session, tank : Tank, val body : phys2d.raw.Body, rad
   }
   
   override def collide(obj : Collider, event : phys2d.raw.CollisionEvent) {
-    if (!obj.isInstanceOf[Projectile]) {
-      destroy = true
-      session.ground.deform(x.toInt, y.toInt, 20)
+    if (obj.isInstanceOf[Projectile]) {
+      return
+    }
+
+    destroy = true
+    session.addExplosion(x, y, EXPLOSION_RADIUS)
+
+    if (session.isInstanceOf[Server]) {
+      session.ground.deform(x.toInt, y.toInt, EXPLOSION_RADIUS.toInt)
     }
     
     if (obj.isInstanceOf[Tank] && session.isInstanceOf[Server]) {

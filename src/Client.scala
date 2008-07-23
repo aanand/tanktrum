@@ -102,6 +102,9 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
 
   def loadGround = {
     val groundArray = new Array[byte](data.remaining)
+    if (ground != null && null != ground.body) {
+      removeBody(ground.body)
+    }
     data.get(groundArray)
     ground.loadFrom(groundArray)
   }

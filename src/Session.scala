@@ -4,7 +4,7 @@ import scala.collection.mutable.HashMap
 import scala.collection.mutable.HashSet
 
 abstract class Session(container: slick.GameContainer) extends phys2d.raw.CollisionListener {
-  val BROADCAST_INTERVAL = 0.1
+  val BROADCAST_INTERVAL = 0.015
 
   var timeToUpdate = BROADCAST_INTERVAL
 
@@ -18,6 +18,7 @@ abstract class Session(container: slick.GameContainer) extends phys2d.raw.Collis
   var tanks = List[Tank]()
   val bodies = new HashMap[phys2d.raw.Body, Collider]
   val projectiles = new HashSet[Projectile]
+  val explosions = new HashSet[Explosion]
 
   def enter() {
     ground = new Ground(this, container.getWidth(), container.getHeight())
@@ -38,16 +39,23 @@ abstract class Session(container: slick.GameContainer) extends phys2d.raw.Collis
     for (p <- projectiles) {
       p.render(container, g)
     }
+    for (e <- explosions) {
+      e.render(g)
+    }
   }
   
   def update(delta: Int) {
     world.step(delta/1000f)
     
+    ground.update(delta)
     for (tank <- tanks) {
       tank.update(delta)
     }
     for (p <- projectiles) {
       p.update(container, delta)
+    }
+    for (e <- explosions) {
+      e.update(delta)
     }
     
     timeToUpdate = timeToUpdate - delta/1000.0
@@ -111,6 +119,14 @@ abstract class Session(container: slick.GameContainer) extends phys2d.raw.Collis
   def removeBody(body : phys2d.raw.Body) {
     world.remove(body)
     bodies -= body
+  }
+
+  def addExplosion(x: Float, y: Float, radius: Float) {
+    explosions += new Explosion(x, y, radius, this)
+  }
+
+  def removeExplosion(e: Explosion) {
+    explosions -= e
   }
   
   def addProjectile(tank : Tank, x : Double, y : Double, angle : Double, speed : Double) = {

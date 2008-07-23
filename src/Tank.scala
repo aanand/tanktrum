@@ -47,8 +47,7 @@ class Tank (session: Session) extends Collider {
 
   val physShapePoints = shapePoints.map((point) => new phys2d.math.Vector2f(point.x, point.y))
   val physShape = new phys2d.raw.shapes.Polygon(physShapePoints.toArray)
-  val body = new phys2d.raw.Body(physShape, 1.0f)
-  body.setFriction(0.8f)
+  var body: phys2d.raw.Body = _
   //body.setMaxVelocity(20f, 20f)
 
   var color: Color = _
@@ -75,8 +74,18 @@ class Tank (session: Session) extends Collider {
   def create(x: Float, color: Color) = {
     val y = session.ground.heightAt(x)
     this.color = color
+    
+    if (session.isInstanceOf[Server]) {
+      body = new phys2d.raw.Body(physShape, 1.0f)
+    }
+    else {
+      body = new phys2d.raw.StaticBody(physShape)
+    }
+    
+    body.setFriction(0.8f)
     body.setPosition(x.toFloat, y.toFloat - 100f)
     session.addBody(this, body)
+
   }
   
   def gunReady = {

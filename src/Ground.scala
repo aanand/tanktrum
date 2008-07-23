@@ -56,9 +56,8 @@ class Ground(session : Session, width : Int, height : Int) extends Collider {
   def deform(x: Int, y : Int, radius: Int) {
     doDeform = (x, y, radius)
   }
-  
-  def render(g: Graphics) {
-    //TODO: This is messy and really in the wrong place...
+
+  def update(delta: Int) {
     if (doDeform != null) {
       val (x, y, radius) = doDeform
 
@@ -89,7 +88,10 @@ class Ground(session : Session, width : Int, height : Int) extends Collider {
         session.asInstanceOf[Server].broadcastGround()
       }
     }
-    
+  }
+  
+  def render(g: Graphics) {
+   
     g.setColor(color)
     g.fill(drawShape)
   }
