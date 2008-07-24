@@ -62,9 +62,24 @@ class Tank (session: Session) extends Collider {
 
   var health = 100
 
-  def grounded = {
-    val g = body.getTouching.contains(session.ground.body)
-    g
+  def grounded : Boolean = {
+    val epsilon = 1
+    
+    val m = Math.atan(90-angle)
+    val c = y - m*x
+    
+    val xLeft  = (x - WIDTH/3 * Math.cos(Math.toRadians(angle))).toInt
+    val xRight = (x + WIDTH/3 * Math.cos(Math.toRadians(angle))).toInt
+    
+    for (gx <- xLeft until xRight) {
+      val gy = m*gx + c
+      
+      if (session.ground.heightAt(gx) < gy + epsilon) {
+        return true
+      }
+    }
+    
+    return false
   }
 
   def angle = body.getRotation.toDegrees
@@ -113,7 +128,7 @@ class Tank (session: Session) extends Collider {
       return
     }
     
-    if (thrust != 0) {
+    if (thrust != 0 && grounded) {
       //body.setFriction(0f)
       body.addForce(new phys2d.math.Vector2f(SPEED*Math.cos(body.getRotation).toFloat*thrust, SPEED*Math.sin(body.getRotation).toFloat*thrust))
       //body.addForce(new phys2d.math.Vector2f(0, -95f))
@@ -167,7 +182,12 @@ class Tank (session: Session) extends Collider {
     
     //g.fillRect(10 + (playerId-1)*110, 10, health, 10)
     
-    g.setColor(color)
+    if (grounded) {
+      g.setColor(color)
+    } else {
+      g.setColor(new Color(1f, 1f, 1f))
+    }
+    
     g.translate(body.getPosition.getX, body.getPosition.getY)
     g.rotate(0, 0, body.getRotation.toDegrees)
     
