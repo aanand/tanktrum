@@ -97,7 +97,8 @@ class Tank (session: Session) extends Collider {
       body = new phys2d.raw.StaticBody(physShape)
     }
     
-    body.setFriction(0.8f)
+    //body.setFriction(0.8f)
+    body.setDamping(0.01f)
     body.setPosition(x.toFloat, y.toFloat - 100f)
     session.addBody(this, body)
 
@@ -129,7 +130,6 @@ class Tank (session: Session) extends Collider {
     }
     
     if (thrust != 0 && grounded) {
-      //body.setFriction(0f)
       body.addForce(new phys2d.math.Vector2f(SPEED*Math.cos(body.getRotation).toFloat*thrust, SPEED*Math.sin(body.getRotation).toFloat*thrust))
       //body.addForce(new phys2d.math.Vector2f(0, -95f))
     }
