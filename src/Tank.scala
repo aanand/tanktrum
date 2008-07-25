@@ -16,7 +16,7 @@ class Tank (session: Session) extends Collider {
   val HEIGHT = 20f
   val TAPER = 5f
 
-  val SPEED = 400f
+  val SPEED = 800f
 
   val WHEEL_OFFSET_X = WIDTH/4
   val WHEEL_OFFSET_Y = HEIGHT/4
@@ -109,7 +109,9 @@ class Tank (session: Session) extends Collider {
     }
     
     //body.setFriction(0.8f)
-    body.setDamping(0.007f)
+    wheel1.setFriction(0.99f)
+    wheel2.setFriction(0.99f)
+    //body.setDamping(0.007f)
 
     session.addBody(this, body)
     session.addBody(this, wheel1)
@@ -152,8 +154,12 @@ class Tank (session: Session) extends Collider {
     }
     
     if (thrust != 0 && grounded) {
-      body.addForce(new phys2d.math.Vector2f(SPEED*Math.cos(body.getRotation).toFloat*thrust, SPEED*Math.sin(body.getRotation).toFloat*thrust))
+      //body.addForce(new phys2d.math.Vector2f(SPEED*Math.cos(body.getRotation).toFloat*thrust, SPEED*Math.sin(body.getRotation).toFloat*thrust))
+      wheel1.setTorque(SPEED*thrust)
+      wheel2.setTorque(SPEED*thrust)
       body.setIsResting(false)
+      wheel1.setIsResting(false)
+      wheel2.setIsResting(false)
       //body.addForce(new phys2d.math.Vector2f(0, -95f))
     }
     else {
