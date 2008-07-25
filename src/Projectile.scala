@@ -31,6 +31,14 @@ class Projectile(session : Session, tank : Tank, val body : phys2d.raw.Body, rad
     destroy = true
     session.addExplosion(x, y, EXPLOSION_RADIUS)
 
+    //TODO: This would possibly play a sound, but causes a link error
+    //currently.
+    /*
+    val file = "home/norgg/svn.norgg.org/deathtank/media/dtz-yeah.ogg"
+    val audio = new slick.openal.OpenALStreamPlayer(44000, file)
+    audio.play(true)
+    */
+
     if (session.isInstanceOf[Server]) {
       session.ground.deform(x.toInt, y.toInt, EXPLOSION_RADIUS.toInt)
     }

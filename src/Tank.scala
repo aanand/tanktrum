@@ -6,6 +6,8 @@ import net.phys2d.raw.shapes._
 import net.phys2d.math._
 import net.phys2d
 
+import java.util.ArrayList
+
 import sbinary.Instances._
 import sbinary.Operations
 
@@ -47,7 +49,11 @@ class Tank (session: Session) extends Collider {
 
   val physShapePoints = shapePoints.map((point) => new phys2d.math.Vector2f(point.x, point.y))
   val physShape = new phys2d.raw.shapes.Polygon(physShapePoints.toArray)
+
+  val wheelShape = new phys2d.raw.shapes.Circle(5)
   var body: phys2d.raw.Body = _
+  var wheel1: phys2d.raw.Body = _
+  var wheel2: phys2d.raw.Body = _
   //body.setMaxVelocity(20f, 20f)
 
   var color: Color = _
@@ -62,45 +68,45 @@ class Tank (session: Session) extends Collider {
 
   var health = 100
 
-  def grounded : Boolean = {
-    val epsilon = 1
-    
-    val m = Math.atan(90-angle)
-    val c = y - m*x
-    
-    val xLeft  = (x - WIDTH/3 * Math.cos(Math.toRadians(angle))).toInt
-    val xRight = (x + WIDTH/3 * Math.cos(Math.toRadians(angle))).toInt
-    
-    for (gx <- xLeft until xRight) {
-      val gy = m*gx + c
-      
-      if (session.ground.heightAt(gx) < gy + epsilon) {
-        return true
-      }
-    }
-    
-    return false
-  }
+  val contactGrace = 200
+  var contactTime = 0
+
+  def grounded : Boolean = contactTime > 0
 
   def angle = body.getRotation.toDegrees
-  def x = body.getPosition.getX.toDouble
-  def y = body.getPosition.getY.toDouble
+  def x = body.getPosition.getX
+  def y = body.getPosition.getY
 
   def create(x: Float, color: Color) = {
-    val y = session.ground.heightAt(x)
+    val y = session.ground.heightAt(x).toFloat
     this.color = color
     
     if (session.isInstanceOf[Server]) {
       body = new phys2d.raw.Body(physShape, 1.0f)
+      body.setPosition(x, y - 100f)
+
+      wheel1 = new phys2d.raw.Body(wheelShape, 1)
+      wheel2 = new phys2d.raw.Body(wheelShape, 1)
+
+      wheel1.setPosition(x-10, y+90)
+      wheel2.setPosition(x+10, y+90)
+
+      val joint1 = new phys2d.raw.BasicJoint(body, wheel1, new phys2d.math.Vector2f(x-10, y+90))
+      val joint2 = new phys2d.raw.BasicJoint(body, wheel2, new phys2d.math.Vector2f(x+10, y+90))
+      session.world.add(joint1)
+      session.world.add(joint2)
     }
     else {
       body = new phys2d.raw.StaticBody(physShape)
+      body.setPosition(x, y - 100f)
     }
     
     //body.setFriction(0.8f)
-    body.setDamping(0.01f)
-    body.setPosition(x.toFloat, y.toFloat - 100f)
+    body.setDamping(0.007f)
+
     session.addBody(this, body)
+    session.addBody(this, wheel1)
+    session.addBody(this, wheel2)
 
   }
   
@@ -129,8 +135,16 @@ class Tank (session: Session) extends Collider {
       return
     }
     
+    if (body.isTouchingStatic(new ArrayList[phys2d.raw.Body])) {
+      contactTime = contactGrace
+    }
+    else if (contactTime > 0) {
+      contactTime -= delta
+    }
+    
     if (thrust != 0 && grounded) {
       body.addForce(new phys2d.math.Vector2f(SPEED*Math.cos(body.getRotation).toFloat*thrust, SPEED*Math.sin(body.getRotation).toFloat*thrust))
+      body.setIsResting(false)
       //body.addForce(new phys2d.math.Vector2f(0, -95f))
     }
     else {
@@ -204,6 +218,12 @@ class Tank (session: Session) extends Collider {
     g.fill(arrowShape)
     
     g.resetTransform
+    g.translate(wheel1.getPosition.getX, wheel1.getPosition.getY)
+    g.fillOval(-10, -10, 10, 10)
+    
+    g.resetTransform
+    g.translate(wheel2.getPosition.getX, wheel2.getPosition.getY)
+    g.fillOval(-10, -10, 10, 10)
   }
   
   def serialise = {
