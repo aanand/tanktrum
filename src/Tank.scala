@@ -81,6 +81,14 @@ class Tank (session: Session) extends Collider {
   def x = body.getPosition.getX
   def y = body.getPosition.getY
 
+  def gunReady = gunTimer <= 0
+  
+  def gunX = x - GUN_OFFSET_X * Math.cos(angle.toRadians) - GUN_OFFSET_Y * Math.sin(angle.toRadians)
+  def gunY = y - GUN_OFFSET_X * Math.sin(angle.toRadians) + GUN_OFFSET_Y * Math.cos(angle.toRadians)
+  
+  def isAlive = health > 0
+  def isDead = !isAlive
+
   def create(x: Float, color: Color) = {
     val y = session.ground.heightAt(x).toFloat
     this.color = color
@@ -117,26 +125,6 @@ class Tank (session: Session) extends Collider {
     session.addBody(this, wheel1)
     session.addBody(this, wheel2)
 
-  }
-  
-  def gunReady = {
-    gunTimer <= 0
-  }
-  
-  def gunX = {
-    x - GUN_OFFSET_X * Math.cos(angle.toRadians) - GUN_OFFSET_Y * Math.sin(angle.toRadians)
-  }
-  
-  def gunY = {
-    y - GUN_OFFSET_X * Math.sin(angle.toRadians) + GUN_OFFSET_Y * Math.cos(angle.toRadians)
-  }
-  
-  def isAlive = {
-    health > 0
-  }
-
-  def isDead = {
-    !isAlive
   }
   
   def update(delta: Int): Unit = {
