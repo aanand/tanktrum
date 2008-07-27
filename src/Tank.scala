@@ -104,10 +104,10 @@ class Tank (session: Session) extends Collider {
   def speedDelta = targetSpeed - actualSpeed
 
   def create(x: Float, color: Color) = {
-    val y = session.ground.heightAt(x).toFloat
     this.color = color
     
     if (session.isInstanceOf[Server]) {
+      val y = session.ground.heightAt(x).toFloat
       body = new phys2d.raw.Body(physShape, BODY_MASS)
       body.setPosition(x, y - 100f)
 
@@ -131,8 +131,6 @@ class Tank (session: Session) extends Collider {
     }
     else {
       body = new phys2d.raw.StaticBody(physShape)
-      body.setPosition(x, y - 100f)
-      
       wheel1 = new phys2d.raw.StaticBody(wheelShape)
       wheel2 = new phys2d.raw.StaticBody(wheelShape)
 
