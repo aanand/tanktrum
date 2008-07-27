@@ -121,7 +121,7 @@ namespace :build do
     
     jars.each do |name|
       cp "lib/#{name}.jar", webstart_dir
-      raise "jarsigner failed" unless system "jarsigner -storepass #{passphrase} #{webstart_dir}/#{name}.jar mykey"
+      raise "jarsigner failed" unless system "jarsigner -keystore deathtank.ks -storepass '#{passphrase}' #{webstart_dir}/#{name}.jar mykey"
     end
   end
 end
