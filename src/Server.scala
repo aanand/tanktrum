@@ -12,6 +12,17 @@ import sbinary.Instances._
 
 class Server(port: Int) extends Session(null) {
   val BROADCAST_INTERVAL = 0.015
+  
+  val TANK_COLORS = List(
+    new Color(1f, 0f, 0f),
+    new Color(0f, 1f, 0f),
+    new Color(0f, 0f, 1f),
+    new Color(1f, 1f, 0f),
+    new Color(1f, 0f, 1f),
+    new Color(0f, 1f, 1f))
+  
+  var nextTankColorIndex = 0
+  
   var channel: DatagramChannel = _
   val players = new HashMap[SocketAddress, Player]
   val data = ByteBuffer.allocate(1000)
@@ -118,9 +129,14 @@ class Server(port: Int) extends Session(null) {
     println("Creating a tank.")
     val tank = new Tank(this)
     val loc = rand.nextFloat * (Main.WIDTH - 200) + 100
-    tank.create(loc, new Color(1.0f, 0.0f, 0.0f))
+    tank.create(loc, nextTankColor)
     tanks += tank
     tank
+  }
+  
+  def nextTankColor = {
+    nextTankColorIndex += 1
+    TANK_COLORS(nextTankColorIndex-1)
   }
 
   def processCommand(command: char, addr: SocketAddress) {
