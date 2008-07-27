@@ -54,8 +54,17 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
     for (f <- frags) {
       f.render(g)
     }
+    for (i <- 0 until tanks.length) {
+      renderHUD(g, i, tanks(i))
+    }
   }
  
+  def renderHUD(g : Graphics, index : Int, tank : Tank) {
+    g.translate(10 + index*110, 10)
+    g.setColor(tank.color)
+    g.fillRect(0, 0, tank.health, 10)
+    g.resetTransform
+  }
   
   def processCommand(command: Char) {
     command match {

@@ -245,10 +245,6 @@ class Tank (session: Session) extends Collider {
     
     g.fill(tankShape)
     
-    //This draws a health bar under the tank:
-    g.setColor(new Color(0f, 0f, 1f, 0.5f))
-    g.fillRect(-WIDTH/2, 15, (health/100f)*WIDTH, 10)
-
     g.translate(GUN_OFFSET_X, GUN_OFFSET_Y)
     g.rotate(0, 0, gunAngle)
     g.scale(1, gunPower/GUN_POWER_SCALE)
