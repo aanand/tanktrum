@@ -6,7 +6,9 @@ directory 'classes'
 directory 'tmp'
 directory 'lib'
 
-CLASSPATH = %w'scala-library slick phys2d lwjgl sbinary'.map{|lib| "lib/#{lib}.jar"}.join(":")
+JARFILES = %w(scala-library slick phys2d lwjgl sbinary)
+CLASSPATH = JARFILES.map{|lib| "lib/#{lib}.jar"}.join(":")
+
 case `uname`
 when /Darwin/i
   SUBDIR = 'macosx'
@@ -101,8 +103,25 @@ namespace :build do
 
     cp_r "lib", java_dir
 
-    raise "SetFile failed" unless system "/Developer/Tools/SetFile -a B #{app_dir}"
+    sh "/Developer/Tools/SetFile -a B #{app_dir}"
     
     chmod 0755, "#{executable_dir}/JavaApplicationStub"
+  end
+  
+  task :webstart => :jar do
+    require 'highline'
+
+    webstart_dir = "dist/webstart"
+    jars = JARFILES - %w(slick lwjgl) + %w(tank)
+    
+    passphrase = HighLine.new.ask("Enter jarsigner passphrase: ") { |q| q.echo = false }
+    
+    mkdir_p webstart_dir
+    cp_r "packaging/webstart/.", webstart_dir
+    
+    jars.each do |name|
+      cp "lib/#{name}.jar", webstart_dir
+      raise "jarsigner failed" unless system "jarsigner -storepass #{passphrase} #{webstart_dir}/#{name}.jar mykey"
+    end
   end
 end
