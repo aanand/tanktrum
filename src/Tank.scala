@@ -16,7 +16,7 @@ class Tank (session: Session) extends Collider {
   val HEIGHT = 20f
   val TAPER = 5f
 
-  val SPEED = 800f
+  val SPEED = 20f // pixels/second
 
   val WHEEL_OFFSET_X = ((WIDTH/2-TAPER/3) + (WIDTH/3))/2
   val WHEEL_OFFSET_Y = -HEIGHT/8
@@ -83,6 +83,7 @@ class Tank (session: Session) extends Collider {
   def angle = body.getRotation.toDegrees
   def x = body.getPosition.getX
   def y = body.getPosition.getY
+  def velocity = body.getVelocity
 
   def gunReady = gunTimer <= 0
   
@@ -91,6 +92,16 @@ class Tank (session: Session) extends Collider {
   
   def isAlive = health > 0
   def isDead = !isAlive
+
+  def direction = new phys2d.math.Vector2f(Math.cos(body.getRotation).toFloat,
+                                           Math.sin(body.getRotation).toFloat)
+
+  def targetSpeed = SPEED * thrust * (if (direction.getY * thrust < 0) direction.getX else (2-direction.getX))
+  def targetVelocity = new phys2d.math.Vector2f(direction.getX*targetSpeed, direction.getY*targetSpeed)
+
+  def actualSpeed = velocity.dot(direction)
+
+  def speedDelta = targetSpeed - actualSpeed
 
   def create(x: Float, color: Color) = {
     val y = session.ground.heightAt(x).toFloat
@@ -111,6 +122,7 @@ class Tank (session: Session) extends Collider {
 
       val joint1 = new phys2d.raw.BasicJoint(body, wheel1, new phys2d.math.Vector2f(x-WHEEL_OFFSET_X, y-100+WHEEL_OFFSET_Y))
       val joint2 = new phys2d.raw.BasicJoint(body, wheel2, new phys2d.math.Vector2f(x+WHEEL_OFFSET_X, y-100+WHEEL_OFFSET_Y))
+
       session.world.add(joint1)
       session.world.add(joint2)
 
@@ -150,17 +162,17 @@ class Tank (session: Session) extends Collider {
       contactTime -= delta
     }
     
-    if (thrust != 0 && grounded) {
-      //body.addForce(new phys2d.math.Vector2f(SPEED*Math.cos(body.getRotation).toFloat*thrust, SPEED*Math.sin(body.getRotation).toFloat*thrust))
-      wheel1.setTorque(SPEED*thrust)
-      wheel2.setTorque(SPEED*thrust)
+    if (grounded) {
+      val delta = new phys2d.math.Vector2f(Math.cos(body.getRotation).toFloat*speedDelta,
+                                           Math.sin(body.getRotation).toFloat*speedDelta)
+      
+      body.adjustVelocity(delta)
+
       body.setIsResting(false)
       wheel1.setIsResting(false)
       wheel2.setIsResting(false)
+
       //body.addForce(new phys2d.math.Vector2f(0, -95f))
-    }
-    else {
-      //body.setFriction(0.9f)
     }
     
     if (gunAngleChange != 0) {
@@ -212,11 +224,19 @@ class Tank (session: Session) extends Collider {
     
     //g.fillRect(10 + (playerId-1)*110, 10, health, 10)
     
-    if (grounded) {
-      g.setColor(color)
-    } else {
-      g.setColor(new Color(1f, 1f, 1f))
-    }
+    // if (grounded) {
+    //   g.setColor(color)
+    // } else {
+    //   g.setColor(new Color(1f, 1f, 1f))
+    // }
+    
+    g.setColor(color)
+    
+    // g.getFont.drawString(20, 0, wheel1.getAngularVelocity.toString)
+    
+    // g.getFont.drawString(20, 0, "targetSpeed = " + targetSpeed)
+    // g.getFont.drawString(20, 10, "actualSpeed = " + actualSpeed)
+    // g.getFont.drawString(20, 20, "speedDelta = " + speedDelta)
     
     g.translate(body.getPosition.getX, body.getPosition.getY)
     g.rotate(0, 0, body.getRotation.toDegrees)
