@@ -127,7 +127,10 @@ namespace :build do
 end
 
 namespace :upload do
+  task :libs do
+    sh "scp dist/webstart/phys2d.jar dist/webstart/sbinary.jar dist/webstart/scala-library.jar deathtank@norgg.org:/var/www/norgg.org/htdocs/deathtank"
+  end
   task :webstart do
-    sh "scp dist/webstart/* deathtank@norgg.org:/var/www/norgg.org/htdocs/deathtank"
+    sh "scp dist/webstart/tank.jar dist/webstart/tank.jnlp deathtank@norgg.org:/var/www/norgg.org/htdocs/deathtank"
   end
 end
