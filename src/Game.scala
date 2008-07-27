@@ -54,7 +54,7 @@ class Game(title: String) extends BasicGame(title) {
       server = null
     }
    
-    server = new Server(port, userName)
+    server = new Server(port)
     println("Starting server.")
     server.enter
 

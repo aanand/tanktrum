@@ -4,18 +4,20 @@ import java.nio.channels._
 import java.nio._
 import java.net._
 import java.util.Random
-import java.util.Date
 
 import scala.collection.mutable.HashMap
 
 import sbinary.Operations
 import sbinary.Instances._
 
-class Server(port: Int, userName: String) extends Session(null) {
+class Server(port: Int) extends Session(null) {
+  val BROADCAST_INTERVAL = 0.015
   var channel: DatagramChannel = _
   val players = new HashMap[SocketAddress, Player]
   val data = ByteBuffer.allocate(1000)
   val rand = new Random()
+  
+  var timeToUpdate = BROADCAST_INTERVAL
   
   override def enter() = {
     super.enter()
@@ -30,6 +32,13 @@ class Server(port: Int, userName: String) extends Session(null) {
   override def update(delta: Int) = {
     super.update(delta)
     checkTimeouts()
+
+    timeToUpdate = timeToUpdate - delta/1000.0
+
+    if (timeToUpdate < 0) {
+      broadcastUpdate()
+      timeToUpdate = BROADCAST_INTERVAL
+    }
 
     data.rewind()
     val addr = channel.receive(data)
@@ -56,6 +65,9 @@ class Server(port: Int, userName: String) extends Session(null) {
   
   def broadcastUpdate() {
     broadcast(tankPositionData)
+  }
+
+  def broadcastFrags() {
   }
   
   def tankPositionData = {

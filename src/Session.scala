@@ -4,11 +4,9 @@ import scala.collection.mutable.HashMap
 import scala.collection.mutable.HashSet
 
 abstract class Session(container: slick.GameContainer) extends phys2d.raw.CollisionListener {
-  val BROADCAST_INTERVAL = 0.015
   val WIDTH = 800
   val HEIGHT = 600
 
-  var timeToUpdate = BROADCAST_INTERVAL
 
   val world = new phys2d.raw.World(new phys2d.math.Vector2f(0.0f, 100.0f), 10)
   world.enableRestingBodyDetection(0.1f, 0.1f, 0.1f)
@@ -32,24 +30,6 @@ abstract class Session(container: slick.GameContainer) extends phys2d.raw.Collis
     active = false
   }
   
-  def render(g: slick.Graphics) {
-    if (ground.initialised) {
-      ground.render(g)
-    }
-    for (tank <- tanks) {
-      tank.render(g)
-    }
-    for (p <- projectiles) {
-      p.render(g)
-    }
-    for (e <- explosions) {
-      e.render(g)
-    }
-    for (f <- frags) {
-      f.render(g)
-    }
-  }
-  
   def update(delta: Int) {
     world.step(delta/1000f)
     
@@ -64,15 +44,7 @@ abstract class Session(container: slick.GameContainer) extends phys2d.raw.Collis
       e.update(delta)
     }
     
-    timeToUpdate = timeToUpdate - delta/1000.0
-
-    if (timeToUpdate < 0) {
-      broadcastUpdate()
-      timeToUpdate = BROADCAST_INTERVAL
-    }
   }
-  
-  def broadcastUpdate()
   
   def byteToArray(c: Byte) = {
     val a = new Array[byte](1)

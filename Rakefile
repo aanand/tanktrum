@@ -33,6 +33,10 @@ task :run => 'compile' do
   sh "java -classpath classes:#{CLASSPATH} -Djava.library.path=#{LIBPATH} Main"
 end
 
+task :run_server => 'compile' do
+  sh "java -classpath classes:#{CLASSPATH} -Djava.library.path=#{LIBPATH} ServerMain"
+end
+
 task :jar => ['lib', 'classes'] do
   sh "jar -cf lib/tank.jar -C classes ."
 end

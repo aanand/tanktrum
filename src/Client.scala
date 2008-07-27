@@ -38,8 +38,25 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
     }
   }
   
-  override def broadcastUpdate() {}
-
+  def render(g: Graphics) {
+    if (ground.initialised) {
+      ground.render(g)
+    }
+    for (tank <- tanks) {
+      tank.render(g)
+    }
+    for (p <- projectiles) {
+      p.render(g)
+    }
+    for (e <- explosions) {
+      e.render(g)
+    }
+    for (f <- frags) {
+      f.render(g)
+    }
+  }
+ 
+  
   def processCommand(command: Char) {
     command match {
       case Commands.GROUND => {loadGround}
