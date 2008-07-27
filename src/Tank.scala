@@ -231,13 +231,21 @@ class Tank (session: Session) extends Collider {
     g.fill(arrowShape)
     
     g.resetTransform
-    g.translate(wheel1.getPosition.getX, wheel1.getPosition.getY)
-    g.fillOval(-WHEEL_RADIUS, -WHEEL_RADIUS, WHEEL_RADIUS*2, WHEEL_RADIUS*2)
-    
-    g.resetTransform
-    g.translate(wheel2.getPosition.getX, wheel2.getPosition.getY)
-    g.fillOval(-WHEEL_RADIUS, -WHEEL_RADIUS, WHEEL_RADIUS*2, WHEEL_RADIUS*2)
 
+    g.translate(wheel1.getPosition.getX, wheel1.getPosition.getY)
+    g.setColor(new Color(0f, 0f, 1f, 0.5f))
+    g.fillOval(-WHEEL_RADIUS, -WHEEL_RADIUS, WHEEL_RADIUS*2, WHEEL_RADIUS*2)
+    g.rotate(0, 0, wheel1.getRotation)
+    g.setColor(new Color(1f, 0f, 0f))
+    g.drawLine(0, 0, WHEEL_RADIUS, 0)
+    g.resetTransform
+
+    g.translate(wheel2.getPosition.getX, wheel2.getPosition.getY)
+    g.setColor(new Color(0f, 0f, 1f, 0.5f))
+    g.fillOval(-WHEEL_RADIUS, -WHEEL_RADIUS, WHEEL_RADIUS*2, WHEEL_RADIUS*2)
+    g.rotate(0, 0, wheel2.getRotation)
+    g.setColor(new Color(1f, 0f, 0f))
+    g.drawLine(0, 0, WHEEL_RADIUS, 0)
     g.resetTransform
   }
   
