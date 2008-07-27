@@ -243,8 +243,8 @@ class Tank (session: Session) extends Collider {
   
   def serialise = {
     Operations.toByteArray(List[Short](
-      x.toShort, 
-      y.toShort, 
+      x.toShort,
+      y.toShort,
       angle.toShort, 
       gunAngle.toShort, 
       gunPower.toShort, 
@@ -259,18 +259,18 @@ class Tank (session: Session) extends Collider {
   }
   
   def loadFrom(data: Array[Byte]) = {
-    val values = Operations.fromByteArray[List[short]](data)
+    val values = Operations.fromByteArray[List[short]](data).elements
     
-    body.setPosition(values(0), values(1))
-    body.setRotation(values(2).toFloat.toRadians)
-    gunAngle = values(3)
-    gunPower = values(4)
-    health = values(5)
-    thrust = values(6)
-    gunAngleChange = values(7)
-    gunPowerChange = values(8)
+    body.setPosition(values.next, values.next)
+    body.setRotation(values.next.toFloat.toRadians)
+    gunAngle = values.next
+    gunPower = values.next
+    health = values.next
+    thrust = values.next
+    gunAngleChange = values.next
+    gunPowerChange = values.next
     
-    color = new slick.Color(values(9).toFloat, values(10).toFloat, values(11).toFloat)
+    color = new slick.Color(values.next.toFloat, values.next.toFloat, values.next.toFloat)
   }
 
 }
