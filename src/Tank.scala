@@ -18,10 +18,10 @@ class Tank (session: Session) extends Collider {
 
   val SPEED = 800f
 
-  val WHEEL_OFFSET_X = WIDTH/4
-  val WHEEL_OFFSET_Y = HEIGHT/4
-  val WHEEL_RADIUS = 8
-  
+  val WHEEL_OFFSET_X = ((WIDTH/2-TAPER/3) + (WIDTH/3))/2
+  val WHEEL_OFFSET_Y = -HEIGHT/8
+  val WHEEL_RADIUS = WIDTH/8
+
   val BODY_MASS = 1f
   val WHEEL_MASS = 1f
   
