@@ -11,7 +11,7 @@ import scala.collection.mutable.HashMap
 import sbinary.Operations
 import sbinary.Instances._
 
-class Server(port: Int, userName: String, container: GameContainer) extends Session(container) {
+class Server(port: Int, userName: String) extends Session(null) {
   var channel: DatagramChannel = _
   val players = new HashMap[SocketAddress, Player]
   val data = ByteBuffer.allocate(1000)
@@ -21,8 +21,6 @@ class Server(port: Int, userName: String, container: GameContainer) extends Sess
     super.enter()
 
     ground.buildPoints()
-    
-    me = new Player(createTank, userName, 0)
     
     channel = DatagramChannel.open()
     channel.socket.bind(new InetSocketAddress(port))
@@ -61,7 +59,7 @@ class Server(port: Int, userName: String, container: GameContainer) extends Sess
   }
   
   def tankPositionData = {
-    val tankDataList : List[Array[Byte]] = me.tank.serialise :: players.values.map(p => p.tank.serialise).toList
+    val tankDataList = players.values.map(p => p.tank.serialise).toList
 
     byteToArray(Commands.TANKS) ++ Operations.toByteArray(tankDataList)
   }
@@ -107,7 +105,7 @@ class Server(port: Int, userName: String, container: GameContainer) extends Sess
   def createTank = {
     println("Creating a tank.")
     val tank = new Tank(this)
-    val loc = rand.nextFloat * (container.getWidth - 200) + 100
+    val loc = rand.nextFloat * (Main.WIDTH - 200) + 100
     tank.create(loc, new Color(1.0f, 0.0f, 0.0f))
     tanks += tank
     tank

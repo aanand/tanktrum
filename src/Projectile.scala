@@ -12,13 +12,13 @@ class Projectile(session : Session, tank : Tank, val body : phys2d.raw.Body, rad
   def x = body.getPosition.getX
   def y = body.getPosition.getY
   
-  def update(container : slick.GameContainer, delta : Int) {
-    if (x < 0 || x > container.getWidth || y > container.getHeight || destroy) {
+  def update(delta : Int) {
+    if (x < 0 || x > Main.WIDTH || y > Main.HEIGHT || destroy) {
       session.removeProjectile(this)
     }
   }
   
-  def render(container : slick.GameContainer, g : slick.Graphics) {
+  def render(g : slick.Graphics) {
     g.setColor(COLOR)
     g.fillOval(x - radius, y - radius, radius*2, radius*2)
   }

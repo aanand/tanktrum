@@ -5,6 +5,8 @@ import scala.collection.mutable.HashSet
 
 abstract class Session(container: slick.GameContainer) extends phys2d.raw.CollisionListener {
   val BROADCAST_INTERVAL = 0.015
+  val WIDTH = 800
+  val HEIGHT = 600
 
   var timeToUpdate = BROADCAST_INTERVAL
 
@@ -13,16 +15,16 @@ abstract class Session(container: slick.GameContainer) extends phys2d.raw.Collis
   world.addListener(this)
 
   var ground: Ground = _
-  var me : Player = _
 
   var active = false
   var tanks = List[Tank]()
   val bodies = new HashMap[phys2d.raw.Body, Collider]
   val projectiles = new HashSet[Projectile]
   val explosions = new HashSet[Explosion]
+  val frags = new HashSet[Frag]
 
   def enter() {
-    ground = new Ground(this, container.getWidth(), container.getHeight())
+    ground = new Ground(this, WIDTH, HEIGHT)
     active = true
   }
   
@@ -38,10 +40,13 @@ abstract class Session(container: slick.GameContainer) extends phys2d.raw.Collis
       tank.render(g)
     }
     for (p <- projectiles) {
-      p.render(container, g)
+      p.render(g)
     }
     for (e <- explosions) {
       e.render(g)
+    }
+    for (f <- frags) {
+      f.render(g)
     }
   }
   
@@ -53,7 +58,7 @@ abstract class Session(container: slick.GameContainer) extends phys2d.raw.Collis
       tank.update(delta)
     }
     for (p <- projectiles) {
-      p.update(container, delta)
+      p.update(delta)
     }
     for (e <- explosions) {
       e.update(delta)
@@ -69,43 +74,6 @@ abstract class Session(container: slick.GameContainer) extends phys2d.raw.Collis
   
   def broadcastUpdate()
   
-  def keyPressed(key : Int, char : Char) {
-    if (me == null) return
-    
-    char match {
-      case 'a' => { me.tank.thrust = -1 }
-      case 'd' => { me.tank.thrust = 1 }
-      case _ => {
-        key match {
-          case slick.Input.KEY_LEFT  => { me.tank.gunAngleChange = -1 }
-          case slick.Input.KEY_RIGHT => { me.tank.gunAngleChange = 1 }
-          case slick.Input.KEY_UP    => { me.tank.gunPowerChange = 1 }
-          case slick.Input.KEY_DOWN  => { me.tank.gunPowerChange = -1 }
-          case slick.Input.KEY_SPACE => { me.tank.fire() }
-          case _ => {}
-        }
-      }
-    }
-  }
-  
-  def keyReleased(key : Int, char : Char) {
-    if (me == null) return
-    
-    char match {
-      case 'a' => { me.tank.thrust = 0 }
-      case 'd' => { me.tank.thrust = 0 }
-      case _ => {
-        key match {
-          case slick.Input.KEY_LEFT  => { me.tank.gunAngleChange = 0 }
-          case slick.Input.KEY_RIGHT => { me.tank.gunAngleChange = 0 }
-          case slick.Input.KEY_UP    => { me.tank.gunPowerChange = 0 }
-          case slick.Input.KEY_DOWN  => { me.tank.gunPowerChange = 0 }
-          case _ => {}
-        }
-      }
-    }
-  }
-
   def byteToArray(c: Byte) = {
     val a = new Array[byte](1)
     a(0) = c.toByte
@@ -128,6 +96,16 @@ abstract class Session(container: slick.GameContainer) extends phys2d.raw.Collis
 
   def removeExplosion(e: Explosion) {
     explosions -= e
+  }
+
+  def addFrag(f: Frag) {
+    addBody(f, f.body)
+    frags += f
+  }
+
+  def removeFrag(f: Frag) {
+    removeBody(f.body)
+    frags -= f
   }
   
   def addProjectile(tank : Tank, x : Double, y : Double, angle : Double, speed : Double) = {

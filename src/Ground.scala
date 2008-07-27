@@ -118,7 +118,7 @@ class Ground(session : Session, width : Int, height : Int) extends Collider {
     if (i < 0) {
       return heightAt(0)
     } else if (i >= points.length-1) {
-      return heightAt(points.length-1)
+      return heightAt(points.length-2)
     }
     
     val h1 = points(i).y

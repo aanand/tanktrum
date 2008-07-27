@@ -49,7 +49,7 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
     }
   }
   
-  override def keyPressed(key : Int, char : Char) {
+  def keyPressed(key : Int, char : Char) {
     char match {
       case 'a' => { sendCommand(Commands.MOVE_LEFT) }
       case 'd' => { sendCommand(Commands.MOVE_RIGHT) }
@@ -66,7 +66,7 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
     }
   }
   
-  override def keyReleased(key : Int, char : Char) {
+  def keyReleased(key : Int, char : Char) {
     char match {
       case 'a' => { sendCommand(Commands.STOP_MOVE_LEFT) }
       case 'd' => { sendCommand(Commands.STOP_MOVE_RIGHT) }

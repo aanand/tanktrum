@@ -215,6 +215,9 @@ class Tank (session: Session) extends Collider {
     
     if (null != wheel1) session.removeBody(wheel1)
     if (null != wheel2) session.removeBody(wheel2)
+
+    session.addFrag(new Frag(x - WHEEL_OFFSET_X, y + WHEEL_OFFSET_Y, WHEEL_RADIUS, color))
+    session.addFrag(new Frag(x + WHEEL_OFFSET_X, y + WHEEL_OFFSET_Y, WHEEL_RADIUS, color))
   }
   
   def render(g: Graphics): Unit = {
@@ -255,7 +258,9 @@ class Tank (session: Session) extends Collider {
     
     g.resetTransform
 
-    g.translate(wheel1.getPosition.getX, wheel1.getPosition.getY)
+    g.translate(x, y)
+    g.rotate(0, 0, body.getRotation.toDegrees)
+    g.translate(-WHEEL_OFFSET_X, WHEEL_OFFSET_Y)
     g.setColor(new Color(0f, 0f, 1f, 0.5f))
     g.fillOval(-WHEEL_RADIUS, -WHEEL_RADIUS, WHEEL_RADIUS*2, WHEEL_RADIUS*2)
     g.rotate(0, 0, wheel1.getRotation)
@@ -263,7 +268,9 @@ class Tank (session: Session) extends Collider {
     g.drawLine(0, 0, WHEEL_RADIUS, 0)
     g.resetTransform
 
-    g.translate(wheel2.getPosition.getX, wheel2.getPosition.getY)
+    g.translate(x, y)
+    g.rotate(0, 0, body.getRotation.toDegrees)
+    g.translate(WHEEL_OFFSET_X, WHEEL_OFFSET_Y)
     g.setColor(new Color(0f, 0f, 1f, 0.5f))
     g.fillOval(-WHEEL_RADIUS, -WHEEL_RADIUS, WHEEL_RADIUS*2, WHEEL_RADIUS*2)
     g.rotate(0, 0, wheel2.getRotation)
