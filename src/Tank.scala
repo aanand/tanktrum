@@ -110,10 +110,19 @@ class Tank (session: Session) extends Collider {
       val joint2 = new phys2d.raw.BasicJoint(body, wheel2, new phys2d.math.Vector2f(x+WHEEL_OFFSET_X, y-100+WHEEL_OFFSET_Y))
       session.world.add(joint1)
       session.world.add(joint2)
+
+      session.addBody(this, wheel1)
+      session.addBody(this, wheel2)
     }
     else {
       body = new phys2d.raw.StaticBody(physShape)
       body.setPosition(x, y - 100f)
+      
+      wheel1 = new phys2d.raw.StaticBody(wheelShape)
+      wheel2 = new phys2d.raw.StaticBody(wheelShape)
+
+      body.addExcludedBody(wheel1)
+      body.addExcludedBody(wheel2)
     }
     
     //body.setFriction(0.8f)
@@ -122,9 +131,6 @@ class Tank (session: Session) extends Collider {
     //body.setDamping(0.007f)
 
     session.addBody(this, body)
-    session.addBody(this, wheel1)
-    session.addBody(this, wheel2)
-
   }
   
   def update(delta: Int): Unit = {
@@ -184,12 +190,16 @@ class Tank (session: Session) extends Collider {
     health -= d
     
     if (isDead) {
-      session.removeBody(body)
+      kill
     }
   }
   
   def kill = {
     health = 0
+    session.removeBody(body)
+    
+    if (null != wheel1) session.removeBody(wheel1)
+    if (null != wheel2) session.removeBody(wheel2)
   }
   
   def render(g: Graphics): Unit = {
