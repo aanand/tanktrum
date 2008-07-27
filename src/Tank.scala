@@ -22,6 +22,9 @@ class Tank (session: Session) extends Collider {
   val WHEEL_OFFSET_Y = HEIGHT/4
   val WHEEL_RADIUS = 8
   
+  val BODY_MASS = 1f
+  val WHEEL_MASS = 1f
+  
   val GUN_ANGLE_SPEED = 20 // degrees/second
   val GUN_POWER_SPEED = 50 // pixels/second/second
 
@@ -94,11 +97,11 @@ class Tank (session: Session) extends Collider {
     this.color = color
     
     if (session.isInstanceOf[Server]) {
-      body = new phys2d.raw.Body(physShape, 1.0f)
+      body = new phys2d.raw.Body(physShape, BODY_MASS)
       body.setPosition(x, y - 100f)
 
-      wheel1 = new phys2d.raw.Body(wheelShape, 1)
-      wheel2 = new phys2d.raw.Body(wheelShape, 1)
+      wheel1 = new phys2d.raw.Body(wheelShape, WHEEL_MASS)
+      wheel2 = new phys2d.raw.Body(wheelShape, WHEEL_MASS)
 
       body.addExcludedBody(wheel1)
       body.addExcludedBody(wheel2)
