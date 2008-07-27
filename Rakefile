@@ -41,10 +41,6 @@ task :jar => ['lib', 'classes'] do
   sh "jar -cf lib/tank.jar -C classes ."
 end
 
-#task :run => :compile do
-#  sh "./run"
-#end
-
 namespace :install do
   desc "install dependencies"
   task :deps => [:scala, :slick, :phys2d, :lwjgl, :sbinary]
@@ -127,5 +123,11 @@ namespace :build do
       cp "lib/#{name}.jar", webstart_dir
       raise "jarsigner failed" unless system "jarsigner -storepass #{passphrase} #{webstart_dir}/#{name}.jar mykey"
     end
+  end
+end
+
+namespace :upload do
+  task :webstart do
+    sh "scp dist/webstart/* deathtank@norgg.org:/var/www/norgg.org/htdocs/deathtank"
   end
 end
