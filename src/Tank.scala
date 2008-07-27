@@ -216,8 +216,8 @@ class Tank (session: Session) extends Collider {
     if (null != wheel1) session.removeBody(wheel1)
     if (null != wheel2) session.removeBody(wheel2)
 
-    session.addFrag(new Frag(x - WHEEL_OFFSET_X, y + WHEEL_OFFSET_Y, WHEEL_RADIUS, color))
-    session.addFrag(new Frag(x + WHEEL_OFFSET_X, y + WHEEL_OFFSET_Y, WHEEL_RADIUS, color))
+    //session.addFrag(new Frag(x - WHEEL_OFFSET_X, y + WHEEL_OFFSET_Y, WHEEL_RADIUS, color))
+    //session.addFrag(new Frag(x + WHEEL_OFFSET_X, y + WHEEL_OFFSET_Y, WHEEL_RADIUS, color))
   }
   
   def render(g: Graphics): Unit = {
