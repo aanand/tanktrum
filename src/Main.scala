@@ -6,6 +6,7 @@ object Main {
     
     val container = new slick.AppGameContainer(game)
     container.setDisplayMode(800, 600, false)
+    container.setShowFPS(false)
     
     //it's useful if the server still sends updates when the player is alt-tabbed
     container.setUpdateOnlyWhenVisible(false)
