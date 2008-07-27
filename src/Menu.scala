@@ -122,7 +122,7 @@ case class MenuEditable(initValue : String) extends MenuItem {
       str = str + '_'
     }
     
-    container.getDefaultFont.drawString(50, 0, str)
+    container.getDefaultFont.drawString(100, 0, str)
   }
 }
 
