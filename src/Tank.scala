@@ -15,12 +15,13 @@ class Tank (session: Session) extends Collider {
   val WIDTH = 40f
   val HEIGHT = 20f
   val TAPER = 5f
+  val BEVEL = 4f
 
   val SPEED = 20f // pixels/second
 
-  val WHEEL_OFFSET_X = ((WIDTH/2-TAPER/3) + (WIDTH/3))/2
-  val WHEEL_OFFSET_Y = -HEIGHT/8
-  val WHEEL_RADIUS = WIDTH/8
+  val WHEEL_RADIUS = BEVEL * Math.sqrt(2f).toFloat / 2
+  val WHEEL_OFFSET_X = WIDTH/2-WHEEL_RADIUS
+  val WHEEL_OFFSET_Y = -WHEEL_RADIUS
 
   val BODY_MASS = 1f
   val WHEEL_MASS = 1f
@@ -44,10 +45,10 @@ class Tank (session: Session) extends Collider {
   val shapePoints = List[slick.geom.Vector2f] (
                       new slick.geom.Vector2f(-(WIDTH/2-TAPER), -HEIGHT),
                       new slick.geom.Vector2f(WIDTH/2-TAPER, -HEIGHT),
-                      new slick.geom.Vector2f(WIDTH/2-TAPER/3, -HEIGHT/4),
-                      new slick.geom.Vector2f(WIDTH/3, 0),
-                      new slick.geom.Vector2f(-WIDTH/3, 0),
-                      new slick.geom.Vector2f(-(WIDTH/2-TAPER/3), -HEIGHT/4)
+                      new slick.geom.Vector2f(WIDTH/2, -BEVEL),
+                      new slick.geom.Vector2f(WIDTH/2-BEVEL, 0),
+                      new slick.geom.Vector2f(-(WIDTH/2-BEVEL), 0),
+                      new slick.geom.Vector2f(-WIDTH/2, -BEVEL)
                     ).toArray
 
   val drawShapePoints = shapePoints.foldLeft[List[Float]](List())((list, v) => list ++ List(v.getX(), v.getY())).toArray
