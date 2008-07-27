@@ -279,35 +279,37 @@ class Tank (session: Session) extends Collider {
   }
   
   def serialise = {
-    Operations.toByteArray(List[Short](
-      x.toShort,
-      y.toShort,
-      angle.toShort, 
-      gunAngle.toShort, 
-      gunPower.toShort, 
-      health.toShort, 
-      thrust.toShort, 
-      gunAngleChange.toShort, 
-      gunPowerChange.toShort,
-      color.r.toShort,
-      color.g.toShort,
-      color.b.toShort
+    Operations.toByteArray(List[Float](
+      x.toFloat,
+      y.toFloat,
+      angle.toFloat, 
+      gunAngle.toFloat, 
+      gunPower.toFloat,
+      gunTimer.toFloat, 
+      health.toFloat, 
+      thrust.toFloat, 
+      gunAngleChange.toFloat, 
+      gunPowerChange.toFloat,
+      color.r.toFloat,
+      color.g.toFloat,
+      color.b.toFloat
     ))
   }
   
   def loadFrom(data: Array[Byte]) = {
-    val values = Operations.fromByteArray[List[short]](data).elements
+    val values = Operations.fromByteArray[List[Float]](data).elements
     
     body.setPosition(values.next, values.next)
-    body.setRotation(values.next.toFloat.toRadians)
+    body.setRotation(values.next.toRadians)
     gunAngle = values.next
     gunPower = values.next
-    health = values.next
-    thrust = values.next
-    gunAngleChange = values.next
-    gunPowerChange = values.next
+    gunTimer = values.next
+    health = values.next.toInt
+    thrust = values.next.toInt
+    gunAngleChange = values.next.toInt
+    gunPowerChange = values.next.toInt
     
-    color = new slick.Color(values.next.toFloat, values.next.toFloat, values.next.toFloat)
+    color = new slick.Color(values.next, values.next, values.next)
   }
 
 }
