@@ -240,8 +240,8 @@ class Tank (session: Session) extends Collider {
     // g.getFont.drawString(20, 10, "actualSpeed = " + actualSpeed)
     // g.getFont.drawString(20, 20, "speedDelta = " + speedDelta)
     
-    g.translate(body.getPosition.getX, body.getPosition.getY)
-    g.rotate(0, 0, body.getRotation.toDegrees)
+    g.translate(x, y)
+    g.rotate(0, 0, angle)
     
     g.fill(tankShape)
     
