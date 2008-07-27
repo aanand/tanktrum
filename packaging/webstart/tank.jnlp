@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <jnlp spec="1.0+"
-      codebase="http://192.168.0.55/~aanand/deathtank"
+      codebase="http://norgg.org/deathtank"
       href="tank.jnlp">
 
   <information>
     <title>Tank</title>
-    <vendor>Aanand Prasad</vendor>
+    <vendor>Deathtank</vendor>
   </information> 
 
   <resources>
