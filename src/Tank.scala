@@ -7,6 +7,7 @@ import net.phys2d.math._
 import net.phys2d
 
 import java.util.ArrayList
+import scala.collection.mutable.HashMap
 
 import sbinary.Instances._
 import sbinary.Operations
@@ -50,6 +51,12 @@ class Tank (session: Session) extends Collider {
                       new slick.geom.Vector2f(-(WIDTH/2-BEVEL), 0),
                       new slick.geom.Vector2f(-WIDTH/2, -BEVEL)
                     ).toArray
+
+  val ammo = new HashMap[ProjectileTypes.Value, Int]()
+  ammo(ProjectileTypes.PROJECTILE) = 999
+  ammo(ProjectileTypes.NUKE) = 2
+
+  var selectedWeapon = ProjectileTypes.PROJECTILE
 
   val drawShapePoints = shapePoints.foldLeft[List[Float]](List())((list, v) => list ++ List(v.getX(), v.getY())).toArray
   val tankShape = new slick.geom.Polygon(drawShapePoints)
@@ -148,6 +155,22 @@ class Tank (session: Session) extends Collider {
 
     session.addBody(this, body)
   }
+
+  def cycleWeapon() {
+    var id = (selectedWeapon.id + 1) % ProjectileTypes.maxId
+    
+    if (!ammo.values.exists((ammoType) => {ammoType > 0})) {
+      println("No ammo left.")
+      return
+    }
+
+    while(ammo(ProjectileTypes.apply(id)) <= 0) {
+      id = (id + 1) % ProjectileTypes.maxId
+    }
+
+    selectedWeapon = ProjectileTypes.apply(id)
+    println(selectedWeapon)
+  }
   
   def update(delta: Int): Unit = {
     if (isDead) {
@@ -195,9 +218,14 @@ class Tank (session: Session) extends Collider {
   def fire() {
     if (isDead) return
     
-    if (gunReady) {
-      session.addProjectile(this, gunX, gunY, angle+gunAngle, gunPower)
+    if (gunReady && ammo(selectedWeapon) > 0) {
+      ammo(selectedWeapon) = ammo(selectedWeapon) - 1
+      session.addProjectile(this, gunX, gunY, angle+gunAngle, gunPower, selectedWeapon)
       gunTimer = GUN_RELOAD_TIME
+    }
+    
+    if (ammo(selectedWeapon) == 0) {
+      cycleWeapon
     }
   }
   
@@ -279,6 +307,7 @@ class Tank (session: Session) extends Collider {
       thrust.toByte, 
       gunAngleChange.toByte, 
       gunPowerChange.toByte,
+      selectedWeapon.id.toByte,
       (color.r*127).toByte,
       (color.g*127).toByte,
       (color.b*127).toByte
@@ -286,11 +315,11 @@ class Tank (session: Session) extends Collider {
   }
   
   def loadFrom(data: Array[Byte]) = {
-    val values = Operations.fromByteArray[(Float, Float, Short, Short, Short, Short, Short, Byte, Byte, Byte, Byte, Byte, Byte)](data)
+    val values = Operations.fromByteArray[(Float, Float, Short, Short, Short, Short, Short, Byte, Byte, Byte, Byte, Byte, Byte, Byte)](data)
     
     val (newX, newY, newAngle, 
         newGunAngle, newGunPower, newGunTimer, 
-        newHealth, newThrust, newGunAngleChange, newGunPowerChange, 
+        newHealth, newThrust, newGunAngleChange, newGunPowerChange, newSelectedWeapon,
         newRed, newGreen, newBlue) = values
 
     body.setPosition(newX, newY)
@@ -302,6 +331,7 @@ class Tank (session: Session) extends Collider {
     thrust = newThrust
     gunAngleChange = newGunAngleChange
     gunPowerChange = newGunPowerChange
+    selectedWeapon = ProjectileTypes.apply(newSelectedWeapon)
     
     color = new slick.Color(newRed/127f, newGreen/127f, newBlue/127f)
   }

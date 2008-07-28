@@ -89,6 +89,18 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
     g.translate(10 + index*110, 10)
     g.setColor(tank.color)
     g.fillRect(0, 0, tank.health, 10)
+    
+    g.translate(10, 30)
+    
+    tank.selectedWeapon match {
+      case ProjectileTypes.PROJECTILE => {
+        g.fillOval(-3, -3, 6, 6)
+      }
+      case ProjectileTypes.NUKE => {
+        g.fillOval(-6, -6, 12, 12)
+      }
+    }
+
     g.resetTransform
   }
   
@@ -112,6 +124,7 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
           case Input.KEY_UP    => { sendCommand(Commands.POWER_UP) }
           case Input.KEY_DOWN  => { sendCommand(Commands.POWER_DOWN) }
           case Input.KEY_SPACE => { sendCommand(Commands.FIRE) }
+          case Input.KEY_TAB   => { sendCommand(Commands.CYCLE_WEAPON) }
           case _ => {}
         }
       }
@@ -164,7 +177,7 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
   def loadProjectile = {
     val projArray = new Array[byte](data.remaining)
     data.get(projArray)
-    addProjectile(tanks(0), 0, 0, 0, 0).loadFrom(projArray)
+    addProjectile(ProjectileLoader.loadProjectile(projArray, this))
   }
   
   def processUpdate = {

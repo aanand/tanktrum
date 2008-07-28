@@ -3,12 +3,19 @@ import net.phys2d
 import sbinary.Instances._
 import sbinary.Operations
 
-class Projectile(session : Session, tank : Tank, val body : phys2d.raw.Body, radius : Float) extends Collider {
+class Projectile(session : Session, tank : Tank) extends Collider {
   val COLOR = new slick.Color(1.0f, 1.0f, 1.0f)
   val EXPLOSION_RADIUS = 20f
+  val radius = 3f
+  val damage = 20
+  val shape = new phys2d.raw.shapes.Circle(radius)
+  val body = new phys2d.raw.Body(shape, 1.0f)
+  val projectileType = ProjectileTypes.PROJECTILE
 
   var destroy = false
 
+  session.addBody(this, body)
+  
   def x = body.getPosition.getX
   def y = body.getPosition.getY
   
@@ -47,17 +54,18 @@ class Projectile(session : Session, tank : Tank, val body : phys2d.raw.Body, rad
       val tank = obj.asInstanceOf[Tank]
       val server = session.asInstanceOf[Server]
       
-      tank.damage(20)
-      server.broadcastDamageUpdate(tank, 20)
+      tank.damage(damage)
+      server.broadcastDamageUpdate(tank, damage)
     }
   }
 
   def serialise = {
-    Operations.toByteArray(List[Float](
+    Operations.toByteArray((
       x,
       y,
       body.getVelocity.getX,
-      body.getVelocity.getY
+      body.getVelocity.getY,
+      projectileType.id.toByte
     ))
   }
 
@@ -66,4 +74,23 @@ class Projectile(session : Session, tank : Tank, val body : phys2d.raw.Body, rad
     body.setPosition(values(0), values(1))
     body.adjustVelocity(new phys2d.math.Vector2f(values(2), values(3)))
   }
+}
+
+object ProjectileLoader {
+  def loadProjectile(data: Array[byte], session: Session) = {
+    val (x, y, xVel, yVel, projectileType) = Operations.fromByteArray[(Float, Float, Float, Float, Byte)](data)
+    var p: Projectile = null
+    ProjectileTypes.apply(projectileType) match {
+      //TODO: Use a tank id to track which tank this projectile came from.
+      case ProjectileTypes.PROJECTILE => { p = new Projectile(session, null) }
+      case ProjectileTypes.NUKE => { p = new Nuke(session, null) }
+    }
+    p.body.setPosition(x, y)
+    p.body.adjustVelocity(new phys2d.math.Vector2f(xVel, yVel))
+    p
+  }
+}
+
+object ProjectileTypes extends Enumeration {
+  val PROJECTILE, NUKE = Value
 }

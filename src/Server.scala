@@ -68,8 +68,8 @@ class Server(port: Int) extends Session(null) {
     }
   }
 
-  override def addProjectile(tank : Tank, x : Double, y : Double, angle : Double, speed : Double) = {
-    val p = super.addProjectile(tank, x, y, angle, speed)
+  override def addProjectile(tank : Tank, x : Double, y : Double, angle : Double, speed : Double, projectileType: ProjectileTypes.Value) = {
+    val p = super.addProjectile(tank, x, y, angle, speed, projectileType)
     broadcast(projectileData(p))
     p
   }
@@ -164,6 +164,7 @@ class Server(port: Int) extends Session(null) {
       case Commands.STOP_POWER_DOWN => { player.tank.gunPowerChange = 0 }
 
       case Commands.FIRE => { player.tank.fire() }
+      case Commands.CYCLE_WEAPON => { player.tank.cycleWeapon() }
     }
   }
 

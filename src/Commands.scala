@@ -27,5 +27,5 @@ object Commands {
   val STOP_POWER_DOWN = nextI
 
   val FIRE = nextI
-  
+  val CYCLE_WEAPON = nextI
 }

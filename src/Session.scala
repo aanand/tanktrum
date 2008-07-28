@@ -80,26 +80,26 @@ abstract class Session(container: slick.GameContainer) extends phys2d.raw.Collis
     frags -= f
   }
   
-  def addProjectile(tank : Tank, x : Double, y : Double, angle : Double, speed : Double) = {
+  def addProjectile(tank : Tank, x : Double, y : Double, angle : Double, speed : Double, projectileType : ProjectileTypes.Value) = {
     val radians = Math.toRadians(angle-90)
     val velocity = new phys2d.math.Vector2f((speed * Math.cos(radians)).toFloat, (speed * Math.sin(radians)).toFloat)
-    
-    val radius = 3f
-    
-    val shape = new phys2d.raw.shapes.Circle(radius)
+    var p: Projectile = null
 
-    val body = new phys2d.raw.Body(shape, 1.0f)
-    body.setPosition(x.toFloat, y.toFloat)
-    body.adjustVelocity(velocity)
-    
-    val p = new Projectile(this, tank, body, radius)
+    projectileType match {
+      case ProjectileTypes.NUKE => { p = new Nuke(this, tank) }
+      case ProjectileTypes.PROJECTILE => { p = new Projectile(this, tank) }
+    }
 
-    addBody(p, body)
-    
+    p.body.setPosition(x.toFloat, y.toFloat)
+    p.body.adjustVelocity(velocity)
     projectiles += p
     
     println("added projectile at " + p.x + ", " + p.y + ", " + angle + ", " + speed)
     p
+  }
+
+  def addProjectile(projectile: Projectile) {
+    projectiles += projectile
   }
   
   def removeProjectile(p : Projectile) {
