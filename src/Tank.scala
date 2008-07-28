@@ -19,9 +19,9 @@ class Tank (session: Session) extends Collider {
 
   val SPEED = 20f // pixels/second
 
-  val WHEEL_RADIUS = BEVEL * Math.sqrt(2f).toFloat / 2
-  val WHEEL_OFFSET_X = WIDTH/2-WHEEL_RADIUS
-  val WHEEL_OFFSET_Y = -WHEEL_RADIUS
+  val WHEEL_RADIUS = BEVEL
+  val WHEEL_OFFSET_X = WIDTH/2-BEVEL
+  val WHEEL_OFFSET_Y = -BEVEL
 
   val BODY_MASS = 1f
   val WHEEL_MASS = 1f
@@ -80,6 +80,8 @@ class Tank (session: Session) extends Collider {
   var contactTime = 0
 
   def grounded : Boolean = contactTime > 0; true
+
+  def wheelColor = color // new Color(0f, 0f, 1f)
 
   def angle = body.getRotation.toDegrees
   def x = body.getPosition.getX
@@ -236,20 +238,31 @@ class Tank (session: Session) extends Collider {
     //Tank body
     g.fill(tankShape)
     
-    //Wheel 1
-    g.translate(-WHEEL_OFFSET_X, WHEEL_OFFSET_Y)
-    g.fillOval(-WHEEL_RADIUS, -WHEEL_RADIUS, WHEEL_RADIUS*2, WHEEL_RADIUS*2)
-    
-    //Wheel 2
-    g.translate(2*WHEEL_OFFSET_X, 0)
-    g.fillOval(-WHEEL_RADIUS, -WHEEL_RADIUS, WHEEL_RADIUS*2, WHEEL_RADIUS*2)
-    
     //Tank gun arrow
-    g.translate(GUN_OFFSET_X-WHEEL_OFFSET_X, GUN_OFFSET_Y-WHEEL_OFFSET_Y)
+    g.translate(GUN_OFFSET_X, GUN_OFFSET_Y)
     g.rotate(0, 0, gunAngle)
     g.scale(1, gunPower/GUN_POWER_SCALE)
     g.setColor(if (gunReady) GUN_READY_COLOR else GUN_LOADING_COLOR)
     g.fill(arrowShape)
+    
+    g.resetTransform
+
+    drawWheel(g, -WHEEL_OFFSET_X, wheel1.getRotation)
+    drawWheel(g, WHEEL_OFFSET_X, wheel2.getRotation)
+  }
+
+  def drawWheel(g : Graphics, offsetX : Float, rotation : Float) {
+    g.translate(x, y)
+    g.rotate(0, 0, body.getRotation.toDegrees)
+    g.translate(offsetX, WHEEL_OFFSET_Y)
+    
+    g.setColor(wheelColor)
+    g.fillOval(-WHEEL_RADIUS, -WHEEL_RADIUS, WHEEL_RADIUS*2, WHEEL_RADIUS*2)
+    
+    // g.rotate(0, 0, rotation)
+    // 
+    // g.setColor(new Color(1f, 0f, 0f))
+    // g.drawLine(0, 0, WHEEL_RADIUS, 0)
     
     g.resetTransform
   }
