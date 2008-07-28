@@ -11,7 +11,7 @@ import sbinary.Operations
 import sbinary.Instances._
 
 class Server(port: Int) extends Session(null) {
-  val BROADCAST_INTERVAL = 0.015
+  val BROADCAST_INTERVAL = 25 //milliseconds
   
   val TANK_COLORS = List(
     new Color(1f, 0f, 0f),
@@ -44,7 +44,7 @@ class Server(port: Int) extends Session(null) {
     super.update(delta)
     checkTimeouts()
 
-    timeToUpdate = timeToUpdate - delta/1000.0
+    timeToUpdate = timeToUpdate - delta
 
     if (timeToUpdate < 0) {
       broadcastUpdate()
@@ -136,6 +136,7 @@ class Server(port: Int) extends Session(null) {
   
   def nextTankColor = {
     nextTankColorIndex += 1
+    nextTankColorIndex = nextTankColorIndex % TANK_COLORS.length
     TANK_COLORS(nextTankColorIndex-1)
   }
 

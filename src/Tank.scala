@@ -173,7 +173,6 @@ class Tank (session: Session) extends Collider {
       wheel1.setIsResting(false)
       wheel2.setIsResting(false)
 
-      //body.addForce(new phys2d.math.Vector2f(0, -95f))
     }
     
     if (gunAngleChange != 0) {
@@ -226,18 +225,9 @@ class Tank (session: Session) extends Collider {
       return
     }
     
-    //g.fillRect(10 + (playerId-1)*110, 10, health, 10)
-    
-    // if (grounded) {
-    //   g.setColor(color)
-    // } else {
-    //   g.setColor(new Color(1f, 1f, 1f))
-    // }
-    
     g.setColor(color)
     
     // g.getFont.drawString(20, 0, wheel1.getAngularVelocity.toString)
-    
     // g.getFont.drawString(20, 0, "targetSpeed = " + targetSpeed)
     // g.getFont.drawString(20, 10, "actualSpeed = " + actualSpeed)
     // g.getFont.drawString(20, 20, "speedDelta = " + speedDelta)
@@ -245,8 +235,10 @@ class Tank (session: Session) extends Collider {
     g.translate(x, y)
     g.rotate(0, 0, angle)
     
+    //Tank body
     g.fill(tankShape)
     
+    //Tank gun arrow
     g.translate(GUN_OFFSET_X, GUN_OFFSET_Y)
     g.rotate(0, 0, gunAngle)
     g.scale(1, gunPower/GUN_POWER_SCALE)
@@ -276,37 +268,42 @@ class Tank (session: Session) extends Collider {
   }
   
   def serialise = {
-    Operations.toByteArray(List[Float](
+    Operations.toByteArray((
       x.toFloat,
       y.toFloat,
-      angle.toFloat, 
-      gunAngle.toFloat, 
-      gunPower.toFloat,
-      gunTimer.toFloat, 
-      health.toFloat, 
-      thrust.toFloat, 
-      gunAngleChange.toFloat, 
-      gunPowerChange.toFloat,
-      color.r.toFloat,
-      color.g.toFloat,
-      color.b.toFloat
+      angle.toShort, 
+      gunAngle.toShort, 
+      gunPower.toShort,
+      gunTimer.toShort, 
+      health.toShort, 
+      thrust.toByte, 
+      gunAngleChange.toByte, 
+      gunPowerChange.toByte,
+      (color.r*127).toByte,
+      (color.g*127).toByte,
+      (color.b*127).toByte
     ))
   }
   
   def loadFrom(data: Array[Byte]) = {
-    val values = Operations.fromByteArray[List[Float]](data).elements
+    val values = Operations.fromByteArray[(Float, Float, Short, Short, Short, Short, Short, Byte, Byte, Byte, Byte, Byte, Byte)](data)
     
-    body.setPosition(values.next, values.next)
-    body.setRotation(values.next.toRadians)
-    gunAngle = values.next
-    gunPower = values.next
-    gunTimer = values.next
-    health = values.next.toInt
-    thrust = values.next.toInt
-    gunAngleChange = values.next.toInt
-    gunPowerChange = values.next.toInt
+    val (newX, newY, newAngle, 
+        newGunAngle, newGunPower, newGunTimer, 
+        newHealth, newThrust, newGunAngleChange, newGunPowerChange, 
+        newRed, newGreen, newBlue) = values
+
+    body.setPosition(newX, newY)
+    body.setRotation(newAngle.toFloat.toRadians)
+    gunAngle = newGunAngle
+    gunPower = newGunPower
+    gunTimer = newGunTimer
+    health = newHealth
+    thrust = newThrust
+    gunAngleChange = newGunAngleChange
+    gunPowerChange = newGunPowerChange
     
-    color = new slick.Color(values.next, values.next, values.next)
+    color = new slick.Color(newRed/127f, newGreen/127f, newBlue/127f)
   }
 
 }
