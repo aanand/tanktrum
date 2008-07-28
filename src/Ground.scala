@@ -1,3 +1,4 @@
+import org.newdawn.slick
 import org.newdawn.slick._
 import org.newdawn.slick.geom._
 
@@ -9,7 +10,10 @@ import sbinary.Operations
 class Ground(session : Session, width : Int, height : Int) extends Collider {
   val granularity = 1
 
-  val color = new Color(0.6f, 0.5f, 0.0f)
+  val topsoilColor = new Color(0.5f, 0.5f, 0f)
+  val color = new Color(0.8f, 0.8f, 0f)
+  
+  val topsoilDepth = 20f
   
   var points : Seq[Vector2f] = _
   var drawShape : Shape = _
@@ -91,9 +95,26 @@ class Ground(session : Session, width : Int, height : Int) extends Collider {
   }
   
   def render(g: Graphics) {
-   
+    import org.lwjgl.opengl.GL11
+    import slick.opengl.SlickCallable
+    
     g.setColor(color)
     g.fill(drawShape)
+    
+    SlickCallable.enterSafeBlock()
+    GL11.glPushMatrix()
+    GL11.glBegin(GL11.GL_QUAD_STRIP)
+    
+    for (p <- points) {
+      GL11.glColor4f(topsoilColor.r, topsoilColor.g, topsoilColor.b, 1f)
+      GL11.glVertex2f(p.x, p.y)
+      GL11.glColor4f(color.r, color.g, color.b, 1f)
+      GL11.glVertex2f(p.x, p.y + topsoilDepth)
+    }
+
+    GL11.glEnd()
+    GL11.glPopMatrix()
+    SlickCallable.leaveSafeBlock()
   }
   
   def serialise() = {

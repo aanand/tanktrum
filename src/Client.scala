@@ -1,3 +1,4 @@
+import org.newdawn.slick
 import org.newdawn.slick._
 import java.nio.channels._
 import java.nio._
@@ -15,6 +16,9 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
   val data = ByteBuffer.allocate(10000)
   var lastPing = new Date()
   var lastPong = new Date()
+
+  val skyTopColor    = new Color(0f, 0f, 0.25f)
+  val skyBottomColor = new Color(0.3f, 0.125f, 0.125f)
 
   override def enter() = {
     super.enter()
@@ -40,6 +44,7 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
   
   def render(g: Graphics) {
     if (ground.initialised) {
+      renderSky(g)
       ground.render(g)
     }
     for (tank <- tanks) {
@@ -57,6 +62,27 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
     for (i <- 0 until tanks.length) {
       renderHUD(g, i, tanks(i))
     }
+  }
+  
+  def renderSky(g : Graphics) {
+    import org.lwjgl.opengl.GL11
+    import slick.opengl.SlickCallable
+  
+    SlickCallable.enterSafeBlock()
+    GL11.glPushMatrix()
+    GL11.glBegin(GL11.GL_POLYGON)
+    
+    GL11.glColor4f(skyTopColor.r, skyTopColor.g, skyTopColor.b, 1f)
+    GL11.glVertex2f(0, 0)
+    GL11.glVertex2f(container.getWidth, 0)
+
+    GL11.glColor4f(skyBottomColor.r, skyBottomColor.g, skyBottomColor.b, 1f)
+    GL11.glVertex2f(container.getWidth, container.getHeight)
+    GL11.glVertex2f(0, container.getHeight)
+
+    GL11.glEnd()
+    GL11.glPopMatrix()
+    SlickCallable.leaveSafeBlock()
   }
  
   def renderHUD(g : Graphics, index : Int, tank : Tank) {
