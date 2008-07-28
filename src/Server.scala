@@ -136,6 +136,7 @@ class Server(port: Int) extends Session(null) {
   
   def nextTankColor = {
     nextTankColorIndex += 1
+    nextTankColorIndex = nextTankColorIndex % TANK_COLORS.length
     TANK_COLORS(nextTankColorIndex-1)
   }
 
