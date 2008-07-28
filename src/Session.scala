@@ -17,7 +17,7 @@ abstract class Session(container: slick.GameContainer) extends phys2d.raw.Collis
   var active = false
   var tanks = List[Tank]()
   val bodies = new HashMap[phys2d.raw.Body, Collider]
-  val projectiles = new HashSet[Projectile]
+  var projectiles = List[Projectile]()
   val explosions = new HashSet[Explosion]
   val frags = new HashSet[Frag]
 
@@ -86,8 +86,9 @@ abstract class Session(container: slick.GameContainer) extends phys2d.raw.Collis
     var p: Projectile = null
 
     projectileType match {
-      case ProjectileTypes.NUKE => { p = new Nuke(this, tank) }
       case ProjectileTypes.PROJECTILE => { p = new Projectile(this, tank) }
+      case ProjectileTypes.NUKE => { p = new Nuke(this, tank) }
+      case ProjectileTypes.ROLLER => { p = new Roller(this, tank) }
     }
 
     p.body.setPosition(x.toFloat, y.toFloat)
@@ -106,8 +107,6 @@ abstract class Session(container: slick.GameContainer) extends phys2d.raw.Collis
     removeBody(p.body)
     
     projectiles -= p
-    
-    println("removed projectile at " + p.x + ", " + p.y)
   }
   
   override def collisionOccured(event : phys2d.raw.CollisionEvent) {

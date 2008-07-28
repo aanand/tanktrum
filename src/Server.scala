@@ -29,7 +29,7 @@ class Server(port: Int) extends Session(null) {
   val rand = new Random()
   
   var timeToUpdate = BROADCAST_INTERVAL
-  
+
   override def enter() = {
     super.enter()
 
@@ -44,10 +44,11 @@ class Server(port: Int) extends Session(null) {
     super.update(delta)
     checkTimeouts()
 
-    timeToUpdate = timeToUpdate - delta
+    timeToUpdate -= delta
 
     if (timeToUpdate < 0) {
-      broadcastUpdate()
+      broadcastTanks
+      broadcastProjectiles
       timeToUpdate = BROADCAST_INTERVAL
     }
 
@@ -74,8 +75,12 @@ class Server(port: Int) extends Session(null) {
     p
   }
   
-  def broadcastUpdate() {
+  def broadcastTanks {
     broadcast(tankPositionData)
+  }
+
+  def broadcastProjectiles {
+    broadcast(projectilesData)
   }
 
   def broadcastFrags() {
@@ -89,6 +94,12 @@ class Server(port: Int) extends Session(null) {
 
   def projectileData(p: Projectile) = {
     byteToArray(Commands.PROJECTILE) ++ p.serialise
+  }
+
+  def projectilesData() = {
+    val projectileDataList = projectiles.map(p => p.serialise).toList
+
+    byteToArray(Commands.PROJECTILES) ++ Operations.toByteArray(projectileDataList)
   }
 
   def checkTimeouts() = {

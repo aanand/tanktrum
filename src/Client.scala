@@ -99,6 +99,10 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
       case ProjectileTypes.NUKE => {
         g.fillOval(-6, -6, 12, 12)
       }
+      case ProjectileTypes.ROLLER => {
+        g.setColor(new Color(0f, 0f, 1f))
+        g.fillOval(-6, -6, 12, 12)
+      }
     }
 
     g.resetTransform
@@ -110,6 +114,7 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
       case Commands.PING   => {resetTimeout}
       case Commands.TANKS => {processUpdate}
       case Commands.PROJECTILE => {loadProjectile}
+      case Commands.PROJECTILES => {loadProjectiles}
     }
   }
   
@@ -178,6 +183,21 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
     val projArray = new Array[byte](data.remaining)
     data.get(projArray)
     addProjectile(ProjectileLoader.loadProjectile(projArray, this))
+  }
+
+  def loadProjectiles = {
+    val projArray = new Array[byte](data.remaining)
+    data.get(projArray)
+
+    val projDataList = Operations.fromByteArray[List[Array[byte]]](projArray)
+
+    for (projectile <- projectiles) {
+      removeProjectile(projectile)
+    }
+
+    projectiles = projDataList.map(projectileData => {
+      ProjectileLoader.loadProjectile(projectileData, this)
+    })
   }
   
   def processUpdate = {
