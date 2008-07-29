@@ -303,7 +303,7 @@ class Tank (session: Session) extends Collider {
       angle.toShort, 
       gunAngle.toShort, 
       gunPower.toShort,
-      gunTimer.toShort, 
+      Math.ceil(gunTimer).toShort, 
       health.toShort, 
       thrust.toByte, 
       gunAngleChange.toByte, 
