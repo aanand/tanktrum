@@ -65,24 +65,23 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
   }
   
   def renderSky(g : Graphics) {
-    import org.lwjgl.opengl.GL11
-    import slick.opengl.SlickCallable
-  
-    SlickCallable.enterSafeBlock()
-    GL11.glPushMatrix()
-    GL11.glBegin(GL11.GL_POLYGON)
+    import slick.opengl.renderer.SGL
     
-    GL11.glColor4f(skyTopColor.r, skyTopColor.g, skyTopColor.b, 1f)
-    GL11.glVertex2f(0, 0)
-    GL11.glVertex2f(container.getWidth, 0)
-
-    GL11.glColor4f(skyBottomColor.r, skyBottomColor.g, skyBottomColor.b, 1f)
-    GL11.glVertex2f(container.getWidth, container.getHeight)
-    GL11.glVertex2f(0, container.getHeight)
-
-    GL11.glEnd()
-    GL11.glPopMatrix()
-    SlickCallable.leaveSafeBlock()
+    new GL {
+      def draw(gl : SGL) {
+        import gl._
+        
+        shape(SGL.GL_QUADS) {
+          glColor4f(skyTopColor.r, skyTopColor.g, skyTopColor.b, 1f)
+          glVertex2f(0, 0)
+          glVertex2f(container.getWidth, 0)
+        
+          glColor4f(skyBottomColor.r, skyBottomColor.g, skyBottomColor.b, 1f)
+          glVertex2f(container.getWidth, container.getHeight)
+          glVertex2f(0, container.getHeight)
+        }
+      }
+    }
   }
  
   def renderHUD(g : Graphics, index : Int, tank : Tank) {
