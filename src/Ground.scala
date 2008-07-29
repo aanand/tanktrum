@@ -99,7 +99,7 @@ class Ground(session : Session, width : Int, height : Int) extends Collider {
     g.fill(drawShape)
     
     new GL {
-      shape(org.lwjgl.opengl.GL11.GL_QUAD_STRIP) {
+      quadStrip {
         for (p <- points) {
           color(topsoilColor.r, topsoilColor.g, topsoilColor.b, 1f)
           vertex(p.x, p.y)

@@ -66,7 +66,7 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
   
   def renderSky(g : Graphics) {
     new GL {
-      shape(slick.opengl.renderer.SGL.GL_QUADS) {
+      polygon {
         color(skyTopColor.r, skyTopColor.g, skyTopColor.b, 1f)
         vertex(0, 0)
         vertex(container.getWidth, 0)
