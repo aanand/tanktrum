@@ -39,6 +39,13 @@ class Server(port: Int) extends Session(null) {
     channel.socket.bind(new InetSocketAddress(port))
     channel.configureBlocking(false)
   }
+  
+  override def leave() = {
+    super.leave()
+
+    channel.socket.close()
+    channel.disconnect()
+  }
 
   override def update(delta: Int) = {
     super.update(delta)
