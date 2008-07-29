@@ -3,7 +3,7 @@ import sbinary.Instances._
 import sbinary.Operations
 
 class Explosion (var x: Float, var y: Float, var radius: Float, session: Session) {
-  val LIFETIME = 1f //second
+  val LIFETIME = 10f //second
   var timeToDie = LIFETIME
 
   val SOUND = "media/explosion.ogg"
@@ -19,7 +19,7 @@ class Explosion (var x: Float, var y: Float, var radius: Float, session: Session
   }
 
   def render(g: Graphics) {
-    g.setColor(new Color(0.5f, 0.5f, 0.8f))
+    g.setColor(new Color(0.5f, 0.5f, 0.8f, timeToDie/LIFETIME))
     g.fillOval(x - radius, y - radius, radius*2, radius*2)
   }
 
