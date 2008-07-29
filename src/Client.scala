@@ -65,21 +65,17 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
   }
   
   def renderSky(g : Graphics) {
-    import slick.opengl.renderer.SGL
-    
     new GL {
-      def draw(gl : SGL) {
-        import gl._
-        
-        shape(SGL.GL_QUADS) {
-          glColor4f(skyTopColor.r, skyTopColor.g, skyTopColor.b, 1f)
-          glVertex2f(0, 0)
-          glVertex2f(container.getWidth, 0)
-        
-          glColor4f(skyBottomColor.r, skyBottomColor.g, skyBottomColor.b, 1f)
-          glVertex2f(container.getWidth, container.getHeight)
-          glVertex2f(0, container.getHeight)
-        }
+      import gl._
+      
+      shape(slick.opengl.renderer.SGL.GL_QUADS) {
+        glColor4f(skyTopColor.r, skyTopColor.g, skyTopColor.b, 1f)
+        glVertex2f(0, 0)
+        glVertex2f(container.getWidth, 0)
+      
+        glColor4f(skyBottomColor.r, skyBottomColor.g, skyBottomColor.b, 1f)
+        glVertex2f(container.getWidth, container.getHeight)
+        glVertex2f(0, container.getHeight)
       }
     }
   }

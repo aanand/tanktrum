@@ -2,19 +2,21 @@ import org.newdawn.slick.opengl
 import opengl.SlickCallable
 import opengl.renderer.{Renderer, SGL}
 
-abstract class GL {
-  def draw(gl : SGL)
-  
+class GL {
   val gl = Renderer.get
   import gl._
   
-  SlickCallable.enterSafeBlock
-  draw(gl)
-  SlickCallable.leaveSafeBlock
-  
   def shape(id : Int)(block : => Unit) {
-    glBegin(id)
+    perform {
+      glBegin(id)
+      block
+      glEnd
+    }
+  }
+  
+  def perform(block : => Unit) {
+    SlickCallable.enterSafeBlock
     block
-    glEnd
+    SlickCallable.leaveSafeBlock
   }
 }
