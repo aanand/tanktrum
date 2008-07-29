@@ -66,8 +66,6 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
   
   def renderSky(g : Graphics) {
     new GL {
-      import gl._
-      
       shape(slick.opengl.renderer.SGL.GL_QUADS) {
         color(skyTopColor.r, skyTopColor.g, skyTopColor.b, 1f)
         vertex(0, 0)

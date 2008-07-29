@@ -99,8 +99,6 @@ class Ground(session : Session, width : Int, height : Int) extends Collider {
     g.fill(drawShape)
     
     new GL {
-      import gl._
-      
       shape(org.lwjgl.opengl.GL11.GL_QUAD_STRIP) {
         for (p <- points) {
           color(topsoilColor.r, topsoilColor.g, topsoilColor.b, 1f)
