@@ -6,7 +6,7 @@ directory 'classes'
 directory 'tmp'
 directory 'lib'
 
-JARFILES = %w(scala-library slick phys2d lwjgl sbinary)
+JARFILES = %w(scala-library slick phys2d lwjgl sbinary jogg vorbisspi jorbis tritonus_share)
 CLASSPATH = JARFILES.map{|lib| "lib/#{lib}.jar"}.join(":")
 
 case `uname`
@@ -43,7 +43,7 @@ end
 
 namespace :install do
   desc "install dependencies"
-  task :deps => [:scala, :slick, :phys2d, :lwjgl, :sbinary]
+  task :deps => [:scala, :slick, :phys2d, :lwjgl, :sbinary, :vorbisspi]
 
   task :clobber do
     rm_rf 'lib'
@@ -64,6 +64,28 @@ namespace :install do
 
   task :sbinary do
     download_file 'lib/sbinary.jar', 'http://sbinary.googlecode.com/files/sbinary-0.2.1.jar'
+  end
+
+  task :vorbisspi do
+    tmp_dir = "tmp/vorbisspi"
+    rm_rf tmp_dir
+    
+    download_file "tmp/vorbisspi.zip", 'http://www.javazoom.net/vorbisspi/sources/vorbisspi1.0.3.zip'
+    raise "extraction of vorbisspi.zip failed" unless sh "unzip tmp/vorbisspi.zip -d #{tmp_dir}"
+
+    vorbis_dir = Dir.glob("#{tmp_dir}/*").first
+
+    vorbis_jar = Dir.glob("#{vorbis_dir}/vorbisspi*.jar").first
+    cp vorbis_jar, "lib/vorbisspi.jar"
+
+    jogg_jar = Dir.glob("#{vorbis_dir}/lib/jogg*.jar").first
+    cp jogg_jar, "lib/jogg.jar"
+
+    jorbis_jar = Dir.glob("#{vorbis_dir}/lib/jorbis*.jar").first
+    cp jorbis_jar, "lib/jorbis.jar"
+
+    tritonus_share_jar = Dir.glob("#{vorbis_dir}/lib/tritonus_share*.jar").first
+    cp tritonus_share_jar, "lib/tritonus_share.jar"
   end
   
   task :lwjgl => ['tmp', 'lib'] do
