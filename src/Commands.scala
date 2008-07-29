@@ -11,6 +11,7 @@ object Commands {
   val TANKS = nextI
   val PROJECTILE = nextI
   val PROJECTILES = nextI
+  val EXPLOSION = nextI
 
   val MOVE_LEFT = nextI
   val STOP_MOVE_LEFT = nextI

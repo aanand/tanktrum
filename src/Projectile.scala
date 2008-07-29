@@ -45,9 +45,6 @@ class Projectile(session : Session, tank : Tank) extends Collider {
     destroy = true
     session.addExplosion(x, y, EXPLOSION_RADIUS)
     
-    val file = "media/explosion.ogg"
-    new OggPlayer(file).start
-    
     if (session.isInstanceOf[Server]) {
       session.ground.deform(x.toInt, y.toInt, EXPLOSION_RADIUS.toInt)
     }

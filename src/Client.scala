@@ -108,6 +108,7 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
       case Commands.TANKS => {processUpdate}
       case Commands.PROJECTILE => {loadProjectile}
       case Commands.PROJECTILES => {loadProjectiles}
+      case Commands.EXPLOSION => {loadExplosion}
     }
   }
   
@@ -191,6 +192,14 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
     projectiles = projDataList.map(projectileData => {
       ProjectileLoader.loadProjectile(projectileData, this)
     })
+  }
+
+  def loadExplosion = {
+    val explosionArray = new Array[byte](data.remaining)
+    data.get(explosionArray)
+    val e = new Explosion(0, 0, 0, this)
+    e.loadFrom(explosionArray)
+    explosions += e
   }
   
   def processUpdate = {

@@ -37,7 +37,7 @@ class OggPlayer(filename: String) extends Actor {
 
   def rawplay(targetFormat: AudioFormat, din: AudioInputStream) = {
     val data = new Array[Byte](4096)
-    val line = getLine(targetFormat)		
+    val line = getLine(targetFormat)
     if (line != null)
     {
       // Start

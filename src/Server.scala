@@ -81,6 +81,12 @@ class Server(port: Int) extends Session(null) {
     broadcast(projectileData(p))
     p
   }
+
+  override def addExplosion(x: Float, y: Float, radius: Float) {
+    val e = new Explosion(x, y, radius, this)
+    explosions += e
+    broadcastExplosion(e)
+  }
   
   def broadcastTanks {
     broadcast(tankPositionData)
@@ -88,6 +94,10 @@ class Server(port: Int) extends Session(null) {
 
   def broadcastProjectiles {
     broadcast(projectilesData)
+  }
+
+  def broadcastExplosion(e: Explosion) {
+    broadcast(byteToArray(Commands.EXPLOSION) ++ e.serialise)
   }
 
   def broadcastFrags() {
