@@ -176,7 +176,7 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
   def loadProjectile = {
     val projArray = new Array[byte](data.remaining)
     data.get(projArray)
-    addProjectile(ProjectileLoader.loadProjectile(projArray, this))
+    addProjectile(ProjectileLoader.loadProjectile(null, projArray, this))
   }
 
   def loadProjectiles = {
@@ -185,12 +185,15 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
 
     val projDataList = Operations.fromByteArray[List[Array[byte]]](projArray)
 
-    for (projectile <- projectiles) {
-      removeProjectile(projectile)
-    }
+    var i = 0
 
     projectiles = projDataList.map(projectileData => {
-      ProjectileLoader.loadProjectile(projectileData, this)
+      var oldProjectile: Projectile = null
+      if (projectiles.isDefinedAt(i)) {
+        oldProjectile = projectiles(i)
+      }
+      i += 1
+      ProjectileLoader.loadProjectile(oldProjectile, projectileData, this)
     })
   }
 

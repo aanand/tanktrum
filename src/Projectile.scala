@@ -9,13 +9,7 @@ class Projectile(session : Session, tank : Tank) extends Collider {
   val radius = 3f
   val damage = 20
   val shape = new phys2d.raw.shapes.Circle(radius)
-  var body: phys2d.raw.Body = _
-  if (session.isInstanceOf[Server]) {
-    body = new phys2d.raw.Body(shape, 1.0f)
-  }
-  else {
-    body = new phys2d.raw.StaticBody(shape)
-  }
+  val body: phys2d.raw.Body = new phys2d.raw.Body(shape, 1.0f)
 
   val projectileType = ProjectileTypes.PROJECTILE
 
@@ -38,14 +32,14 @@ class Projectile(session : Session, tank : Tank) extends Collider {
   }
   
   override def collide(obj : Collider, event : phys2d.raw.CollisionEvent) {
-    if (obj.isInstanceOf[Projectile]) {
+    if (obj.isInstanceOf[Projectile] || destroy) {
       return
     }
 
     destroy = true
-    session.addExplosion(x, y, EXPLOSION_RADIUS)
-    
+
     if (session.isInstanceOf[Server]) {
+      session.addExplosion(x, y, EXPLOSION_RADIUS)
       session.ground.deform(x.toInt, y.toInt, EXPLOSION_RADIUS.toInt)
     }
     
@@ -62,22 +56,40 @@ class Projectile(session : Session, tank : Tank) extends Collider {
     Operations.toByteArray((
       x,
       y,
+      body.getVelocity.getX,
+      body.getVelocity.getY,
+      body.getRotation,
+      body.getAngularVelocity,
       projectileType.id.toByte
     ))
   }
 }
 
 object ProjectileLoader {
-  def loadProjectile(data: Array[byte], session: Session) = {
-    val (x, y, projectileType) = Operations.fromByteArray[(Float, Float, Byte)](data)
+  def loadProjectile(oldProjectile: Projectile, data: Array[byte], session: Session) = {
+    val (x, y, xVel, yVel, rot, angVel, projectileType) = Operations.fromByteArray[(Float, Float, Float, Float, Float, Float, Byte)](data)
     var p: Projectile = null
-    ProjectileTypes.apply(projectileType) match {
-      //TODO: Use a tank id to track which tank this projectile came from.
-      case ProjectileTypes.PROJECTILE => { p = new Projectile(session, null) }
-      case ProjectileTypes.NUKE => { p = new Nuke(session, null) }
-      case ProjectileTypes.ROLLER => { p = new Roller(session, null) }
+    if (null != oldProjectile && oldProjectile.projectileType.id == projectileType) {
+      p = oldProjectile
+    }
+    else {
+      println("Bad old projectile, creating new projectile.")
+      if (oldProjectile != null) {
+        session.removeProjectile(oldProjectile)
+      }
+      ProjectileTypes.apply(projectileType) match {
+        //TODO: Use a tank id to track which tank this projectile came from.
+        case ProjectileTypes.PROJECTILE => { p = new Projectile(session, null) }
+        case ProjectileTypes.NUKE => { p = new Nuke(session, null) }
+        case ProjectileTypes.ROLLER => { p = new Roller(session, null) }
+      }
     }
     p.body.setPosition(x, y)
+    val vel = new phys2d.math.Vector2f(xVel, yVel)
+    vel.sub(p.body.getVelocity)
+    p.body.adjustVelocity(vel)
+    p.body.setRotation(rot)
+    p.body.adjustAngularVelocity(angVel - p.body.getAngularVelocity)
     p
   }
 }

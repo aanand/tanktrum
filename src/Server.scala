@@ -11,8 +11,9 @@ import sbinary.Operations
 import sbinary.Instances._
 
 class Server(port: Int) extends Session(null) {
-  val BROADCAST_INTERVAL = 25 //milliseconds
-  
+  val TANK_BROADCAST_INTERVAL = 25 //milliseconds
+  val PROJECTILE_BROADCAST_INTERVAL = 100
+
   val TANK_COLORS = List(
     new Color(1f, 0f, 0f),
     new Color(0f, 1f, 0f),
@@ -28,7 +29,8 @@ class Server(port: Int) extends Session(null) {
   val data = ByteBuffer.allocate(1000)
   val rand = new Random()
   
-  var timeToUpdate = BROADCAST_INTERVAL
+  var timeToTankUpdate = TANK_BROADCAST_INTERVAL
+  var timeToProjectileUpdate = PROJECTILE_BROADCAST_INTERVAL
 
   override def enter() = {
     super.enter()
@@ -51,12 +53,18 @@ class Server(port: Int) extends Session(null) {
     super.update(delta)
     checkTimeouts()
 
-    timeToUpdate -= delta
+    timeToTankUpdate -= delta
 
-    if (timeToUpdate < 0) {
+    if (timeToTankUpdate < 0) {
       broadcastTanks
+      timeToTankUpdate = TANK_BROADCAST_INTERVAL
+    }
+
+    timeToProjectileUpdate -= delta
+
+    if (timeToProjectileUpdate < 0) {
       broadcastProjectiles
-      timeToUpdate = BROADCAST_INTERVAL
+      timeToProjectileUpdate = PROJECTILE_BROADCAST_INTERVAL
     }
 
     data.rewind()
