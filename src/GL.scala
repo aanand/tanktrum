@@ -19,4 +19,7 @@ class GL {
     block
     SlickCallable.leaveSafeBlock
   }
+  
+  def color(r : Float, g : Float, b : Float, a : Float) = glColor4f(r, g, b, a)
+  def vertex(x : Float, y : Float) = glVertex2f(x, y)
 }

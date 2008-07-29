@@ -69,13 +69,13 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
       import gl._
       
       shape(slick.opengl.renderer.SGL.GL_QUADS) {
-        glColor4f(skyTopColor.r, skyTopColor.g, skyTopColor.b, 1f)
-        glVertex2f(0, 0)
-        glVertex2f(container.getWidth, 0)
+        color(skyTopColor.r, skyTopColor.g, skyTopColor.b, 1f)
+        vertex(0, 0)
+        vertex(container.getWidth, 0)
       
-        glColor4f(skyBottomColor.r, skyBottomColor.g, skyBottomColor.b, 1f)
-        glVertex2f(container.getWidth, container.getHeight)
-        glVertex2f(0, container.getHeight)
+        color(skyBottomColor.r, skyBottomColor.g, skyBottomColor.b, 1f)
+        vertex(container.getWidth, container.getHeight)
+        vertex(0, container.getHeight)
       }
     }
   }

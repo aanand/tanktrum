@@ -11,7 +11,7 @@ class Ground(session : Session, width : Int, height : Int) extends Collider {
   val granularity = 1
 
   val topsoilColor = new Color(0.5f, 0.5f, 0f)
-  val color = new Color(0.8f, 0.8f, 0f)
+  val earthColor = new Color(0.8f, 0.8f, 0f)
   
   val topsoilDepth = 20f
   
@@ -95,7 +95,7 @@ class Ground(session : Session, width : Int, height : Int) extends Collider {
   }
   
   def render(g: Graphics) {
-    g.setColor(color)
+    g.setColor(earthColor)
     g.fill(drawShape)
     
     new GL {
@@ -103,10 +103,11 @@ class Ground(session : Session, width : Int, height : Int) extends Collider {
       
       shape(org.lwjgl.opengl.GL11.GL_QUAD_STRIP) {
         for (p <- points) {
-          glColor4f(topsoilColor.r, topsoilColor.g, topsoilColor.b, 1f)
-          glVertex2f(p.x, p.y)
-          glColor4f(color.r, color.g, color.b, 1f)
-          glVertex2f(p.x, p.y + topsoilDepth)
+          color(topsoilColor.r, topsoilColor.g, topsoilColor.b, 1f)
+          vertex(p.x, p.y)
+          
+          color(earthColor.r, earthColor.g, earthColor.b, 1f)
+          vertex(p.x, p.y + topsoilDepth)
         }
       }
     }
