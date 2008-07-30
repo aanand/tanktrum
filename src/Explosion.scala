@@ -7,7 +7,7 @@ class Explosion (var x: Float, var y: Float, var radius: Float, session: Session
   val LIFETIME = 10f //second
   var timeToDie = LIFETIME
 
-  val SOUND = "explosion.ogg"
+  val SOUND = "explosion1.wav"
   if (session.isInstanceOf[Client]) {
     new SoundPlayer(SOUND).start
   }

@@ -7,35 +7,24 @@ import scala.actors.Actor
 import scala.collection.mutable.HashMap
 
 object DeathTankSounds {
-  val files = new File("media/").list(new OggFileFilter)
+  val files = new File("media/sounds/").list(new SoundFileFilter)
   val mixer = AudioSystem.getMixer(null)
-  val sounds = new HashMap[String,Array[Byte]]()
-  val formatStream = AudioSystem.getAudioInputStream(new FileInputStream("media/" + files(0)))
-  
-  val baseFormat = formatStream.getFormat()
-  formatStream.close
-
-  val format = new AudioFormat(
-        AudioFormat.Encoding.PCM_SIGNED,
-        baseFormat.getSampleRate(),
-        16,
-        baseFormat.getChannels(),
-        baseFormat.getChannels() * 2,
-        baseFormat.getSampleRate(),
-        false) 
+  val sounds = new HashMap[String, (AudioFormat, Array[Byte])]()
   
   for (file <- files) {
-    sounds(file) = readFile("media/" + file)
+    sounds(file) = readFile("media/sounds/" + file)
   }
-
   
   def play(filename: String) = {
     println(filename)
+
+    val (format, data) = sounds(filename)
+    
     val line = getLine(format)
-    if (line != null)
-    {
+
+    if (line != null) {
       line.start
-      line.write(sounds(filename), 0, sounds(filename).length)
+      line.write(data, 0, data.length)
       line.drain
       line.stop
       line.close
@@ -49,17 +38,29 @@ object DeathTankSounds {
   }
 
   def readFile(fileName: String) = {
+    val rawStream = AudioSystem.getAudioInputStream(new BufferedInputStream(new FileInputStream(fileName)))
+    
+    val baseFormat = rawStream.getFormat()
+
+    val format = new AudioFormat(
+          AudioFormat.Encoding.PCM_SIGNED,
+          baseFormat.getSampleRate(),
+          16,
+          baseFormat.getChannels(),
+          baseFormat.getChannels() * 2,
+          baseFormat.getSampleRate(),
+          false) 
+    
     val byteBuf = new Array[Byte](4096)
     val outStream = new ByteArrayOutputStream(4096)
-    val inStream = AudioSystem.getAudioInputStream(format, 
-                     AudioSystem.getAudioInputStream(
-                       new FileInputStream(fileName)))
+    val inStream = AudioSystem.getAudioInputStream(format, rawStream)
     var read = 0
     while (read >= 0) {
       outStream.write(byteBuf, 0, read)
       read = inStream.read(byteBuf)
     }
-    outStream.toByteArray
+    
+    (format, outStream.toByteArray)
   }
 }
 
@@ -69,8 +70,8 @@ class SoundPlayer(sound: String) extends Actor {
   }
 }
 
-class OggFileFilter extends FilenameFilter {
+class SoundFileFilter extends FilenameFilter {
   override def accept(dir: File, fileName: String) = {
-    fileName.matches(".*.ogg")
+    fileName.matches(".*.ogg") || fileName.matches(".*.wav")
   }
 }
