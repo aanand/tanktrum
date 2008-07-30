@@ -20,21 +20,16 @@ object DeathTankSounds {
 
     val (format, data) = sounds(filename)
     
-    val line = getLine(format)
+    val line = mixer.getLine(mixer.getSourceLineInfo()(0)).asInstanceOf[SourceDataLine]
 
     if (line != null) {
+      line.open(format)
       line.start
       line.write(data, 0, data.length)
       line.drain
       line.stop
       line.close
     }
-  }
-
-  def getLine(audioFormat: AudioFormat) = {
-    val newLine = mixer.getLine(mixer.getSourceLineInfo()(0)).asInstanceOf[SourceDataLine]
-    newLine.open(audioFormat)
-    newLine
   }
 
   def readFile(fileName: String) = {
