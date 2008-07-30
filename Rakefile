@@ -40,6 +40,7 @@ end
 
 task :jar => ['lib', 'classes'] do
   sh "jar -cf lib/tank.jar -C classes ."
+  sh "jar -uf lib/tank.jar media "
 end
 
 namespace :install do
