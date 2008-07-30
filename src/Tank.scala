@@ -70,6 +70,7 @@ class Tank (session: Session) extends Collider {
   var body: phys2d.raw.Body = _
   var wheel1: phys2d.raw.Body = _
   var wheel2: phys2d.raw.Body = _
+  //body.setMaxVelocity(20f, 20f)
 
   var color: Color = _
 
@@ -116,31 +117,37 @@ class Tank (session: Session) extends Collider {
   def create(x: Float, color: Color) = {
     this.color = color
     
-    val y = session.ground.heightAt(x).toFloat
-    body = new phys2d.raw.Body(physShape, BODY_MASS)
-    body.setPosition(x, y - 100f)
+    if (session.isInstanceOf[Server]) {
+      val y = session.ground.heightAt(x).toFloat
+      body = new phys2d.raw.Body(physShape, BODY_MASS)
+      body.setPosition(x, y - 100f)
 
-    wheel1 = new phys2d.raw.Body(wheelShape, WHEEL_MASS)
-    wheel2 = new phys2d.raw.Body(wheelShape, WHEEL_MASS)
+      wheel1 = new phys2d.raw.Body(wheelShape, WHEEL_MASS)
+      wheel2 = new phys2d.raw.Body(wheelShape, WHEEL_MASS)
 
-    body.addExcludedBody(wheel1)
-    body.addExcludedBody(wheel2)
+      body.addExcludedBody(wheel1)
+      body.addExcludedBody(wheel2)
 
-    if (session.isInstanceOf[Client]) {
-      body.setEnabled(false)
+      wheel1.setPosition(x-WHEEL_OFFSET_X, y-100+WHEEL_OFFSET_Y)
+      wheel2.setPosition(x+WHEEL_OFFSET_X, y-100+WHEEL_OFFSET_Y)
+
+      val joint1 = new phys2d.raw.BasicJoint(body, wheel1, new phys2d.math.Vector2f(x-WHEEL_OFFSET_X, y-100+WHEEL_OFFSET_Y))
+      val joint2 = new phys2d.raw.BasicJoint(body, wheel2, new phys2d.math.Vector2f(x+WHEEL_OFFSET_X, y-100+WHEEL_OFFSET_Y))
+
+      session.world.add(joint1)
+      session.world.add(joint2)
+
+      session.addBody(this, wheel1)
+      session.addBody(this, wheel2)
     }
+    else {
+      body = new phys2d.raw.StaticBody(physShape)
+      wheel1 = new phys2d.raw.StaticBody(wheelShape)
+      wheel2 = new phys2d.raw.StaticBody(wheelShape)
 
-    wheel1.setPosition(x-WHEEL_OFFSET_X, y-100+WHEEL_OFFSET_Y)
-    wheel2.setPosition(x+WHEEL_OFFSET_X, y-100+WHEEL_OFFSET_Y)
-
-    val joint1 = new phys2d.raw.BasicJoint(body, wheel1, new phys2d.math.Vector2f(x-WHEEL_OFFSET_X, y-100+WHEEL_OFFSET_Y))
-    val joint2 = new phys2d.raw.BasicJoint(body, wheel2, new phys2d.math.Vector2f(x+WHEEL_OFFSET_X, y-100+WHEEL_OFFSET_Y))
-
-    session.world.add(joint1)
-    session.world.add(joint2)
-
-    session.addBody(this, wheel1)
-    session.addBody(this, wheel2)
+      body.addExcludedBody(wheel1)
+      body.addExcludedBody(wheel2)
+    }
     
     //body.setFriction(0.8f)
     wheel1.setFriction(0.99f)
@@ -171,28 +178,26 @@ class Tank (session: Session) extends Collider {
       return
     }
     
-    if (session.isInstanceOf[Server]) {
-      if (body.isTouchingStatic(new ArrayList[phys2d.raw.Body]) ||
-          wheel1.isTouchingStatic(new ArrayList[phys2d.raw.Body]) ||
-          wheel2.isTouchingStatic(new ArrayList[phys2d.raw.Body])) {
-        contactTime = contactGrace
-      }
-      else if (contactTime > 0) {
-        contactTime -= delta
-      }
+    if (body.isTouchingStatic(new ArrayList[phys2d.raw.Body]) ||
+        wheel1.isTouchingStatic(new ArrayList[phys2d.raw.Body]) ||
+        wheel2.isTouchingStatic(new ArrayList[phys2d.raw.Body])) {
+      contactTime = contactGrace
+    }
+    else if (contactTime > 0) {
+      contactTime -= delta
+    }
     
-      if (grounded) {
-        val velAdjust = new phys2d.math.Vector2f(Math.cos(body.getRotation).toFloat*speedDelta,
+    if (grounded) {
+      val delta = new phys2d.math.Vector2f(Math.cos(body.getRotation).toFloat*speedDelta,
                                            Math.sin(body.getRotation).toFloat*speedDelta)
       
-        body.adjustVelocity(velAdjust)
+      body.adjustVelocity(delta)
 
-        body.setIsResting(false)
-        wheel1.setIsResting(false)
-        wheel2.setIsResting(false)
-      }
+      body.setIsResting(false)
+      wheel1.setIsResting(false)
+      wheel2.setIsResting(false)
+
     }
-
     
     if (gunAngleChange != 0) {
       val newAngle = gunAngle + gunAngleChange * GUN_ANGLE_SPEED * delta / 1000.0f
@@ -295,11 +300,14 @@ class Tank (session: Session) extends Collider {
     Operations.toByteArray((
       x.toFloat,
       y.toFloat,
-      body.getRotation,
+      angle.toShort, 
       gunAngle.toShort, 
       gunPower.toShort,
       Math.ceil(gunTimer).toShort, 
       health.toShort, 
+      thrust.toByte, 
+      gunAngleChange.toByte, 
+      gunPowerChange.toByte,
       selectedWeapon.id.toByte,
       (color.r*127).toByte,
       (color.g*127).toByte,
@@ -308,22 +316,25 @@ class Tank (session: Session) extends Collider {
   }
   
   def loadFrom(data: Array[Byte]) = {
-    val values = Operations.fromByteArray[(Float, Float, Float, Short, Short, Short, Short, Byte, Byte, Byte, Byte)](data)
+    val values = Operations.fromByteArray[(Float, Float, Short, Short, Short, Short, Short, Byte, Byte, Byte, Byte, Byte, Byte, Byte)](data)
     
-    val (newX, newY, newAngle,
+    val (newX, newY, newAngle, 
         newGunAngle, newGunPower, newGunTimer, 
-        newHealth, newSelectedWeapon,
+        newHealth, newThrust, newGunAngleChange, newGunPowerChange, newSelectedWeapon,
         newRed, newGreen, newBlue) = values
-    
+
     body.setPosition(newX, newY)
-    body.setRotation(newAngle)
-  
+    body.setRotation(newAngle.toFloat.toRadians)
     gunAngle = newGunAngle
     gunPower = newGunPower
     gunTimer = newGunTimer
     health = newHealth
+    thrust = newThrust
+    gunAngleChange = newGunAngleChange
+    gunPowerChange = newGunPowerChange
     selectedWeapon = ProjectileTypes.apply(newSelectedWeapon)
     
     color = new slick.Color(newRed/127f, newGreen/127f, newBlue/127f)
   }
+
 }
