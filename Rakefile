@@ -7,6 +7,7 @@ directory 'tmp'
 directory 'lib'
 
 JARFILES = %w(scala-library slick phys2d lwjgl sbinary jogg vorbisspi jorbis tritonus_share)
+WEBSTART_JARS = JARFILES - %w(lwjgl slick)
 CLASSPATH = JARFILES.map{|lib| "lib/#{lib}.jar"}.join(":")
 
 case `uname`
@@ -134,7 +135,7 @@ namespace :build do
     require 'highline'
 
     webstart_dir = "dist/webstart"
-    jars = JARFILES - %w(slick lwjgl) + %w(tank)
+    jars = WEBSTART_JARS + %w(tank)
     
     passphrase = HighLine.new.ask("Enter jarsigner passphrase: ") { |q| q.echo = false }
     
@@ -150,7 +151,7 @@ end
 
 namespace :upload do
   task :libs do
-    sh "scp dist/webstart/phys2d.jar dist/webstart/sbinary.jar dist/webstart/scala-library.jar deathtank@norgg.org:/var/www/norgg.org/htdocs/deathtank"
+    sh "scp #{WEBSTART_JARS.map{|name| "dist/webstart/" + name + ".jar"}.join(" ")} deathtank@norgg.org:/var/www/norgg.org/htdocs/deathtank"
   end
   task :webstart do
     sh "scp dist/webstart/tank.jar dist/webstart/tank.jnlp deathtank@norgg.org:/var/www/norgg.org/htdocs/deathtank"
