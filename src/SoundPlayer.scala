@@ -10,10 +10,8 @@ object DeathTankSounds {
   val files = new File("media/").list(new OggFileFilter)
   val mixer = AudioSystem.getMixer(null)
   val sounds = new HashMap[String,Array[Byte]]()
-  for (file <- files) {
-    sounds(file) = readFile("media/" + file)
-  }
-  val formatStream = AudioSystem.getAudioInputStream(new ByteArrayInputStream(sounds.values.next))
+  val formatStream = AudioSystem.getAudioInputStream(new FileInputStream("media/" + files(0)))
+  
   val baseFormat = formatStream.getFormat()
   formatStream.close
 
@@ -26,31 +24,22 @@ object DeathTankSounds {
         baseFormat.getSampleRate(),
         false) 
   
+  for (file <- files) {
+    sounds(file) = readFile("media/" + file)
+  }
+
+  
   def play(filename: String) = {
     println(filename)
-    // Get AudioInputStream from given file.
-    val in = AudioSystem.getAudioInputStream(format, 
-               AudioSystem.getAudioInputStream(
-               new ByteArrayInputStream(sounds(filename))))
-    val data = new Array[Byte](4096)
     val line = getLine(format)
     if (line != null)
     {
-      // Start
-      line.start()
-      var nBytesRead = 0
-      var nBytesWritten = 0
-      while (nBytesRead != -1) {
-        nBytesRead = in.read(data, 0, data.length)
-
-        if (nBytesRead != -1) nBytesWritten = line.write(data, 0, nBytesRead)
-      }
-      // Stop
-      line.drain()
-      line.stop()
-      line.close()
+      line.start
+      line.write(sounds(filename), 0, sounds(filename).length)
+      line.drain
+      line.stop
+      line.close
     }
-    in.close()
   }
 
   def getLine(audioFormat: AudioFormat) = {
@@ -60,9 +49,11 @@ object DeathTankSounds {
   }
 
   def readFile(fileName: String) = {
-    val byteBuf = new Array[Byte](1024)
+    val byteBuf = new Array[Byte](4096)
     val outStream = new ByteArrayOutputStream(4096)
-    val inStream = new FileInputStream(fileName)
+    val inStream = AudioSystem.getAudioInputStream(format, 
+                     AudioSystem.getAudioInputStream(
+                       new FileInputStream(fileName)))
     var read = 0
     while (read >= 0) {
       outStream.write(byteBuf, 0, read)
