@@ -10,7 +10,7 @@ class Game(title: String) extends BasicGame(title) {
   var menu : Menu = _
 
   val INTRO_SOUND = "explosion.ogg"
-  new OggPlayer(INTRO_SOUND).start
+  new SoundPlayer(INTRO_SOUND).start
 
   def init(container: GameContainer) {
     this.container = container

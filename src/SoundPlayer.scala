@@ -72,7 +72,7 @@ object DeathTankSounds {
   }
 }
 
-class OggPlayer(sound: String) extends Actor {
+class SoundPlayer(sound: String) extends Actor {
   def act() {
     DeathTankSounds.play(sound)
   }
