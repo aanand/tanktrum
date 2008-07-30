@@ -8,7 +8,10 @@ class Game(title: String) extends BasicGame(title) {
   var container: GameContainer = _
 
   var menu : Menu = _
-  
+
+  val INTRO_SOUND = "explosion.ogg"
+  new OggPlayer(INTRO_SOUND).start
+
   def init(container: GameContainer) {
     this.container = container
 

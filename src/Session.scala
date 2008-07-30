@@ -7,7 +7,6 @@ abstract class Session(container: slick.GameContainer) extends phys2d.raw.Collis
   val WIDTH = 800
   val HEIGHT = 600
 
-
   val world = new phys2d.raw.World(new phys2d.math.Vector2f(0.0f, 100.0f), 10)
   world.enableRestingBodyDetection(0.001f, 0.001f, 0.001f)
   world.addListener(this)
