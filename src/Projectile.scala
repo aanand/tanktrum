@@ -73,7 +73,6 @@ object ProjectileLoader {
       p = oldProjectile
     }
     else {
-      println("Bad old projectile, creating new projectile.")
       if (oldProjectile != null) {
         session.removeProjectile(oldProjectile)
       }
