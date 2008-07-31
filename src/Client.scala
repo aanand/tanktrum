@@ -232,7 +232,7 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
       }
       tanks = tankDataList.map(tankData => {
         val t = new Tank(this, 0)
-        t.create(0, null)
+        t.create(0)
         t.loadFrom(tankData)
         if (players.isDefinedAt(t.id)) {
           players(t.id).tank = t

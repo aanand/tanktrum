@@ -16,14 +16,6 @@ class Server(port: Int) extends Session(null) {
   val PLAYER_BROADCAST_INTERVAL = 1000
   val MAX_PLAYERS = 6
 
-  val TANK_COLORS = List(
-    new Color(1f, 0f, 0f),
-    new Color(0f, 1f, 0f),
-    new Color(0f, 0f, 1f),
-    new Color(1f, 1f, 0f),
-    new Color(1f, 0f, 1f),
-    new Color(0f, 1f, 1f))
-  
   var nextTankColorIndex = 0
   
   var playerID: Byte = -1
@@ -177,17 +169,11 @@ class Server(port: Int) extends Session(null) {
     println("Creating a tank.")
     val tank = new Tank(this, id)
     val loc = rand.nextFloat * (Main.WIDTH - 200) + 100
-    tank.create(loc, nextTankColor)
+    tank.create(loc)
     tanks += tank
     tank
   }
   
-  def nextTankColor = {
-    nextTankColorIndex += 1
-    nextTankColorIndex = nextTankColorIndex % TANK_COLORS.length
-    TANK_COLORS(nextTankColorIndex-1)
-  }
-
   def processCommand(command: char, addr: SocketAddress) {
     val player = players(addr)
     command match {

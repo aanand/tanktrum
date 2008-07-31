@@ -42,7 +42,15 @@ class Tank (session: Session, var id: Byte) extends Collider {
   
   val GUN_READY_COLOR   = new Color(0.0f, 1.0f, 0.0f, 0.5f)
   val GUN_LOADING_COLOR = new Color(1.0f, 0.0f, 0.0f, 0.5f)
-  
+    
+  val BODY_COLORS = List(
+    new Color(1f, 0f, 0f),
+    new Color(0f, 1f, 0f),
+    new Color(0f, 0f, 1f),
+    new Color(1f, 1f, 0f),
+    new Color(1f, 0f, 1f),
+    new Color(0f, 1f, 1f))
+ 
   val shapePoints = List[slick.geom.Vector2f] (
                       new slick.geom.Vector2f(-(WIDTH/2-TAPER), -HEIGHT),
                       new slick.geom.Vector2f(WIDTH/2-TAPER, -HEIGHT),
@@ -117,7 +125,7 @@ class Tank (session: Session, var id: Byte) extends Collider {
 
   def speedDelta = targetSpeed - actualSpeed
 
-  def create(x: Float, color: Color) = {
+  def create(x: Float) = {
     this.color = color
     
     if (session.isInstanceOf[Server]) {
@@ -312,20 +320,17 @@ class Tank (session: Session, var id: Byte) extends Collider {
       gunAngleChange.toByte, 
       gunPowerChange.toByte,
       selectedWeapon.id.toByte,
-      (color.r*127).toByte,
-      (color.g*127).toByte,
-      (color.b*127).toByte,
       id
     ))
   }
   
   def loadFrom(data: Array[Byte]) = {
-    val values = Operations.fromByteArray[(Float, Float, Short, Short, Short, Short, Short, Byte, Byte, Byte, Byte, Byte, Byte, Byte, Byte)](data)
+    val values = Operations.fromByteArray[(Float, Float, Short, Short, Short, Short, Short, Byte, Byte, Byte, Byte, Byte)](data)
     
     val (newX, newY, newAngle, 
         newGunAngle, newGunPower, newGunTimer, 
         newHealth, newThrust, newGunAngleChange, newGunPowerChange, newSelectedWeapon,
-        newRed, newGreen, newBlue, newID) = values
+        newID) = values
 
     body.setPosition(newX, newY)
     body.setRotation(newAngle.toFloat.toRadians)
@@ -338,8 +343,9 @@ class Tank (session: Session, var id: Byte) extends Collider {
     gunPowerChange = newGunPowerChange
     selectedWeapon = ProjectileTypes.apply(newSelectedWeapon)
     
-    color = new slick.Color(newRed/127f, newGreen/127f, newBlue/127f)
     id = newID
+    
+    color = BODY_COLORS(id%BODY_COLORS.length)
   }
 
 }
