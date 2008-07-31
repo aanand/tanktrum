@@ -201,14 +201,13 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
     data.get(playersArray)
     val playerDataList = Operations.fromByteArray[List[Array[byte]]](playersArray)
     for (playerData <- playerDataList) {
-      val p = new Player(null, null, 0)
+      val p = new Player(null, "Unknown.", 0)
       p.loadFrom(playerData)
       if (players.isDefinedAt(p.id) && players(p.id).name == p.name) {
-        println("Already have player " + p.name)
+        players(p.id).loadFrom(playerData)
       }
       else {
         players.put(p.id, p)
-        println("Loaded player " + p.name)
       }
     }
   }

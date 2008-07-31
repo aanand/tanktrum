@@ -15,9 +15,9 @@ class Game(title: String) extends BasicGame(title) {
   def init(container: GameContainer) {
     this.container = container
 
-    val serverPort = MenuEditable("10000");
-    val serverHostname = MenuEditable("localhost")
-    val userName = MenuEditable("Player")
+    val serverPort = MenuEditable("10000", 5);
+    val serverHostname = MenuEditable("localhost", 255)
+    val userName = MenuEditable("Player", Player.MAX_NAME_LENGTH)
 
     this.menu = new Menu(List(
       ("name", userName),

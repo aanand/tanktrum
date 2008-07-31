@@ -13,7 +13,8 @@ import sbinary.Instances._
 class Server(port: Int) extends Session(null) {
   val TANK_BROADCAST_INTERVAL = 25 //milliseconds
   val PROJECTILE_BROADCAST_INTERVAL = 100
-  val MAX_PLAYERS = 8
+  val PLAYER_BROADCAST_INTERVAL = 1000
+  val MAX_PLAYERS = 6
 
   val TANK_COLORS = List(
     new Color(1f, 0f, 0f),
@@ -34,6 +35,7 @@ class Server(port: Int) extends Session(null) {
   
   var timeToTankUpdate = TANK_BROADCAST_INTERVAL
   var timeToProjectileUpdate = PROJECTILE_BROADCAST_INTERVAL
+  var timeToPlayerUpdate = PLAYER_BROADCAST_INTERVAL
 
   override def enter() = {
     super.enter()
@@ -68,6 +70,13 @@ class Server(port: Int) extends Session(null) {
     if (timeToProjectileUpdate < 0) {
       broadcastProjectiles
       timeToProjectileUpdate = PROJECTILE_BROADCAST_INTERVAL
+    }
+
+    timeToPlayerUpdate -= delta
+
+    if (timeToPlayerUpdate < 0) {
+      broadcastPlayers
+      timeToPlayerUpdate = PLAYER_BROADCAST_INTERVAL
     }
 
     data.clear()

@@ -5,8 +5,16 @@ import java.util.Date
 import sbinary.Instances._
 import sbinary.Operations
 
+object Player {
+  val MAX_NAME_LENGTH = 16
+}
+
 class Player (var tank: Tank, var name: String, var id: Byte) {
   val TIMEOUT = 10000 //in milliseconds
+  
+  if (null != name && name.length > Player.MAX_NAME_LENGTH) {
+    name = name.substring(0, Player.MAX_NAME_LENGTH)
+  }
 
   var lastPing = new Date()
 
@@ -20,13 +28,6 @@ class Player (var tank: Tank, var name: String, var id: Byte) {
     (new Date().getTime() - lastPing.getTime()) > TIMEOUT
   }
 
-  def serialise = {
-    Operations.toByteArray((
-      id,
-      name
-    ))
-  }
-
   def render(g: Graphics) {
     if (null == tank || tank.isDead) {
       return
@@ -37,7 +38,6 @@ class Player (var tank: Tank, var name: String, var id: Byte) {
     
     g.translate(0, 10)
     g.drawString(name, 0, 0)
-    
 
     g.translate(10, 30)
     
@@ -56,10 +56,22 @@ class Player (var tank: Tank, var name: String, var id: Byte) {
     g.resetTransform
   }
 
+  def serialise = {
+    Operations.toByteArray((
+      id,
+      name
+    ))
+  }
+
   def loadFrom(data: Array[Byte]) = {
     val values = Operations.fromByteArray[(Byte, String)](data)
     val (newID, newName) = values
-    name = newName
+    if (newName.length > Player.MAX_NAME_LENGTH) {
+      name = newName.substring(0, Player.MAX_NAME_LENGTH)
+    }
+    else {
+      name = newName
+    }
     id = newID
   }
 }

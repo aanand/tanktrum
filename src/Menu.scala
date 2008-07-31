@@ -95,7 +95,7 @@ abstract class MenuItem {
   def render(container : GameContainer, graphics : Graphics, menu : Menu, current: Boolean) = {}
 }
 
-case class MenuEditable(initValue : String) extends MenuItem {
+case class MenuEditable(initValue : String, maxLength: Int) extends MenuItem {
   var value = initValue
   
   override def perform(menu : Menu) = menu.editing = true
@@ -110,7 +110,9 @@ case class MenuEditable(initValue : String) extends MenuItem {
         }
       }
       case _ => {
-        value = value + char
+        if (value.length < maxLength) {
+          value = value + char
+        }
       }
     }
   }
