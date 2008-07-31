@@ -3,11 +3,11 @@ import net.phys2d
 import sbinary.Instances._
 import sbinary.Operations
 
-class Projectile(session : Session, tank : Tank) extends Collider {
+class Projectile(session: Session, val tank: Tank) extends Collider {
   val COLOR = new slick.Color(1.0f, 1.0f, 1.0f)
   val EXPLOSION_RADIUS = 20f
   val radius = 3f
-  val damage = 20
+  val damage = 5
   val shape = new phys2d.raw.shapes.Circle(radius)
   val body: phys2d.raw.Body = new phys2d.raw.Body(shape, 1.0f)
 
@@ -39,7 +39,7 @@ class Projectile(session : Session, tank : Tank) extends Collider {
     destroy = true
 
     if (session.isInstanceOf[Server]) {
-      session.addExplosion(x, y, EXPLOSION_RADIUS)
+      session.addExplosion(x, y, EXPLOSION_RADIUS, this)
       session.ground.deform(x.toInt, y.toInt, EXPLOSION_RADIUS.toInt)
     }
     

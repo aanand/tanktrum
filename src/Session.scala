@@ -61,8 +61,8 @@ abstract class Session(container: slick.GameContainer) extends phys2d.raw.Collis
     bodies -= body
   }
 
-  def addExplosion(x: Float, y: Float, radius: Float) {
-    explosions += new Explosion(x, y, radius, this)
+  def addExplosion(x: Float, y: Float, radius: Float, projectile: Projectile) {
+    explosions += new Explosion(x, y, radius, this, projectile)
   }
 
   def removeExplosion(e: Explosion) {

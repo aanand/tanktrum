@@ -6,6 +6,6 @@ import sbinary.Operations
 class Nuke(session: Session, tank: Tank) extends Projectile(session, tank) {
   override val radius = 5f
   override val EXPLOSION_RADIUS = 40f
-  override val damage = 40
+  override val damage = 10
   override val projectileType = ProjectileTypes.NUKE
 }

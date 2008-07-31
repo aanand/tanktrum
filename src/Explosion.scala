@@ -3,7 +3,7 @@ import sbinary.Instances._
 import sbinary.Operations
 import net.phys2d
 
-class Explosion (var x: Float, var y: Float, var radius: Float, session: Session) {
+class Explosion (var x: Float, var y: Float, var radius: Float, session: Session, projectile: Projectile) {
   val LIFETIME = 10f //second
   var timeToDie = LIFETIME
 
@@ -28,10 +28,20 @@ class Explosion (var x: Float, var y: Float, var radius: Float, session: Session
           if (-contacts(i).getSeparation > maxOverlap) {
             maxOverlap = -contacts(i).getSeparation
           }
-          println(contacts(i).getSeparation)
         }
         val damage = maxOverlap.toInt
         tank.damage(damage)
+        if (projectile != null) {
+          if (tank == projectile.tank) {
+            projectile.tank.player.score -= damage
+            projectile.tank.player.money -= damage
+          }
+          else {
+            projectile.tank.player.score += damage
+            projectile.tank.player.money += damage
+          }
+
+        }
         session.asInstanceOf[Server].broadcastDamageUpdate(tank, damage)
       }
     }

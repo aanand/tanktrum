@@ -10,20 +10,6 @@ class Roller(session : Session, tank : Tank) extends Projectile(session, tank) {
     if (!obj.isInstanceOf[Tank] || destroy) {
       return
     }
-
-    destroy = true
-
-    if (session.isInstanceOf[Server]) {
-      session.addExplosion(x, y, EXPLOSION_RADIUS)
-      session.ground.deform(x.toInt, y.toInt, EXPLOSION_RADIUS.toInt)
-    }
-    
-    if (obj.isInstanceOf[Tank] && session.isInstanceOf[Server]) {
-      val tank = obj.asInstanceOf[Tank]
-      val server = session.asInstanceOf[Server]
-      
-      tank.damage(damage)
-      server.broadcastDamageUpdate(tank, damage)
-    }
+    super.collide(obj, event) //heh
   }
 }
