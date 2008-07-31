@@ -87,6 +87,8 @@ class Tank (session: Session, var id: Byte) extends Collider {
   val contactGrace = 50
   var contactTime = 0
 
+  var destroy = false
+
   def grounded : Boolean = contactTime > 0; true
 
   def wheelColor = color // new Color(0f, 0f, 1f)
@@ -174,9 +176,13 @@ class Tank (session: Session, var id: Byte) extends Collider {
   }
   
   def update(delta: Int): Unit = {
-    if (isDead) {
-      return
+    if (destroy) {
+      if (null != body) session.removeBody(body)
+      if (null != wheel1) session.removeBody(wheel1)
+      if (null != wheel2) session.removeBody(wheel2)
+      destroy = false
     }
+    if (isDead) return
     
     if (body.isTouchingStatic(new ArrayList[phys2d.raw.Body]) ||
         wheel1.isTouchingStatic(new ArrayList[phys2d.raw.Body]) ||
@@ -239,12 +245,8 @@ class Tank (session: Session, var id: Byte) extends Collider {
   }
   
   def kill = {
+    destroy = true
     health = 0
-    session.removeBody(body)
-    
-    if (null != wheel1) session.removeBody(wheel1)
-    if (null != wheel2) session.removeBody(wheel2)
-
     //session.addFrag(new Frag(x - WHEEL_OFFSET_X, y + WHEEL_OFFSET_Y, WHEEL_RADIUS, color))
     //session.addFrag(new Frag(x + WHEEL_OFFSET_X, y + WHEEL_OFFSET_Y, WHEEL_RADIUS, color))
   }
