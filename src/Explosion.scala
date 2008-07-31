@@ -11,14 +11,29 @@ class Explosion (var x: Float, var y: Float, var radius: Float, session: Session
   if (session.isInstanceOf[Client]) {
     SoundPlayer ! PlaySound(SOUND)
   }
-
-  for (tank <- session.tanks) {
-    val contacts = new Array[phys2d.raw.Contact](1)
-    contacts(0) = new phys2d.raw.Contact
-    val explodeBody = new phys2d.raw.StaticBody(new phys2d.raw.shapes.Circle(radius))
-    explodeBody.setPosition(x, y)
-    if (phys2d.raw.Collide.collide(contacts, explodeBody, tank.body, 0f) > 0) {
-      println("Tank in explosion.")
+  else {
+    for (tank <- session.tanks) {
+      val explodeBody = new phys2d.raw.StaticBody(new phys2d.raw.shapes.Circle(radius))
+      explodeBody.setPosition(x, y)
+      
+      val contacts = new Array[phys2d.raw.Contact](10)
+      for (i <- 0 until contacts.length) contacts(i) = new phys2d.raw.Contact
+      val numContacts = phys2d.raw.Collide.collide(contacts, explodeBody, tank.body, 0f) 
+      
+      if (numContacts > 0) {
+        var maxOverlap = 0f
+        println("Tank in explosion.")
+        //Yeah, this should probably be done with a foldleft.
+        for (i <- 0 until numContacts) {
+          if (-contacts(i).getSeparation > maxOverlap) {
+            maxOverlap = -contacts(i).getSeparation
+          }
+          println(contacts(i).getSeparation)
+        }
+        val damage = maxOverlap.toInt
+        tank.damage(damage)
+        session.asInstanceOf[Server].broadcastDamageUpdate(tank, damage)
+      }
     }
   }
     
