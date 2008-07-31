@@ -5,6 +5,8 @@ import java.nio._
 import java.net._
 import java.util.Date
 
+import scala.collection.mutable.HashMap
+
 import sbinary.Operations
 import sbinary.Instances._
 
@@ -19,6 +21,10 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
 
   val skyTopColor    = new Color(0f, 0f, 0.25f)
   val skyBottomColor = new Color(0.3f, 0.125f, 0.125f)
+
+  val players = new HashMap[Short, Player]
+
+  var serverFull = false
 
   override def enter() = {
     super.enter()
@@ -43,6 +49,11 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
   }
   
   def render(g: Graphics) {
+    if (serverFull) {
+      g.setColor(new Color(1f, 0f, 0f))
+      g.drawString("Error: Server full.", 300, 300)
+      return
+    }
     if (ground.initialised) {
       renderSky(g)
       ground.render(g)
@@ -59,8 +70,8 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
     for (f <- frags) {
       f.render(g)
     }
-    for (i <- 0 until tanks.length) {
-      renderHUD(g, i, tanks(i))
+    for (p <- players.values) {
+      p.render(g)
     }
   }
   
@@ -78,37 +89,16 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
     }
   }
  
-  def renderHUD(g : Graphics, index : Int, tank : Tank) {
-    g.translate(10 + index*110, 10)
-    g.setColor(tank.color)
-    g.fillRect(0, 0, tank.health, 10)
-    
-    g.translate(10, 30)
-    
-    tank.selectedWeapon match {
-      case ProjectileTypes.PROJECTILE => {
-        g.fillOval(-3, -3, 6, 6)
-      }
-      case ProjectileTypes.NUKE => {
-        g.fillOval(-6, -6, 12, 12)
-      }
-      case ProjectileTypes.ROLLER => {
-        g.setColor(new Color(0f, 0f, 1f))
-        g.fillOval(-6, -6, 12, 12)
-      }
-    }
-
-    g.resetTransform
-  }
-  
   def processCommand(command: Char) {
     command match {
+      case Commands.SERVER_FULL => {serverFull = true}
       case Commands.GROUND => {loadGround}
       case Commands.PING   => {resetTimeout}
       case Commands.TANKS => {processUpdate}
       case Commands.PROJECTILE => {loadProjectile}
       case Commands.PROJECTILES => {loadProjectiles}
       case Commands.EXPLOSION => {loadExplosion}
+      case Commands.PLAYERS => {loadPlayers}
     }
   }
   
@@ -204,6 +194,23 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
     e.loadFrom(explosionArray)
     explosions += e
   }
+
+  def loadPlayers = {
+    val playersArray = new Array[Byte](data.remaining)
+    data.get(playersArray)
+    val playerDataList = Operations.fromByteArray[List[Array[byte]]](playersArray)
+    for (playerData <- playerDataList) {
+      val p = new Player(null, null, 0)
+      p.loadFrom(playerData)
+      if (players.isDefinedAt(p.id) && players(p.id).name == p.name) {
+        println("Already have player " + p.name)
+      }
+      else {
+        players.put(p.id, p)
+        println("Loaded player " + p.name)
+      }
+    }
+  }
   
   def processUpdate = {
     val byteArray = new Array[byte](data.remaining)
@@ -214,6 +221,9 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
     if (tanks.length == tankDataList.length) {
       for (i <- 0 until tanks.length) {
         tanks(i).loadFrom(tankDataList(i))
+        if(players.isDefinedAt(tanks(i).id)) {
+          players(tanks(i).id).tank = tanks(i)
+        }
       }
     }
     else {
@@ -221,9 +231,12 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
         removeBody(tank.body)
       }
       tanks = tankDataList.map(tankData => {
-        val t = new Tank(this)
+        val t = new Tank(this, 0)
         t.create(0, null)
         t.loadFrom(tankData)
+        if (players.isDefinedAt(t.id)) {
+          players(t.id).tank = t
+        }
         t
       })
     }

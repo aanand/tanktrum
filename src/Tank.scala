@@ -12,7 +12,7 @@ import scala.collection.mutable.HashMap
 import sbinary.Instances._
 import sbinary.Operations
 
-class Tank (session: Session) extends Collider {
+class Tank (session: Session, var id: Byte) extends Collider {
   val WIDTH = 40f
   val HEIGHT = 20f
   val TAPER = 5f
@@ -311,17 +311,18 @@ class Tank (session: Session) extends Collider {
       selectedWeapon.id.toByte,
       (color.r*127).toByte,
       (color.g*127).toByte,
-      (color.b*127).toByte
+      (color.b*127).toByte,
+      id
     ))
   }
   
   def loadFrom(data: Array[Byte]) = {
-    val values = Operations.fromByteArray[(Float, Float, Short, Short, Short, Short, Short, Byte, Byte, Byte, Byte, Byte, Byte, Byte)](data)
+    val values = Operations.fromByteArray[(Float, Float, Short, Short, Short, Short, Short, Byte, Byte, Byte, Byte, Byte, Byte, Byte, Byte)](data)
     
     val (newX, newY, newAngle, 
         newGunAngle, newGunPower, newGunTimer, 
         newHealth, newThrust, newGunAngleChange, newGunPowerChange, newSelectedWeapon,
-        newRed, newGreen, newBlue) = values
+        newRed, newGreen, newBlue, newID) = values
 
     body.setPosition(newX, newY)
     body.setRotation(newAngle.toFloat.toRadians)
@@ -335,6 +336,7 @@ class Tank (session: Session) extends Collider {
     selectedWeapon = ProjectileTypes.apply(newSelectedWeapon)
     
     color = new slick.Color(newRed/127f, newGreen/127f, newBlue/127f)
+    id = newID
   }
 
 }

@@ -13,6 +13,7 @@ import sbinary.Instances._
 class Server(port: Int) extends Session(null) {
   val TANK_BROADCAST_INTERVAL = 25 //milliseconds
   val PROJECTILE_BROADCAST_INTERVAL = 100
+  val MAX_PLAYERS = 8
 
   val TANK_COLORS = List(
     new Color(1f, 0f, 0f),
@@ -24,6 +25,8 @@ class Server(port: Int) extends Session(null) {
   
   var nextTankColorIndex = 0
   
+  var playerID: Byte = -1
+
   var channel: DatagramChannel = _
   val players = new HashMap[SocketAddress, Player]
   val data = ByteBuffer.allocate(1000)
@@ -95,26 +98,15 @@ class Server(port: Int) extends Session(null) {
     explosions += e
     broadcastExplosion(e)
   }
-  
-  def broadcastTanks {
-    broadcast(tankPositionData)
-  }
 
-  def broadcastProjectiles {
-    broadcast(projectilesData)
-  }
-
-  def broadcastExplosion(e: Explosion) {
-    broadcast(byteToArray(Commands.EXPLOSION) ++ e.serialise)
-  }
-
-  def broadcastFrags() {
-  }
-  
   def tankPositionData = {
     val tankDataList = players.values.map(p => p.tank.serialise).toList
-
     byteToArray(Commands.TANKS) ++ Operations.toByteArray(tankDataList)
+  }
+
+  def playerData = {
+    val playerDataList = players.values.map(p => p.serialise).toList
+    byteToArray(Commands.PLAYERS) ++ Operations.toByteArray(playerDataList)
   }
 
   def projectileData(p: Projectile) = {
@@ -130,7 +122,7 @@ class Server(port: Int) extends Session(null) {
   def checkTimeouts() = {
     for (addr <- players.keys) {
       if (players(addr).timedOut) {
-        println(players(addr).getName + " timed out.")
+        println(players(addr).name + " timed out.")
         players(addr).tank.kill
         players -= addr
       }
@@ -138,32 +130,44 @@ class Server(port: Int) extends Session(null) {
   }
 
   /**
-    * Adds a player, returns false if they already existed.
+    * Adds a player.
     */
-  def addPlayer(addr: SocketAddress) = {
+  def addPlayer(addr: SocketAddress) {
+    if (players.size >= MAX_PLAYERS) {
+      sendFull(addr)
+      return
+    }
+
     if (!players.isDefinedAt(addr)) {
       val nameArray = new Array[byte](data.remaining())
       data.get(nameArray)
       val name = new String(nameArray)
       println("Adding player: " + name)
 
-      players.put(addr, new Player(createTank, name, 0))
+      findNextID
+      val tank = createTank(playerID)
+      val player = new Player(tank, name, playerID)
+      players.put(addr, player)
 
       if (ground.initialised) {
-        println("Sending ground to " + players(addr).getName)
+        println("Sending ground to " + players(addr).name)
         sendGround(addr)
         send(tankPositionData, addr)
       }
-      true
+      broadcastPlayers
     }
-    else {
-      false
+  }
+
+  def findNextID {
+    playerID = ((playerID + 1) % MAX_PLAYERS).toByte
+    if (players.values.exists(player => { player.id == playerID })) {
+      findNextID
     }
   }
   
-  def createTank = {
+  def createTank(id: Byte) = {
     println("Creating a tank.")
-    val tank = new Tank(this)
+    val tank = new Tank(this, id)
     val loc = rand.nextFloat * (Main.WIDTH - 200) + 100
     tank.create(loc, nextTankColor)
     tanks += tank
@@ -210,7 +214,22 @@ class Server(port: Int) extends Session(null) {
   def sendGround(addr: SocketAddress) = {
     send(byteToArray(Commands.GROUND) ++ ground.serialise, addr)
   }
+  
+  def broadcastTanks {
+    broadcast(tankPositionData)
+  }
 
+  def broadcastProjectiles {
+    broadcast(projectilesData)
+  }
+
+  def broadcastExplosion(e: Explosion) {
+    broadcast(byteToArray(Commands.EXPLOSION) ++ e.serialise)
+  }
+
+  def broadcastFrags() {
+  }
+  
   def broadcastGround() = {
     broadcast(byteToArray(Commands.GROUND) ++ ground.serialise)
   }
@@ -219,8 +238,16 @@ class Server(port: Int) extends Session(null) {
     println("broadcasting damage update: " + tank.toString + ", " + damage.toString)
   }
 
+  def broadcastPlayers = {
+    broadcast(playerData)
+  }
+
   def sendPong(addr: SocketAddress) = {
     send(byteToArray(Commands.PING), addr)
+  }
+
+  def sendFull(addr: SocketAddress) = {
+    send(byteToArray(Commands.SERVER_FULL), addr)
   }
   
   def broadcast(data : Array[byte]) {
