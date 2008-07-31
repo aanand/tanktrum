@@ -51,6 +51,7 @@ class Tank (session: Session, var id: Byte) extends Collider {
                       new slick.geom.Vector2f(-(WIDTH/2-BEVEL), 0),
                       new slick.geom.Vector2f(-WIDTH/2, -BEVEL)
                     ).toArray
+  var player: Player = null
 
   val ammo = new HashMap[ProjectileTypes.Value, Int]()
   ammo(ProjectileTypes.PROJECTILE) = 999

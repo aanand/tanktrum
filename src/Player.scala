@@ -60,7 +60,6 @@ class Player (var tank: Tank, var name: String, var id: Byte) {
   }
 
   def serialise = {
-    score += 1
     Operations.toByteArray((
       id,
       score,

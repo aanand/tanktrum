@@ -154,6 +154,7 @@ class Server(port: Int) extends Session(null) {
       findNextID
       val tank = createTank(playerID)
       val player = new Player(tank, name, playerID)
+      tank.player = player
       players.put(addr, player)
 
       if (ground.initialised) {

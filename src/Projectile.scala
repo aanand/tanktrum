@@ -44,11 +44,21 @@ class Projectile(session : Session, tank : Tank) extends Collider {
     }
     
     if (obj.isInstanceOf[Tank] && session.isInstanceOf[Server]) {
-      val tank = obj.asInstanceOf[Tank]
+      val hitTank = obj.asInstanceOf[Tank]
       val server = session.asInstanceOf[Server]
       
-      tank.damage(damage)
-      server.broadcastDamageUpdate(tank, damage)
+      hitTank.damage(damage)
+      if (tank != null && tank.player != null) {
+        if (tank == hitTank) {
+          tank.player.score -= damage
+          tank.player.money -= damage
+        }
+        else {
+          tank.player.score += damage
+          tank.player.money += damage
+        }
+      }
+      server.broadcastDamageUpdate(hitTank, damage)
     }
   }
 
