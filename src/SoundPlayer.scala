@@ -12,8 +12,13 @@ object SoundPlayer extends Actor {
   val files = new File("media/sounds/").list(new SoundFileFilter)
   val sounds = new HashMap[String, (AudioFormat, Array[Byte])]()
   
-  for (file <- files) {
-    sounds(file) = decodeFile("media/sounds/" + file)
+  if (null == files) {
+    System.err.println("Error: Could not find sounds.")
+  }
+  else {
+    for (file <- files) {
+      sounds(file) = decodeFile("media/sounds/" + file)
+    }
   }
 
   def act {
