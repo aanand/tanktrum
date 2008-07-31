@@ -10,7 +10,7 @@ class Game(title: String) extends BasicGame(title) {
   var menu : Menu = _
 
   val INTRO_SOUND = "explosion.ogg"
-  new SoundPlayer(INTRO_SOUND).start
+  SoundPlayer.start
 
   def init(container: GameContainer) {
     this.container = container
@@ -65,6 +65,7 @@ class Game(title: String) extends BasicGame(title) {
   }
 
   def startClient(address: String, port: Int, userName: String) = {
+    SoundPlayer ! PlaySound(INTRO_SOUND)
     if (client != null) {
       client.leave()
       client = null

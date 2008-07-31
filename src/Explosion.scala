@@ -9,7 +9,7 @@ class Explosion (var x: Float, var y: Float, var radius: Float, session: Session
 
   val SOUND = "explosion1.wav"
   if (session.isInstanceOf[Client]) {
-    new SoundPlayer(SOUND).start
+    SoundPlayer ! PlaySound(SOUND)
   }
 
   for (tank <- session.tanks) {

@@ -6,33 +6,40 @@ import javazoom.spi.PropertiesContainer
 import scala.actors.Actor
 import scala.collection.mutable.HashMap
 
-object DeathTankSounds {
+case class PlaySound(s: String) {}
+
+object SoundPlayer extends Actor {
   val files = new File("media/sounds/").list(new SoundFileFilter)
-  val mixer = AudioSystem.getMixer(null)
   val sounds = new HashMap[String, (AudioFormat, Array[Byte])]()
   
   for (file <- files) {
-    sounds(file) = readFile("media/sounds/" + file)
+    sounds(file) = decodeFile("media/sounds/" + file)
+  }
+
+  def act {
+    while (true) {
+      receive {
+        case PlaySound(sound) => { play(sound) }
+      }
+    }
   }
   
   def play(filename: String) = {
-    println(filename)
+    println("Playing: " + filename)
 
     val (format, data) = sounds(filename)
-    
-    val line = mixer.getLine(mixer.getSourceLineInfo()(0)).asInstanceOf[SourceDataLine]
-
-    if (line != null) {
-      line.open(format)
-      line.start
-      line.write(data, 0, data.length)
-      line.drain
-      line.stop
-      line.close
+    val clip = AudioSystem.getClip
+    clip.addLineListener(new SoundListener)
+    try {
+      clip.open(format, data, 0, data.length)
     }
+    catch {
+      case e:LineUnavailableException => { println("Warning: no available sound clips.") }
+    }
+    clip.start
   }
 
-  def readFile(fileName: String) = {
+  def decodeFile(fileName: String) = {
     val rawStream = AudioSystem.getAudioInputStream(new BufferedInputStream(new FileInputStream(fileName)))
     
     val baseFormat = rawStream.getFormat()
@@ -59,9 +66,12 @@ object DeathTankSounds {
   }
 }
 
-class SoundPlayer(sound: String) extends Actor {
-  def act() {
-    DeathTankSounds.play(sound)
+class SoundListener extends LineListener {
+  def update(e: LineEvent) {
+    if (e.getType == LineEvent.Type.STOP) {
+      println("closing line")
+      e.getLine.close
+    }
   }
 }
 
