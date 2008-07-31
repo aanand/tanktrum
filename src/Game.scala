@@ -1,4 +1,5 @@
 import org.newdawn.slick._
+import java.io._
 
 class Game(title: String) extends BasicGame(title) {
   var client: Client = _
@@ -8,16 +9,30 @@ class Game(title: String) extends BasicGame(title) {
   var container: GameContainer = _
 
   var menu : Menu = _
+  
+  val userNameFile = new File("username")
 
   val INTRO_SOUND = "explosion.ogg"
   SoundPlayer.start
+  
 
   def init(container: GameContainer) {
     this.container = container
 
     val serverPort = MenuEditable("10000", 5);
     val serverHostname = MenuEditable("localhost", 255)
-    val userName = MenuEditable("Player", Player.MAX_NAME_LENGTH)
+
+    var storedUserName = "Player"
+    if (userNameFile.exists) {
+      val userNameBytes = new Array[Byte](Player.MAX_NAME_LENGTH)
+      new FileInputStream(userNameFile).read(userNameBytes)
+      storedUserName = new String(userNameBytes)
+    }
+    else {
+      userNameFile.createNewFile
+    }
+
+    val userName = MenuEditable(storedUserName, Player.MAX_NAME_LENGTH)
 
     this.menu = new Menu(List(
       ("name", userName),
@@ -65,6 +80,8 @@ class Game(title: String) extends BasicGame(title) {
   }
 
   def startClient(address: String, port: Int, userName: String) = {
+    new FileOutputStream(userNameFile).write(userName.getBytes)
+
     SoundPlayer ! PlaySound(INTRO_SOUND)
     if (client != null) {
       client.leave()
