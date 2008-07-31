@@ -34,7 +34,7 @@ object SoundPlayer extends Actor {
       clip.open(format, data, 0, data.length)
     }
     catch {
-      case e:LineUnavailableException => { println("Warning: no available sound clips.") }
+      case e:LineUnavailableException => { println("Warning: no available sound lines.") }
     }
     clip.start
   }
