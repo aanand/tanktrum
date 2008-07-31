@@ -70,8 +70,9 @@ class Server(port: Int) extends Session(null) {
       timeToProjectileUpdate = PROJECTILE_BROADCAST_INTERVAL
     }
 
-    data.rewind()
+    data.clear()
     val addr = channel.receive(data)
+    data.limit(data.position)
     data.rewind()
     if (addr != null) {
       val command = data.get().toChar
@@ -129,9 +130,6 @@ class Server(port: Int) extends Session(null) {
     }
   }
 
-  /**
-    * Adds a player.
-    */
   def addPlayer(addr: SocketAddress) {
     if (players.size >= MAX_PLAYERS) {
       sendFull(addr)

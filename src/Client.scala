@@ -40,8 +40,9 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
     ping
     checkTimeout
 
-    data.rewind
+    data.clear
     if (channel.receive(data) != null) {
+      data.limit(data.position)
       data.rewind
       val command = data.get.toChar
       processCommand(command)
