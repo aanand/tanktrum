@@ -35,7 +35,7 @@ class Player (var tank: Tank, var name: String, var id: Byte) {
     g.setColor(tank.color)
     g.fillRect(0, 0, tank.health, 10)
     
-    g.translate(0, 30)
+    g.translate(0, 10)
     g.drawString(name, 0, 0)
     
 
