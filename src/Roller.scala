@@ -3,6 +3,12 @@ import net.phys2d
 import sbinary.Instances._
 import sbinary.Operations
 
+object Roller { 
+  val name = "Roller"
+  val cost = 150
+  val ammo = 5
+}
+
 class Roller(session : Session, tank : Tank) extends Projectile(session, tank) {
   override val projectileType = ProjectileTypes.ROLLER
 

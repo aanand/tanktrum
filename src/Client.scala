@@ -23,8 +23,11 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
   val skyBottomColor = new Color(0.3f, 0.125f, 0.125f)
 
   val players = new HashMap[Short, Player]
+  var me: Player = null
 
   var serverFull = false
+
+  var shop: Shop = new Shop(this)
 
   override def enter() = {
     super.enter()
@@ -53,6 +56,10 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
     if (serverFull) {
       g.setColor(new Color(1f, 0f, 0f))
       g.drawString("Error: Server full.", 300, 300)
+      return
+    }
+    if (shop.menu.showing) {
+      shop.render(g)
       return
     }
     if (ground.initialised) {
@@ -104,9 +111,13 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
   }
   
   def keyPressed(key : Int, char : Char) {
+    if (shop.menu.showing) {
+      shop.menu.keyPressed(key, char)
+    }
     char match {
       case 'a' => { sendCommand(Commands.MOVE_LEFT) }
       case 'd' => { sendCommand(Commands.MOVE_RIGHT) }
+      case 'b' => { shop.menu.showing = true }
       case _ => {
         key match {
           case Input.KEY_LEFT  => { sendCommand(Commands.AIM_ANTICLOCKWISE) }
@@ -208,6 +219,10 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
       }
       else {
         players.put(p.id, p)
+      }
+      //This is poetry:
+      if (p.me) {
+        me = p
       }
     }
   }

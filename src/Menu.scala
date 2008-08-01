@@ -11,10 +11,8 @@ class Menu(tree : List[(String, MenuItem)]) {
   val path = new Stack[Submenu]
   var selection = 0
 
-  def render(container : GameContainer, g : Graphics) {
+  def render(g: Graphics) {
     if (!showing) return;
-    
-    val font = container.getDefaultFont()
     
     g.translate(20, 20)
     
@@ -24,8 +22,9 @@ class Menu(tree : List[(String, MenuItem)]) {
       
       val color = if (current) SELECTED_COLOR else UNSELECTED_COLOR
 
-      font.drawString(0, 0, key, color)
-      command.render(container, g, this, current)
+      g.setColor(color)
+      g.drawString(key, 0, 0)
+      command.render(g, this, current)
       
       g.translate(0, 20)
     }
@@ -92,7 +91,7 @@ class Menu(tree : List[(String, MenuItem)]) {
 abstract class MenuItem {
   def perform(menu : Menu)
   def keyPressed(key : Int, char : Char, menu : Menu) = {}
-  def render(container : GameContainer, graphics : Graphics, menu : Menu, current: Boolean) = {}
+  def render(graphics : Graphics, menu : Menu, current: Boolean) = {}
 }
 
 case class MenuEditable(initValue : String, maxLength: Int) extends MenuItem {
@@ -117,14 +116,14 @@ case class MenuEditable(initValue : String, maxLength: Int) extends MenuItem {
     }
   }
   
-  override def render(container : GameContainer, g : Graphics, menu : Menu, current: Boolean) {
+  override def render(g: Graphics, menu: Menu, current: Boolean) {
     var str = value
     
     if (current && menu.editing) {
       str = str + '_'
     }
     
-    container.getDefaultFont.drawString(100, 0, str)
+    g.drawString(str, 100, 0)
   }
 }
 

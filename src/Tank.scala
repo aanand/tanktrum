@@ -320,16 +320,18 @@ class Tank (session: Session, var id: Byte) extends Collider {
       gunAngleChange.toByte, 
       gunPowerChange.toByte,
       selectedWeapon.id.toByte,
+      ammo(selectedWeapon).toShort,
       id
     ))
   }
   
   def loadFrom(data: Array[Byte]) = {
-    val values = Operations.fromByteArray[(Float, Float, Short, Short, Short, Short, Short, Byte, Byte, Byte, Byte, Byte)](data)
+    val values = Operations.fromByteArray[(Float, Float, Short, Short, Short, Short, Short, Byte, Byte, Byte, Byte, Short, Byte)](data)
     
     val (newX, newY, newAngle, 
         newGunAngle, newGunPower, newGunTimer, 
-        newHealth, newThrust, newGunAngleChange, newGunPowerChange, newSelectedWeapon,
+        newHealth, newThrust, newGunAngleChange, newGunPowerChange, 
+        newSelectedWeapon, newSelectedAmmo,
         newID) = values
 
     body.setPosition(newX, newY)
@@ -342,6 +344,7 @@ class Tank (session: Session, var id: Byte) extends Collider {
     gunAngleChange = newGunAngleChange
     gunPowerChange = newGunPowerChange
     selectedWeapon = ProjectileTypes.apply(newSelectedWeapon)
+    ammo(selectedWeapon) = newSelectedAmmo
     
     id = newID
     

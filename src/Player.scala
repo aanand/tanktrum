@@ -17,6 +17,8 @@ class Player (var tank: Tank, var name: String, var id: Byte) {
   var score = 0
   var money = 0
 
+  var me = false
+
   if (null != name && name.length > Player.MAX_NAME_LENGTH) {
     name = name.substring(0, Player.MAX_NAME_LENGTH)
   }
@@ -56,12 +58,29 @@ class Player (var tank: Tank, var name: String, var id: Byte) {
         g.fillOval(-6, -6, 12, 12)
       }
     }
+    g.drawString(tank.ammo(tank.selectedWeapon).toString, 15, -10)
+
     g.resetTransform
+  }
+
+  def buyNuke = {
+    if (money > Nuke.cost) { 
+      money -= Nuke.cost
+      tank.ammo(ProjectileTypes.NUKE) = tank.ammo(ProjectileTypes.NUKE) + Nuke.ammo
+    }
+  }
+  
+  def buyRoller = {
+    if (money > Roller.cost) { 
+      money -= Roller.cost
+      tank.ammo(ProjectileTypes.ROLLER) = tank.ammo(ProjectileTypes.ROLLER) + Roller.ammo
+    }
   }
 
   def serialise = {
     Operations.toByteArray((
       id,
+      me,
       score,
       money,
       name
@@ -69,14 +88,15 @@ class Player (var tank: Tank, var name: String, var id: Byte) {
   }
 
   def loadFrom(data: Array[Byte]) = {
-    val values = Operations.fromByteArray[(Byte, Int, Int, String)](data)
-    val (newID, newScore, newMoney, newName) = values
+    val values = Operations.fromByteArray[(Byte, Boolean, Int, Int, String)](data)
+    val (newID, newMe, newScore, newMoney, newName) = values
     if (newName.length > Player.MAX_NAME_LENGTH) {
       name = newName.substring(0, Player.MAX_NAME_LENGTH)
     }
     else {
       name = newName
     }
+    me = newMe
     score = newScore
     money = newMoney
     id = newID

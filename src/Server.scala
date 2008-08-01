@@ -200,6 +200,9 @@ class Server(port: Int) extends Session(null) {
 
       case Commands.FIRE => { player.tank.fire() }
       case Commands.CYCLE_WEAPON => { player.tank.cycleWeapon() }
+
+      case Commands.BUY_NUKE => { player.buyNuke }
+      case Commands.BUY_ROLLER => { player.buyRoller }
     }
   }
 
@@ -255,7 +258,11 @@ class Server(port: Int) extends Session(null) {
   }
 
   def broadcastPlayers = {
-    broadcast(playerData)
+    for (addr <- players.keys) {
+      players(addr).me = true
+      send(playerData, addr)
+      players(addr).me = false
+    }
   }
 
 

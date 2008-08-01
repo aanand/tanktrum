@@ -62,7 +62,7 @@ class Game(title: String) extends BasicGame(title) {
     }
     
     if (menu != null) {
-      menu.render(container, graphics)
+      menu.render(graphics)
     }
   }
   

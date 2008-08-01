@@ -32,4 +32,7 @@ object Commands {
 
   val FIRE = nextI
   val CYCLE_WEAPON = nextI
+
+  val BUY_NUKE = nextI
+  val BUY_ROLLER = nextI
 }
