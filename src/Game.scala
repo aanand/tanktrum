@@ -24,7 +24,10 @@ class Game(title: String) extends BasicGame(title) {
 
     var storedUserName = "Player"
     if (userNameFile.exists) {
-      val userNameBytes = new Array[Byte](Player.MAX_NAME_LENGTH)
+      var len = userNameFile.length.toInt //There could be a problem here if the username file is more than 2 Gb.
+      if (len > Player.MAX_NAME_LENGTH) { len = Player.MAX_NAME_LENGTH }
+      
+      val userNameBytes = new Array[Byte](len)
       new FileInputStream(userNameFile).read(userNameBytes)
       storedUserName = new String(userNameBytes)
     }
