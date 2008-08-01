@@ -29,6 +29,9 @@ class Server(port: Int) extends Session(null) {
   var timeToProjectileUpdate = PROJECTILE_BROADCAST_INTERVAL
   var timeToPlayerUpdate = PLAYER_BROADCAST_INTERVAL
 
+  /**
+   * Called to start the server.
+   */
   override def enter() = {
     super.enter()
 
@@ -39,6 +42,9 @@ class Server(port: Int) extends Session(null) {
     channel.configureBlocking(false)
   }
   
+  /**
+   * Called to stop the server.
+   */
   override def leave() = {
     super.leave()
 
@@ -46,6 +52,10 @@ class Server(port: Int) extends Session(null) {
     channel.disconnect()
   }
 
+  /**
+   * Updates the server, processing physics and sending updates if it is time
+   * to.
+   */
   override def update(delta: Int) = {
     super.update(delta)
     checkTimeouts()
@@ -89,6 +99,9 @@ class Server(port: Int) extends Session(null) {
     }
   }
 
+  /***
+   * Add methods.  These all add create an instance of a game object and add it to a collection to be tracked by the server.
+   */
   override def addProjectile(tank : Tank, x : Double, y : Double, angle : Double, speed : Double, projectileType: ProjectileTypes.Value) = {
     val p = super.addProjectile(tank, x, y, angle, speed, projectileType)
     broadcast(projectileData(p))
@@ -99,36 +112,6 @@ class Server(port: Int) extends Session(null) {
     val e = new Explosion(x, y, radius, this, projectile)
     explosions += e
     broadcastExplosion(e)
-  }
-
-  def tankPositionData = {
-    val tankDataList = players.values.map(p => p.tank.serialise).toList
-    byteToArray(Commands.TANKS) ++ Operations.toByteArray(tankDataList)
-  }
-
-  def playerData = {
-    val playerDataList = players.values.map(p => p.serialise).toList
-    byteToArray(Commands.PLAYERS) ++ Operations.toByteArray(playerDataList)
-  }
-
-  def projectileData(p: Projectile) = {
-    byteToArray(Commands.PROJECTILE) ++ p.serialise
-  }
-
-  def projectilesData() = {
-    val projectileDataList = projectiles.map(p => p.serialise).toList
-
-    byteToArray(Commands.PROJECTILES) ++ Operations.toByteArray(projectileDataList)
-  }
-
-  def checkTimeouts() = {
-    for (addr <- players.keys) {
-      if (players(addr).timedOut) {
-        println(players(addr).name + " timed out.")
-        players(addr).tank.kill
-        players -= addr
-      }
-    }
   }
 
   def addPlayer(addr: SocketAddress) {
@@ -158,13 +141,6 @@ class Server(port: Int) extends Session(null) {
     }
   }
 
-  def findNextID {
-    playerID = ((playerID + 1) % MAX_PLAYERS).toByte
-    if (players.values.exists(player => { player.id == playerID })) {
-      findNextID
-    }
-  }
-  
   def createTank(id: Byte) = {
     println("Creating a tank.")
     val tank = new Tank(this, id)
@@ -172,6 +148,31 @@ class Server(port: Int) extends Session(null) {
     tank.create(loc)
     tanks += tank
     tank
+  }
+
+  /**
+   * Check each player to see if they have timed out or not.  Remove them if they have.
+   */
+  def checkTimeouts() = {
+    for (addr <- players.keys) {
+      if (players(addr).timedOut) {
+        println(players(addr).name + " timed out.")
+        players(addr).tank.kill
+        players -= addr
+      }
+    }
+  }
+
+  /**
+   * Finds the next available player id.
+   * TODO: Decide if this should be the lowest possible id or the next
+   * available after the last used one. (it's currently the next available)
+   */
+  def findNextID {
+    playerID = ((playerID + 1) % MAX_PLAYERS).toByte
+    if (players.values.exists(player => { player.id == playerID })) {
+      findNextID
+    }
   }
   
   def processCommand(command: char, addr: SocketAddress) {
@@ -202,13 +203,34 @@ class Server(port: Int) extends Session(null) {
     }
   }
 
-  /** Send the ground array, preceded by something telling the client that this
-    * is a ground array. (I guess scala does some kind of javadoc thing like this?)
-    */
-  def sendGround(addr: SocketAddress) = {
-    send(byteToArray(Commands.GROUND) ++ ground.serialise, addr)
+  /***
+   * Serialisation methods.  These all return byte arrays which can be sent to
+   * the client as an update.
+   */
+  def tankPositionData = {
+    val tankDataList = players.values.map(p => p.tank.serialise).toList
+    byteToArray(Commands.TANKS) ++ Operations.toByteArray(tankDataList)
   }
-  
+
+  def playerData = {
+    val playerDataList = players.values.map(p => p.serialise).toList
+    byteToArray(Commands.PLAYERS) ++ Operations.toByteArray(playerDataList)
+  }
+
+  def projectileData(p: Projectile) = {
+    byteToArray(Commands.PROJECTILE) ++ p.serialise
+  }
+
+  def projectilesData() = {
+    val projectileDataList = projectiles.map(p => p.serialise).toList
+
+    byteToArray(Commands.PROJECTILES) ++ Operations.toByteArray(projectileDataList)
+  }
+
+
+  /***
+   * Broadcast methods.  These send an update to all clients.
+   */
   def broadcastTanks {
     broadcast(tankPositionData)
   }
@@ -236,6 +258,10 @@ class Server(port: Int) extends Session(null) {
     broadcast(playerData)
   }
 
+
+  /***
+   * Send methods.  These send a command to a single address.
+   */
   def sendPong(addr: SocketAddress) = {
     send(byteToArray(Commands.PING), addr)
   }
@@ -243,13 +269,24 @@ class Server(port: Int) extends Session(null) {
   def sendFull(addr: SocketAddress) = {
     send(byteToArray(Commands.SERVER_FULL), addr)
   }
+
+  def sendGround(addr: SocketAddress) = {
+    send(byteToArray(Commands.GROUND) ++ ground.serialise, addr)
+  }
   
+
+  /**
+   * Sends the provided byte array to all clients.
+   */
   def broadcast(data : Array[byte]) {
     for (addr <- players.keys) {
       send(data, addr)
     }
   }
 
+  /**
+   * Sends the provided byte array to a single client.
+   */
   def send(data: Array[byte], addr: SocketAddress) = {
     channel.send(ByteBuffer.wrap(data), addr)
   }
