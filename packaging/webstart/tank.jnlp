@@ -15,7 +15,10 @@
     <jar href="scala-library.jar"/>
     <jar href="phys2d.jar"/>
     <jar href="sbinary.jar"/>
-    
+    <jar href="tritonus_share.jar"/>
+    <jar href="jogg.jar"/>
+    <jar href="jorbis.jar"/>
+    <jar href="vorbisspi.jar"/>
     <extension href="http://slick.cokeandcode.com/demos/slick.jnlp" version="b236"/>
   </resources>
 

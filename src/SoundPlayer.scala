@@ -9,16 +9,14 @@ import scala.collection.mutable.HashMap
 case class PlaySound(s: String) {}
 
 object SoundPlayer extends Actor {
-  val files = new File("media/sounds/").list(new SoundFileFilter)
+  var files = List[String]()
+  files += "explosion.ogg"
+  files += "explosion1.wav"
+  
   val sounds = new HashMap[String, (AudioFormat, Array[Byte])]()
   
-  if (null == files) {
-    System.err.println("Error: Could not find sounds.")
-  }
-  else {
-    for (file <- files) {
-      sounds(file) = decodeFile("media/sounds/" + file)
-    }
+  for (file <- files) {
+    sounds(file) = decodeFile("media/sounds/" + file)
   }
 
   def act {
@@ -45,7 +43,13 @@ object SoundPlayer extends Actor {
   }
 
   def decodeFile(fileName: String) = {
-    val rawStream = AudioSystem.getAudioInputStream(new BufferedInputStream(new FileInputStream(fileName)))
+    var rawStream: AudioInputStream = null
+    if (new File(fileName).exists) {
+      rawStream = AudioSystem.getAudioInputStream(new BufferedInputStream(new FileInputStream(fileName)))
+    }
+    else {
+      rawStream = AudioSystem.getAudioInputStream(new BufferedInputStream(getClass.getResourceAsStream(fileName)))
+    }
     
     val baseFormat = rawStream.getFormat()
 
