@@ -113,6 +113,7 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
   def keyPressed(key : Int, char : Char) {
     if (shop.menu.showing) {
       shop.menu.keyPressed(key, char)
+      return
     }
     char match {
       case 'a' => { sendCommand(Commands.MOVE_LEFT) }

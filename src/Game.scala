@@ -60,12 +60,12 @@ class Game(title: String) extends BasicGame(title) {
   }
 
   def render(container: GameContainer, graphics: Graphics) {
+    if (menu != null && menu.showing) {
+      menu.render(graphics)
+      return
+    }
     if (client != null && client.isActive) {
       client.render(graphics)
-    }
-    
-    if (menu != null) {
-      menu.render(graphics)
     }
   }
   
