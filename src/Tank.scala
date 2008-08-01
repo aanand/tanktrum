@@ -63,8 +63,8 @@ class Tank (session: Session, var id: Byte) extends Collider {
 
   val ammo = new HashMap[ProjectileTypes.Value, Int]()
   ammo(ProjectileTypes.PROJECTILE) = 999
-  ammo(ProjectileTypes.NUKE) = 2
-  ammo(ProjectileTypes.ROLLER) = 10
+  ammo(ProjectileTypes.NUKE) = 0
+  ammo(ProjectileTypes.ROLLER) = 2
 
   var selectedWeapon = ProjectileTypes.PROJECTILE
 
