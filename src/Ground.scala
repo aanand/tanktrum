@@ -8,6 +8,7 @@ import sbinary.Instances._
 import sbinary.Operations
 
 class Ground(session : Session, width : Int, height : Int) extends Collider {
+  val MIN_HEIGHT = 20
   val granularity = 1
 
   val topsoilColor = new Color(0.5f, 0.5f, 0f)
@@ -86,6 +87,9 @@ class Ground(session : Session, width : Int, height : Int) extends Collider {
               points(x+i).y += (yBottom - yTop).toFloat
             }
           }
+          if (points(x+i).y > Main.HEIGHT-MIN_HEIGHT) {
+            points(x+i).y = Main.HEIGHT-MIN_HEIGHT
+          }
         }
       }
       initPoints()
@@ -111,6 +115,9 @@ class Ground(session : Session, width : Int, height : Int) extends Collider {
         }
       }
     }
+
+    g.setColor(new Color(0.5f, 0.5f, 0.5f))
+    g.fillRect(0, Main.HEIGHT-MIN_HEIGHT, Main.WIDTH, MIN_HEIGHT)
   }
   
   def serialise() = {
