@@ -40,7 +40,9 @@ class Ground(session : Session, width : Int, height : Int) extends Collider {
   }
   
   def initPoints() {
-    val shapePoints = List(new Vector2f(0, height)) ++ points ++ List(new Vector2f(width, height), new Vector2f(0, height))
+    val shapePoints = List(new Vector2f(-20, height), new Vector2f(0, -height)) ++ 
+                      points ++ 
+                      List(new Vector2f(width, -height), new Vector2f(width+20, height), new Vector2f(-20, height))
     
     val drawShapePoints = shapePoints.foldLeft[List[Float]](List())((list, v) => list ++ List(v.getX(), v.getY()))
     
