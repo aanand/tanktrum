@@ -34,7 +34,7 @@ class Player (var tank: Tank, var name: String, var id: Byte) {
   }
 
   def render(g: Graphics) {
-    if (null == tank || tank.isDead) {
+    if (null == tank) {
       return
     }
     g.translate(10 + id*110, 10)
@@ -44,34 +44,35 @@ class Player (var tank: Tank, var name: String, var id: Byte) {
     g.translate(0, 10)
     g.drawString(name + ": " + score, 0, 0)
 
-    g.translate(10, 30)
-    
-    tank.selectedWeapon match {
-      case ProjectileTypes.PROJECTILE => {
-        g.fillOval(-3, -3, 6, 6)
+    if (tank.isAlive) {
+      g.translate(10, 30)
+      
+      tank.selectedWeapon match {
+        case ProjectileTypes.PROJECTILE => {
+          g.fillOval(-3, -3, 6, 6)
+        }
+        case ProjectileTypes.NUKE => {
+          g.fillOval(-6, -6, 12, 12)
+        }
+        case ProjectileTypes.ROLLER => {
+          g.setColor(new Color(0f, 0f, 1f))
+          g.fillOval(-6, -6, 12, 12)
+        }
       }
-      case ProjectileTypes.NUKE => {
-        g.fillOval(-6, -6, 12, 12)
-      }
-      case ProjectileTypes.ROLLER => {
-        g.setColor(new Color(0f, 0f, 1f))
-        g.fillOval(-6, -6, 12, 12)
-      }
+      g.drawString(tank.ammo(tank.selectedWeapon).toString, 15, -10)
     }
-    g.drawString(tank.ammo(tank.selectedWeapon).toString, 15, -10)
-
     g.resetTransform
   }
 
   def buyNuke = {
-    if (money > Nuke.cost) { 
+    if (money >= Nuke.cost) { 
       money -= Nuke.cost
       tank.ammo(ProjectileTypes.NUKE) = tank.ammo(ProjectileTypes.NUKE) + Nuke.ammo
     }
   }
   
   def buyRoller = {
-    if (money > Roller.cost) { 
+    if (money >= Roller.cost) { 
       money -= Roller.cost
       tank.ammo(ProjectileTypes.ROLLER) = tank.ammo(ProjectileTypes.ROLLER) + Roller.ammo
     }
