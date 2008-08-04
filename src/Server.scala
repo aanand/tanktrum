@@ -32,7 +32,7 @@ class Server(port: Int) extends Session(null) {
   var timeToReadyRoomUpdate = READY_ROOM_BROADCAST_INTERVAL
 
   var inReadyRoom = true
-
+  
   /**
    * Called to start the server.
    */
@@ -84,10 +84,7 @@ class Server(port: Int) extends Session(null) {
     }
     else {
       if (players.values.toList.filter(player => player.tank.isAlive).size <= 1) {
-        for (player <- players.values) {
-          player.ready = false
-        }
-        inReadyRoom = true;
+        newRound
       }
       timeToTankUpdate -= delta
 
@@ -142,6 +139,21 @@ class Server(port: Int) extends Session(null) {
     val e = new Explosion(x, y, radius, this, projectile)
     explosions += e
     broadcastExplosion(e)
+  }
+
+  def newRound {
+    /*projectiles.clear
+    explosions.clear
+    bodies.clear*/
+    for (player <- players.values) {
+      player.ready = false
+    }
+    inReadyRoom = true;
+    ground.buildPoints
+    for (player <- players.values) {
+      player.tank.remove
+      player.tank = createTank(player.id)
+    }
   }
 
   def addPlayer(addr: SocketAddress) {
