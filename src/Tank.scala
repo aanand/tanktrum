@@ -13,12 +13,12 @@ import sbinary.Instances._
 import sbinary.Operations
 
 class Tank (session: Session, var id: Byte) extends Collider {
-  val WIDTH = 40f
-  val HEIGHT = 20f
-  val TAPER = 5f
-  val BEVEL = 4f
+  val WIDTH = 30f
+  val HEIGHT = WIDTH/2
+  val TAPER = WIDTH/8
+  val BEVEL = WIDTH/10
 
-  val SPEED = 20f // pixels/second
+  val SPEED = WIDTH/2 // pixels/second
 
   val WHEEL_RADIUS = BEVEL
   val WHEEL_OFFSET_X = WIDTH/2-BEVEL
@@ -38,7 +38,7 @@ class Tank (session: Session, var id: Byte) extends Collider {
   val GUN_RELOAD_TIME = 4.0f
   
   val GUN_OFFSET_X = 0
-  val GUN_OFFSET_Y = -30
+  val GUN_OFFSET_Y = -(1.5f*HEIGHT)
   
   val GUN_READY_COLOR   = new Color(0.0f, 1.0f, 0.0f, 0.5f)
   val GUN_LOADING_COLOR = new Color(1.0f, 0.0f, 0.0f, 0.5f)
