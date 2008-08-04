@@ -27,7 +27,8 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
 
   var serverFull = false
 
-  var shop: Shop = new Shop(this)
+  val readyRoom = new ReadyRoom(this)
+  var inReadyRoom = false
 
   override def enter() = {
     super.enter()
@@ -51,6 +52,10 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
       processCommand(command)
     }
   }
+
+  override def tanks = {
+    players.values.map(player => player.tank)
+  }
   
   def render(g: Graphics) {
     if (serverFull) {
@@ -58,16 +63,13 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
       g.drawString("Error: Server full.", 300, 300)
       return
     }
-    if (shop.menu.showing) {
-      shop.render(g)
+    if (inReadyRoom) {
+      readyRoom.render(g)
       return
     }
     if (ground.initialised) {
       renderSky(g)
       ground.render(g)
-    }
-    for (tank <- tanks) {
-      tank.render(g)
     }
     for (p <- projectiles) {
       p.render(g)
@@ -107,18 +109,18 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
       case Commands.PROJECTILES => {loadProjectiles}
       case Commands.EXPLOSION => {loadExplosion}
       case Commands.PLAYERS => {loadPlayers}
+      case Commands.READY_ROOM => {inReadyRoom = true}
     }
   }
   
   def keyPressed(key : Int, char : Char) {
-    if (shop.menu.showing) {
-      shop.menu.keyPressed(key, char)
+    if (inReadyRoom) {
+      readyRoom.menu.keyPressed(key, char)
       return
     }
     char match {
       case 'a' => { sendCommand(Commands.MOVE_LEFT) }
       case 'd' => { sendCommand(Commands.MOVE_RIGHT) }
-      case 'b' => { shop.menu.showing = true }
       case _ => {
         key match {
           case Input.KEY_LEFT  => { sendCommand(Commands.AIM_ANTICLOCKWISE) }
@@ -212,6 +214,9 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
     val playersArray = new Array[Byte](data.remaining)
     data.get(playersArray)
     val playerDataList = Operations.fromByteArray[List[Array[byte]]](playersArray)
+
+    for (player <- players.values) { player.updated = false }
+
     for (playerData <- playerDataList) {
       val p = new Player(null, "Unknown.", 0)
       p.loadFrom(playerData)
@@ -221,40 +226,41 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
       else {
         players.put(p.id, p)
       }
+      players(p.id).updated = true
       //This is poetry:
       if (p.me) {
         me = p
       }
     }
+
+    //prune players who no longer exist.
+    for (player <- players.values) {
+      if (player.updated == false && !player.me) {
+        players -= player.id
+      }
+    }
   }
   
   def processUpdate = {
+    inReadyRoom = false
     val byteArray = new Array[byte](data.remaining)
     data.get(byteArray)
     
-    val tankDataList = Operations.fromByteArray[List[Array[byte]]](byteArray)
+    val tankDataList = Operations.fromByteArray[List[(Byte, Array[Byte])]](byteArray)
   
-    if (tanks.length == tankDataList.length) {
-      for (i <- 0 until tanks.length) {
-        tanks(i).loadFrom(tankDataList(i))
-        if(players.isDefinedAt(tanks(i).id)) {
-          players(tanks(i).id).tank = tanks(i)
+    for (tankDataMap <- tankDataList) {
+      val (id, tankData) = tankDataMap
+      if (players.isDefinedAt(id)) {
+        if (null != players(id).tank) {
+          players(id).tank.loadFrom(tankData)
         }
-      }
-    }
-    else {
-      for (tank <- tanks) {
-        removeBody(tank.body)
-      }
-      tanks = tankDataList.map(tankData => {
-        val t = new Tank(this, 0)
-        t.create(0)
-        t.loadFrom(tankData)
-        if (players.isDefinedAt(t.id)) {
+        else {
+          val t = new Tank(this, 0)
+          t.create(0)
+          t.loadFrom(tankData)
           players(t.id).tank = t
         }
-        t
-      })
+      }
     }
   }
 

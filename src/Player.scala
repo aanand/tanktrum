@@ -19,6 +19,9 @@ class Player (var tank: Tank, var name: String, var id: Byte) {
 
   var me = false
 
+  var updated = true
+  var ready = false
+
   if (null != name && name.length > Player.MAX_NAME_LENGTH) {
     name = name.substring(0, Player.MAX_NAME_LENGTH)
   }
@@ -62,6 +65,8 @@ class Player (var tank: Tank, var name: String, var id: Byte) {
       g.drawString(tank.ammo(tank.selectedWeapon).toString, 15, -10)
     }
     g.resetTransform
+
+    tank.render(g)
   }
 
   def buyNuke = {
@@ -82,6 +87,7 @@ class Player (var tank: Tank, var name: String, var id: Byte) {
     Operations.toByteArray((
       id,
       me,
+      ready,
       score,
       money,
       name
@@ -89,8 +95,8 @@ class Player (var tank: Tank, var name: String, var id: Byte) {
   }
 
   def loadFrom(data: Array[Byte]) = {
-    val values = Operations.fromByteArray[(Byte, Boolean, Int, Int, String)](data)
-    val (newID, newMe, newScore, newMoney, newName) = values
+    val values = Operations.fromByteArray[(Byte, Boolean, Boolean, Int, Int, String)](data)
+    val (newID, newMe, newReady, newScore, newMoney, newName) = values
     if (newName.length > Player.MAX_NAME_LENGTH) {
       name = newName.substring(0, Player.MAX_NAME_LENGTH)
     }
@@ -98,6 +104,7 @@ class Player (var tank: Tank, var name: String, var id: Byte) {
       name = newName
     }
     me = newMe
+    ready = newReady
     score = newScore
     money = newMoney
     id = newID

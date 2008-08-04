@@ -14,6 +14,7 @@ class Server(port: Int) extends Session(null) {
   val TANK_BROADCAST_INTERVAL = 25 //milliseconds
   val PROJECTILE_BROADCAST_INTERVAL = 100
   val PLAYER_BROADCAST_INTERVAL = 1000
+  val READY_ROOM_BROADCAST_INTERVAL = 1000
   val MAX_PLAYERS = 6
 
   var nextTankColorIndex = 0
@@ -28,6 +29,9 @@ class Server(port: Int) extends Session(null) {
   var timeToTankUpdate = TANK_BROADCAST_INTERVAL
   var timeToProjectileUpdate = PROJECTILE_BROADCAST_INTERVAL
   var timeToPlayerUpdate = PLAYER_BROADCAST_INTERVAL
+  var timeToReadyRoomUpdate = READY_ROOM_BROADCAST_INTERVAL
+
+  var inReadyRoom = true
 
   /**
    * Called to start the server.
@@ -51,6 +55,10 @@ class Server(port: Int) extends Session(null) {
     channel.socket.close()
     channel.disconnect()
   }
+  
+  override def tanks = {
+    players.values.map(player => player.tank)
+  }
 
   /**
    * Updates the server, processing physics and sending updates if it is time
@@ -60,25 +68,47 @@ class Server(port: Int) extends Session(null) {
     super.update(delta)
     checkTimeouts()
 
-    timeToTankUpdate -= delta
+    if (inReadyRoom) {
+      if (players.size > 1 && players.values.forall(player => player.ready)) {
+        //If all players are ready then we start the game.
+        println("Starting game.")
+        inReadyRoom = false;
+      }
 
-    if (timeToTankUpdate < 0) {
-      broadcastTanks
-      timeToTankUpdate = TANK_BROADCAST_INTERVAL
+      timeToReadyRoomUpdate -= delta
+      if (timeToReadyRoomUpdate < 0) {
+        broadcastReadyRoom
+        broadcastPlayers
+        timeToReadyRoomUpdate = READY_ROOM_BROADCAST_INTERVAL
+      }
     }
+    else {
+      if (players.values.toList.filter(player => player.tank.isAlive).size <= 1) {
+        for (player <- players.values) {
+          player.ready = false
+        }
+        inReadyRoom = true;
+      }
+      timeToTankUpdate -= delta
 
-    timeToProjectileUpdate -= delta
+      if (timeToTankUpdate < 0) {
+        broadcastTanks
+        timeToTankUpdate = TANK_BROADCAST_INTERVAL
+      }
 
-    if (timeToProjectileUpdate < 0) {
-      broadcastProjectiles
-      timeToProjectileUpdate = PROJECTILE_BROADCAST_INTERVAL
-    }
+      timeToProjectileUpdate -= delta
 
-    timeToPlayerUpdate -= delta
+      if (timeToProjectileUpdate < 0) {
+        broadcastProjectiles
+        timeToProjectileUpdate = PROJECTILE_BROADCAST_INTERVAL
+      }
 
-    if (timeToPlayerUpdate < 0) {
-      broadcastPlayers
-      timeToPlayerUpdate = PLAYER_BROADCAST_INTERVAL
+      timeToPlayerUpdate -= delta
+
+      if (timeToPlayerUpdate < 0) {
+        broadcastPlayers
+        timeToPlayerUpdate = PLAYER_BROADCAST_INTERVAL
+      }
     }
 
     data.clear()
@@ -146,7 +176,6 @@ class Server(port: Int) extends Session(null) {
     val tank = new Tank(this, id)
     val loc = rand.nextFloat * (Main.WIDTH - 200) + 100
     tank.create(loc)
-    tanks += tank
     tank
   }
 
@@ -157,7 +186,7 @@ class Server(port: Int) extends Session(null) {
     for (addr <- players.keys) {
       if (players(addr).timedOut) {
         println(players(addr).name + " timed out.")
-        players(addr).tank.kill
+        players(addr).tank.remove
         players -= addr
       }
     }
@@ -201,8 +230,10 @@ class Server(port: Int) extends Session(null) {
       case Commands.FIRE => { player.tank.fire() }
       case Commands.CYCLE_WEAPON => { player.tank.cycleWeapon() }
 
-      case Commands.BUY_NUKE => { player.buyNuke }
-      case Commands.BUY_ROLLER => { player.buyRoller }
+      case Commands.READY => { player.ready = true }
+      case Commands.BUY_NUKE => { if (inReadyRoom) player.buyNuke }
+      case Commands.BUY_ROLLER => { if (inReadyRoom) player.buyRoller }
+
     }
   }
 
@@ -211,7 +242,7 @@ class Server(port: Int) extends Session(null) {
    * the client as an update.
    */
   def tankPositionData = {
-    val tankDataList = players.values.map(p => p.tank.serialise).toList
+    val tankDataList = players.values.map(p => (p.tank.id, p.tank.serialise)).toList
     byteToArray(Commands.TANKS) ++ Operations.toByteArray(tankDataList)
   }
 
@@ -263,6 +294,10 @@ class Server(port: Int) extends Session(null) {
       send(playerData, addr)
       players(addr).me = false
     }
+  }
+  
+  def broadcastReadyRoom {
+    broadcast(byteToArray(Commands.READY_ROOM))
   }
 
 

@@ -14,11 +14,12 @@ abstract class Session(container: slick.GameContainer) extends phys2d.raw.Collis
   var ground: Ground = _
 
   var active = false
-  var tanks = List[Tank]()
   val bodies = new HashMap[phys2d.raw.Body, Collider]
   var projectiles = List[Projectile]()
   val explosions = new HashSet[Explosion]
   val frags = new HashSet[Frag]
+
+  def tanks: Iterator[Tank]
 
   def enter() {
     ground = new Ground(this, WIDTH, HEIGHT)
@@ -34,7 +35,7 @@ abstract class Session(container: slick.GameContainer) extends phys2d.raw.Collis
     
     ground.update(delta)
     for (tank <- tanks) {
-      tank.update(delta)
+      if (null != tank) { tank.update(delta) }
     }
     for (p <- projectiles) {
       p.update(delta)
@@ -42,7 +43,6 @@ abstract class Session(container: slick.GameContainer) extends phys2d.raw.Collis
     for (e <- explosions) {
       e.update(delta)
     }
-    
   }
   
   def byteToArray(c: Byte) = {

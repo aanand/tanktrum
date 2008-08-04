@@ -14,6 +14,7 @@ object Commands {
   val EXPLOSION = nextI
   val PLAYERS = nextI
   val SERVER_FULL = nextI
+  val READY_ROOM = nextI
 
   val MOVE_LEFT = nextI
   val STOP_MOVE_LEFT = nextI
@@ -33,6 +34,7 @@ object Commands {
   val FIRE = nextI
   val CYCLE_WEAPON = nextI
 
+  val READY = nextI
   val BUY_NUKE = nextI
   val BUY_ROLLER = nextI
 }

@@ -186,10 +186,7 @@ class Tank (session: Session, var id: Byte) extends Collider {
   
   def update(delta: Int): Unit = {
     if (destroy) {
-      if (null != body) session.removeBody(body)
-      if (null != wheel1) session.removeBody(wheel1)
-      if (null != wheel2) session.removeBody(wheel2)
-      destroy = false
+      remove
     }
     if (isDead) return
     
@@ -249,17 +246,19 @@ class Tank (session: Session, var id: Byte) extends Collider {
     health -= d
     
     if (isDead) {
-      kill
+      destroy = true
+      health = 0
     }
   }
   
-  def kill = {
-    destroy = true
-    health = 0
-    //session.addFrag(new Frag(x - WHEEL_OFFSET_X, y + WHEEL_OFFSET_Y, WHEEL_RADIUS, color))
-    //session.addFrag(new Frag(x + WHEEL_OFFSET_X, y + WHEEL_OFFSET_Y, WHEEL_RADIUS, color))
+  def remove =  {
+    println("Removing tank.")
+    if (null != body) session.removeBody(body)
+    if (null != wheel1) session.removeBody(wheel1)
+    if (null != wheel2) session.removeBody(wheel2)
+    destroy = false
   }
-  
+
   def render(g: Graphics): Unit = {
     if (isDead) {
       return
