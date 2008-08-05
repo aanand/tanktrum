@@ -72,9 +72,8 @@ class Server(port: Int) extends Session(null) {
 
     if (inReadyRoom) {
       if (players.size > 1 && players.values.forall(player => player.ready)) {
+        startRound
         //If all players are ready then we start the game.
-        println("Starting game.")
-        inReadyRoom = false;
       }
 
       timeToReadyRoomUpdate -= delta
@@ -86,7 +85,7 @@ class Server(port: Int) extends Session(null) {
     }
     else {
       if (players.values.toList.filter(player => player.tank.isAlive).size <= 1) {
-        newRound
+        endRound
       }
       timeToTankUpdate -= delta
 
@@ -143,7 +142,7 @@ class Server(port: Int) extends Session(null) {
     broadcastExplosion(e)
   }
 
-  def newRound {
+  def endRound {
     world = createWorld
     projectiles = List[Projectile]()
     explosions = new HashSet[Explosion]()
@@ -156,10 +155,17 @@ class Server(port: Int) extends Session(null) {
     ground = new Ground(this, WIDTH, HEIGHT)
     ground.buildPoints
     for (player <- players.values) {
+      val oldTank = player.tank
       player.tank.remove
       player.tank = createTank(player.id)
       player.tank.player = player //Oh no.
+      if (oldTank.isAlive) { player.tank.ammo = oldTank.ammo }
     }
+  }
+  
+  def startRound {
+    println("Starting game.")
+    inReadyRoom = false
     broadcastGround
   }
 
@@ -181,11 +187,6 @@ class Server(port: Int) extends Session(null) {
       tank.player = player
       players.put(addr, player)
 
-      if (ground.initialised) {
-        println("Sending ground to " + players(addr).name)
-        sendGround(addr)
-        send(tankPositionData, addr)
-      }
       broadcastPlayers
     }
   }
