@@ -7,16 +7,14 @@ abstract class Session(container: slick.GameContainer) extends phys2d.raw.Collis
   val WIDTH = 800
   val HEIGHT = 600
 
-  val world = new phys2d.raw.World(new phys2d.math.Vector2f(0.0f, 100.0f), 10)
-  world.enableRestingBodyDetection(0.001f, 0.001f, 0.001f)
-  world.addListener(this)
+  var world = createWorld
 
   var ground: Ground = _
 
   var active = false
-  val bodies = new HashMap[phys2d.raw.Body, Collider]
+  var bodies = new HashMap[phys2d.raw.Body, Collider]
   var projectiles = List[Projectile]()
-  val explosions = new HashSet[Explosion]
+  var explosions = new HashSet[Explosion]
   val frags = new HashSet[Frag]
 
   def tanks: Iterator[Tank]
@@ -49,6 +47,13 @@ abstract class Session(container: slick.GameContainer) extends phys2d.raw.Collis
     val a = new Array[byte](1)
     a(0) = c.toByte
     a
+  }
+
+  def createWorld = {
+    val newWorld = new phys2d.raw.World(new phys2d.math.Vector2f(0.0f, 100.0f), 10)
+    newWorld.enableRestingBodyDetection(0.001f, 0.001f, 0.001f)
+    newWorld.addListener(this)
+    newWorld
   }
 
   def addBody(obj: Collider, body: phys2d.raw.Body) {

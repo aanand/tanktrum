@@ -28,7 +28,7 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
   var serverFull = false
 
   val readyRoom = new ReadyRoom(this)
-  var inReadyRoom = false
+  var inReadyRoom = true
 
   override def enter() = {
     super.enter()

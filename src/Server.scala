@@ -1,4 +1,5 @@
 import org.newdawn.slick._
+import net.phys2d
 
 import java.nio.channels._
 import java.nio._
@@ -6,6 +7,7 @@ import java.net._
 import java.util.Random
 
 import scala.collection.mutable.HashMap
+import scala.collection.mutable.HashSet
 
 import sbinary.Operations
 import sbinary.Instances._
@@ -142,18 +144,22 @@ class Server(port: Int) extends Session(null) {
   }
 
   def newRound {
-    /*projectiles.clear
-    explosions.clear
-    bodies.clear*/
+    world = createWorld
+    projectiles = List[Projectile]()
+    explosions = new HashSet[Explosion]()
+    bodies = new HashMap[phys2d.raw.Body, Collider]
     for (player <- players.values) {
       player.ready = false
     }
     inReadyRoom = true;
+    ground = new Ground(this, WIDTH, HEIGHT)
     ground.buildPoints
     for (player <- players.values) {
       player.tank.remove
       player.tank = createTank(player.id)
+      player.tank.player = player //Oh no.
     }
+    broadcastGround
   }
 
   def addPlayer(addr: SocketAddress) {
