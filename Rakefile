@@ -28,17 +28,17 @@ TARGETS.each do |target|
   end
 end
 
-task :compile => ['classes'] + TARGETS
+task :compile => TARGETS
 
-task :run => 'compile' do
+task :run => :compile do
   sh "java -classpath classes:#{CLASSPATH} -Djava.library.path=#{LIBPATH} Main"
 end
 
-task :run_server => 'compile' do
+task :run_server => :compile do
   sh "java -classpath classes:#{CLASSPATH} -Djava.library.path=#{LIBPATH} ServerMain"
 end
 
-task :jar => ['lib', 'classes'] do
+task :jar => :compile do
   sh "jar -cf lib/tank.jar -C classes ."
   sh "jar -uf lib/tank.jar media "
 end

@@ -24,6 +24,9 @@ class Projectile(session: Session, val tank: Tank) extends Collider {
     if (x < 0 || x > Main.WIDTH || y > Main.HEIGHT || destroy) {
       session.removeProjectile(this)
     }
+    if (y > session.ground.heightAt(x)) {
+      collide(session.ground, null)
+    }
   }
   
   def render(g : slick.Graphics) {
