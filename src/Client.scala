@@ -70,24 +70,27 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
     }
     if (inReadyRoom) {
       readyRoom.render(g)
-      return
     }
-    if (ground.initialised) {
-      renderSky(g)
-      ground.render(g)
+    else { 
+      if (ground.initialised) {
+        renderSky(g)
+        ground.render(g)
+      }
+      for (p <- projectiles) {
+        p.render(g)
+      }
+      for (e <- explosions) {
+        e.render(g)
+      }
+      for (f <- frags) {
+        f.render(g)
+      }
+      for (p <- players.values) {
+        p.render(g)
+      }
     }
-    for (p <- projectiles) {
-      p.render(g)
-    }
-    for (e <- explosions) {
-      e.render(g)
-    }
-    for (f <- frags) {
-      f.render(g)
-    }
-    for (p <- players.values) {
-      p.render(g)
-    }
+
+    //TODO: Move this and other chat stuff into a Chat object.
     if (chatInput) {
       g.resetTransform
       g.translate(0, 560)
@@ -95,7 +98,7 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
     }
     g.resetTransform
     g.translate(20, 560 - 15*chatMessages.length)
-    g.setColor(new Color(0, 0, 1))
+    g.setColor(new Color(0f, 0f, 1f))
     for (message <- chatMessages) {
       g.translate(0, 15)
       g.drawString(message, 0, 0)

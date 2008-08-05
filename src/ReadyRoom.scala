@@ -9,9 +9,10 @@ class ReadyRoom (client: Client) {
   def render(g: Graphics) {
     menu.showing = true
     if (null != client.me) {
-      g.drawString("Funds: " + client.me.money, 0, 0)
-      g.translate(0, 20)
+      g.setColor(new Color(0f, 1f, 0f))
+      g.drawString("Funds: " + client.me.money, 20, 0)
     }
+    g.translate(20, 0)
     menu.render(g)
 
     for (player <- client.players.values) {
@@ -21,7 +22,7 @@ class ReadyRoom (client: Client) {
       else {
         g.setColor(new Color(1f, 0f, 0f))
       }
-      g.drawString(player.name + ": " + player.score, 700, player.id * 20)
+      g.drawString(player.name + ": " + player.score, 400, player.id * 20)
     }
   }
 
