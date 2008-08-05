@@ -88,6 +88,10 @@ class Menu(tree : List[(String, MenuItem)]) {
   }
 }
 
+class ChatMenu(tree : List[(String, MenuItem)]) extends Menu(tree) {
+  override val SELECTED_COLOR = new Color(0, 0, 0)
+}
+
 abstract class MenuItem {
   def perform(menu : Menu)
   def keyPressed(key : Int, char : Char, menu : Menu) = {}
@@ -96,6 +100,7 @@ abstract class MenuItem {
 
 case class MenuEditable(initValue : String, maxLength: Int) extends MenuItem {
   var value = initValue
+  val offset = 100
   
   override def perform(menu : Menu) = menu.editing = true
   
@@ -123,8 +128,12 @@ case class MenuEditable(initValue : String, maxLength: Int) extends MenuItem {
       str = str + '_'
     }
     
-    g.drawString(str, 100, 0)
+    g.drawString(str, offset, 0)
   }
+}
+
+case class ChatMenuEditable(override val initValue: String, override val maxLength: Int) extends MenuEditable(initValue, maxLength) {
+  override val offset = 40
 }
 
 case class MenuCommand(callback : Unit => Unit) extends MenuItem {

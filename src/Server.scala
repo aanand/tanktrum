@@ -16,7 +16,7 @@ class Server(port: Int) extends Session(null) {
   val TANK_BROADCAST_INTERVAL = 25 //milliseconds
   val PROJECTILE_BROADCAST_INTERVAL = 100
   val PLAYER_BROADCAST_INTERVAL = 1000
-  val READY_ROOM_BROADCAST_INTERVAL = 1000
+  val READY_ROOM_BROADCAST_INTERVAL = 500
   val MAX_PLAYERS = 6
 
   var nextTankColorIndex = 0
@@ -110,12 +110,12 @@ class Server(port: Int) extends Session(null) {
       }
     }
 
-    data.clear()
+    data.clear
     val addr = channel.receive(data)
-    data.limit(data.position)
-    data.rewind()
     if (addr != null) {
-      val command = data.get().toChar
+      data.limit(data.position)
+      data.rewind
+      val command = data.get.toChar
 
       if (command == Commands.HELLO) {
         addPlayer(addr)
@@ -149,6 +149,7 @@ class Server(port: Int) extends Session(null) {
     explosions = new HashSet[Explosion]()
     bodies = new HashMap[phys2d.raw.Body, Collider]
     for (player <- players.values) {
+      player.money += 10
       player.ready = false
     }
     inReadyRoom = true;
@@ -248,11 +249,21 @@ class Server(port: Int) extends Session(null) {
       case Commands.FIRE => { player.tank.fire() }
       case Commands.CYCLE_WEAPON => { player.tank.cycleWeapon() }
 
-      case Commands.READY => { player.ready = true }
+      case Commands.READY => { player.ready = true; broadcastPlayers }
       case Commands.BUY_NUKE => { if (inReadyRoom) player.buyNuke }
       case Commands.BUY_ROLLER => { if (inReadyRoom) player.buyRoller }
 
+      case Commands.CHAT_MESSAGE => { handleChat(player) }
+
     }
+  }
+
+  def handleChat(player: Player) = {
+    val messageArray = new Array[byte](data.remaining)
+    data.get(messageArray)
+    val message = player.name + ": " + Operations.fromByteArray[String](messageArray)
+    println("Broadcasting chat message: " + message)
+    broadcast(byteToArray(Commands.CHAT_MESSAGE) ++ Operations.toByteArray(message))
   }
 
   /***

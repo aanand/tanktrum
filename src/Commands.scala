@@ -15,6 +15,7 @@ object Commands {
   val PLAYERS = nextI
   val SERVER_FULL = nextI
   val READY_ROOM = nextI
+  val CHAT_MESSAGE = nextI
 
   val MOVE_LEFT = nextI
   val STOP_MOVE_LEFT = nextI

@@ -13,6 +13,7 @@ import sbinary.Instances._
 class Client (hostname: String, port: Int, name: String, container: GameContainer) extends Session(container) {
   val PING_PERIOD = 1000
   val SERVER_TIMEOUT = 10000
+  val MAX_MESSAGES = 5
 
   var channel: DatagramChannel = _
   val data = ByteBuffer.allocate(10000)
@@ -29,6 +30,10 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
 
   val readyRoom = new ReadyRoom(this)
   var inReadyRoom = true
+  var chatInput = false
+  val chatInputField = new ChatMenuEditable("", 512)
+  val chatInputMenu = new ChatMenu(List(("Chat: ", chatInputField)))
+  var chatMessages = List[String]()
 
   override def enter() = {
     super.enter()
@@ -83,6 +88,18 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
     for (p <- players.values) {
       p.render(g)
     }
+    if (chatInput) {
+      g.resetTransform
+      g.translate(0, 560)
+      chatInputMenu.render(g)
+    }
+    g.resetTransform
+    g.translate(20, 560 - 15*chatMessages.length)
+    g.setColor(new Color(0, 0, 1))
+    for (message <- chatMessages) {
+      g.translate(0, 15)
+      g.drawString(message, 0, 0)
+    }
   }
   
   def renderSky(g : Graphics) {
@@ -110,12 +127,20 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
       case Commands.EXPLOSION => {loadExplosion}
       case Commands.PLAYERS => {loadPlayers}
       case Commands.READY_ROOM => {inReadyRoom = true}
+      case Commands.CHAT_MESSAGE => {addChatMessage}
     }
   }
   
   def keyPressed(key : Int, char : Char) {
     if (inReadyRoom) {
       readyRoom.menu.keyPressed(key, char)
+      return
+    }
+    if (chatInput) {
+      key match {
+        case Input.KEY_ENTER => { sendChat }
+        case _ => { chatInputMenu.keyPressed(key, char) }
+      }
       return
     }
     char match {
@@ -129,6 +154,7 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
           case Input.KEY_DOWN  => { sendCommand(Commands.POWER_DOWN) }
           case Input.KEY_SPACE => { sendCommand(Commands.FIRE) }
           case Input.KEY_TAB   => { sendCommand(Commands.CYCLE_WEAPON) }
+          case Input.KEY_ENTER => { startChat }
           case _ => {}
         }
       }
@@ -148,6 +174,28 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
           case _ => {}
         }
       }
+    }
+  }
+
+  def startChat = {
+    chatInput = true
+    chatInputField.value = ""
+    chatInputField.perform(chatInputMenu)
+  }
+
+  def sendChat = {
+    chatInput = false
+    send(byteToArray(Commands.CHAT_MESSAGE) ++ Operations.toByteArray(chatInputField.value))
+  }
+
+  def addChatMessage = {
+    val messageArray = new Array[byte](data.remaining)
+    data.get(messageArray)
+    val message = Operations.fromByteArray[String](messageArray)
+    println("Got chat message: " + message)
+    chatMessages += message
+    if (chatMessages.length > MAX_MESSAGES) {
+      chatMessages = chatMessages.tail
     }
   }
   

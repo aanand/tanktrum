@@ -31,7 +31,7 @@ class Explosion (var x: Float, var y: Float, var radius: Float, session: Session
         }
         val damage = maxOverlap.toInt
         tank.damage(damage)
-        if (null != projectile)
+        if (null != projectile) {
           if (tank == projectile.tank) {
             projectile.tank.player.score -= damage
             projectile.tank.player.money -= damage

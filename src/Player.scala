@@ -15,7 +15,7 @@ class Player (var tank: Tank, var name: String, var id: Byte) {
   var lastPing = new Date()
 
   var score = 0
-  var money = 1000
+  var money = 0
 
   var me = false
 
