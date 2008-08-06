@@ -16,7 +16,7 @@ class Ground(session : Session, width : Int, height : Int) extends Collider {
   
   val topsoilDepth = 20f
   
-  var points : Seq[Vector2f] = _
+  var points : Array[Vector2f] = _
   var drawShape : Shape = _
   var physShape : phys2d.raw.shapes.Shape = _
   var body : phys2d.raw.Body = _
@@ -35,7 +35,7 @@ class Ground(session : Session, width : Int, height : Int) extends Collider {
         x += granularity
         v
       }
-    )
+    ).toArray
     
     initPoints()
   }
