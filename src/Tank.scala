@@ -125,6 +125,8 @@ class Tank (session: Session, var id: Byte) extends Collider {
 
   def speedDelta = targetSpeed - actualSpeed
 
+  var previousValues: (Float, Float, Float, Float, Float, Int, Int, Int, Int, Int, Int) = _
+
   def create(x: Float) = {
     this.color = color
     
@@ -306,6 +308,10 @@ class Tank (session: Session, var id: Byte) extends Collider {
     g.resetTransform
   }
   
+  def currentValues = {
+    (x, y, angle, gunAngle, gunPower, gunAngleChange, gunPowerChange, health, thrust, selectedWeapon.id, ammo(selectedWeapon))
+  }
+
   def serialise = {
     Operations.toByteArray((
       x.toFloat,

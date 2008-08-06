@@ -272,7 +272,12 @@ class Server(port: Int) extends Session(null) {
    * the client as an update.
    */
   def tankPositionData = {
-    val tankDataList = players.values.map(p => (p.tank.id, p.tank.serialise)).toList
+    val movedPlayers = players.values.filter (p => {
+      val changed = p.tank.currentValues != p.tank.previousValues
+      p.tank.previousValues = p.tank.currentValues
+      changed
+    })
+    val tankDataList = movedPlayers.map(p => (p.tank.id, p.tank.serialise)).toList
     byteToArray(Commands.TANKS) ++ Operations.toByteArray(tankDataList)
   }
 
