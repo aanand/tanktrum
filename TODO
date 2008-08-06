@@ -1,0 +1,15 @@
+ * Display a meaningful error message to the client when it times out.
+ 
+ * Catch exceptions and display error messages to the client nicely.
+ 
+ * Refactor chat stuff into a new file.
+ 
+ * Clean up server and client stuff, separating all network stuff from game
+   logic stuff.
+ 
+ * Fix the bug that happens when someone joins in the middle of a round and
+   they don't get the ground sent until an explosion happens.
+ 
+ * For that matter, don't allow joining in the middle of a round, or have
+   someone only able to spectate until the round is over (simply by just not
+   creating a tank for them.)
