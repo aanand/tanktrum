@@ -14,8 +14,15 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
   val PING_PERIOD = 1000
   val SERVER_TIMEOUT = 10000
 
-  val CHAT_KEY = 't'
-
+  val CHAT_KEY              = Input.KEY_T
+  val MOVE_LEFT_KEY         = Input.KEY_A
+  val MOVE_RIGHT_KEY        = Input.KEY_D
+  val AIM_ANTICLOCKWISE_KEY = Input.KEY_LEFT
+  val AIM_CLOCKWISE_KEY     = Input.KEY_RIGHT
+  val POWER_UP_KEY          = Input.KEY_UP
+  val POWER_DOWN_KEY        = Input.KEY_DOWN
+  val FIRE_KEY              = Input.KEY_SPACE
+  val CYCLE_WEAPON_KEY      = Input.KEY_TAB
 
   var channel: DatagramChannel = _
   val data = ByteBuffer.allocate(10000)
@@ -128,41 +135,33 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
       return
     }
     if (inReadyRoom) {
-      if (char == CHAT_KEY) { chat.start }
+      if (key == CHAT_KEY) { chat.start }
       else { readyRoom.menu.keyPressed(key, char) }
       return
     }
-    char match {
-      case 'a' => { sendCommand(Commands.MOVE_LEFT) }
-      case 'd' => { sendCommand(Commands.MOVE_RIGHT) }
-      case CHAT_KEY => { chat.start }
-      case _ => {
-        key match {
-          case Input.KEY_LEFT  => { sendCommand(Commands.AIM_ANTICLOCKWISE) }
-          case Input.KEY_RIGHT => { sendCommand(Commands.AIM_CLOCKWISE) }
-          case Input.KEY_UP    => { sendCommand(Commands.POWER_UP) }
-          case Input.KEY_DOWN  => { sendCommand(Commands.POWER_DOWN) }
-          case Input.KEY_SPACE => { sendCommand(Commands.FIRE) }
-          case Input.KEY_TAB   => { sendCommand(Commands.CYCLE_WEAPON) }
-          case _ => {}
-        }
-      }
+    key match {
+      case CHAT_KEY              => { chat.start }
+      case MOVE_LEFT_KEY         => { sendCommand(Commands.MOVE_LEFT) }
+      case MOVE_RIGHT_KEY        => { sendCommand(Commands.MOVE_RIGHT) }
+      case AIM_ANTICLOCKWISE_KEY => { sendCommand(Commands.AIM_ANTICLOCKWISE) }
+      case AIM_CLOCKWISE_KEY     => { sendCommand(Commands.AIM_CLOCKWISE) }
+      case POWER_UP_KEY          => { sendCommand(Commands.POWER_UP) }
+      case POWER_DOWN_KEY        => { sendCommand(Commands.POWER_DOWN) }
+      case FIRE_KEY              => { sendCommand(Commands.FIRE) }
+      case CYCLE_WEAPON_KEY      => { sendCommand(Commands.CYCLE_WEAPON) }
+      case _                     => { }
     }
   }
   
   def keyReleased(key : Int, char : Char) {
-    char match {
-      case 'a' => { sendCommand(Commands.STOP_MOVE_LEFT) }
-      case 'd' => { sendCommand(Commands.STOP_MOVE_RIGHT) }
-      case _ => {
-        key match {
-          case Input.KEY_LEFT  => { sendCommand(Commands.STOP_AIM_ANTICLOCKWISE) }
-          case Input.KEY_RIGHT => { sendCommand(Commands.STOP_AIM_CLOCKWISE) }
-          case Input.KEY_UP    => { sendCommand(Commands.STOP_POWER_UP) }
-          case Input.KEY_DOWN  => { sendCommand(Commands.STOP_POWER_DOWN) }
-          case _ => {}
-        }
-      }
+    key match {
+      case MOVE_LEFT_KEY         => { sendCommand(Commands.STOP_MOVE_LEFT) }
+      case MOVE_RIGHT_KEY        => { sendCommand(Commands.STOP_MOVE_RIGHT) }
+      case AIM_ANTICLOCKWISE_KEY => { sendCommand(Commands.STOP_AIM_ANTICLOCKWISE) }
+      case AIM_CLOCKWISE_KEY     => { sendCommand(Commands.STOP_AIM_CLOCKWISE) }
+      case POWER_UP_KEY          => { sendCommand(Commands.STOP_POWER_UP) }
+      case POWER_DOWN_KEY        => { sendCommand(Commands.STOP_POWER_DOWN) }
+      case _ => {}
     }
   }
 
