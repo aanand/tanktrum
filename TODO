@@ -1,0 +1,84 @@
+This is a list of things that need to be done before release:
+ 
+ * Choose a name.  Possibilities so far are:
+   - Boom Trapezoid
+   - Totenpanzer
+   - Horror Tank
+   - Death Tank Drei
+   - Death Tank Vier
+   - Death Tank Fear
+   - ...
+
+ * Display a meaningful error message to the client when it times out.
+ 
+ * Catch exceptions and display error messages to the client nicely.
+ 
+ * Refactor chat stuff into a new file.
+ 
+ * Clean up server and client stuff, separating all network stuff from game
+   logic stuff.
+ 
+ * Fix the bug that happens when someone joins in the middle of a round and
+   they don't get the ground sent until an explosion happens.
+ 
+ * For that matter, don't allow joining in the middle of a round, or have
+   someone only able to spectate until the round is over (simply by just not
+   creating a tank for them.)
+
+ * Go back and rework tank physics again.  Egglet says that tanks shouldn't get
+   stuck quite so much and he is basically the deathtank expert.  Also, the
+   slipping down hills seems to be worse again recently.
+
+ * Game search.  Servers need names and there should be a thing where you can
+   search for servers by name or just find ones with a low ping to you.
+
+ * More sound effects/music:
+   - Opening theme (also an opening graphic).
+   - Background sound (I like the idea of gentle bird song at the moment).
+   - Sound effects for each of the weapons/special items.
+   - Sound effect for moving?
+   - Death sound.
+
+ * Tweaking of money and existing weapons.
+   - Explosions possibly need a "damage factor" for how much damage they do per
+     unit of intersection with a tank.
+   - Scoring and prices needs balancing and a decision made whether to stick
+     with points and money per point of damage or to go with the traditional
+     deathtank system.
+   - Nuke: Possibly needs to do even more damage.
+   - Roller mines probably need rethinking again, there is some jitter
+     currently.  Trying to do projectile physics as interpolation on the client
+     isn't quite working yet still.  Probably need to do some structured
+     thinking about this instead of just hacking and praying.
+   - Also need to check how Roller Mines are represented on the HUD in DTZ,
+     having a blue circle is just wrong and confusing for the blue tank.  Maybe
+     change to a circle with some arcs around it for now.
+   - Different projectiles need to have different reload times.
+
+ * Weapons still to be implemented:
+   - Machine Gun: Should be simple, lots of rectangular projectiles.
+   - Missiles: Missile shaped projectile, normal damage and explosion, left and
+     right controls affect any missiles the player has fired instead of the
+     tank.
+   - MIRV: Normal projectile to start with, splits into 5 projectiles as soon
+     as Y velocity < 0 (apex of the shot).  Possibly after a minimum time.
+   - Air Strike: "Shooting down the planes will cause them to break open and
+     drop all of remaining bombs at once." Yes.
+   - Death's Head: Big MIRV.
+   - Carbomite: On death create an explosion with radius relative to the amount
+     of carbomite purchased.
+
+ * Other items that can be bought and need to be implemented:
+   - Jump Jets: Yes.  Give some lift.  Need to play with these in DTZ again to
+     remember exactly how they work.  Experiment.
+   - Shields: Create a circle around the tank, if a projectile is in the circle
+     (same test as between a tank and an explosion), give it a push away,
+     possibly proportional to how far inside the circle it is.
+   - Target Computer: There is some maths here that will need to be done.
+     Should probably display as a translucent circle of the colour of the
+     owner.
+   - Hover Coil: Whee.  Again, needs experimentation.  Possibility of just not
+     including this and allowing multiple purchases of Jump Jets.
+
+ * Special weapon drops are a thing that should happen eventually too, but
+   they're not really a priority right now.
