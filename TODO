@@ -13,8 +13,6 @@ This is a list of things that need to be done before release:
  
  * Catch exceptions and display error messages to the client nicely.
  
- * Refactor chat stuff into a new file.
- 
  * Clean up server and client stuff, separating all network stuff from game
    logic stuff.
  
