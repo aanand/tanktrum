@@ -35,7 +35,8 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
   val players = new HashMap[Short, Player]
   var me: Player = null
 
-  var serverFull = false
+  var errorState = false
+  var errorMessage = ""
 
   val readyRoom = new ReadyRoom(this)
   var inReadyRoom = true
@@ -52,16 +53,23 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
   }
 
   override def update(delta: Int) {
-    super.update(delta)
-    ping
-    checkTimeout
+    try {
+      super.update(delta)
+      ping
+      checkTimeout
 
-    data.clear
-    if (channel.receive(data) != null) {
-      data.limit(data.position)
-      data.rewind
-      val command = data.get.toChar
-      processCommand(command)
+      data.clear
+      if (channel.receive(data) != null) {
+        data.limit(data.position)
+        data.rewind
+        val command = data.get.toChar
+        processCommand(command)
+      }
+    }
+    catch {
+      case e:Exception => { 
+        error(e.toString) 
+      }
     }
   }
 
@@ -70,9 +78,9 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
   }
   
   def render(g: Graphics) {
-    if (serverFull) {
+    if (errorState) {
       g.setColor(new Color(1f, 0f, 0f))
-      g.drawString("Error: Server full.", 300, 300)
+      g.drawString(errorMessage, 300, 300)
       return
     }
     if (inReadyRoom) {
@@ -113,10 +121,16 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
       }
     }
   }
+
+  def error(message: String) {
+    errorState = true
+    errorMessage = message
+    if (null == errorMessage) { errorMessage = "Unknown error." }
+  }
  
   def processCommand(command: Char) {
     command match {
-      case Commands.SERVER_FULL => {serverFull = true}
+      case Commands.SERVER_FULL => {error("Server full.")}
       case Commands.GROUND => {loadGround}
       case Commands.PING   => {resetTimeout}
       case Commands.TANKS => {processUpdate}
@@ -130,40 +144,58 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
   }
   
   def keyPressed(key : Int, char : Char) {
-    if (chat.input) {
-      chat.keyPressed(key, char)
-      return
+    try {
+      if (chat.input) {
+        chat.keyPressed(key, char)
+        return
+      }
+      if (inReadyRoom) {
+        if (key == CHAT_KEY) { chat.start }
+        else { readyRoom.menu.keyPressed(key, char) }
+        return
+      }
+      key match {
+        case CHAT_KEY              => { chat.start }
+        case MOVE_LEFT_KEY         => { sendCommand(Commands.MOVE_LEFT) }
+        case MOVE_RIGHT_KEY        => { sendCommand(Commands.MOVE_RIGHT) }
+        case AIM_ANTICLOCKWISE_KEY => { sendCommand(Commands.AIM_ANTICLOCKWISE) }
+        case AIM_CLOCKWISE_KEY     => { sendCommand(Commands.AIM_CLOCKWISE) }
+        case POWER_UP_KEY          => { sendCommand(Commands.POWER_UP) }
+        case POWER_DOWN_KEY        => { sendCommand(Commands.POWER_DOWN) }
+        case FIRE_KEY              => { sendCommand(Commands.FIRE) }
+        case CYCLE_WEAPON_KEY      => { sendCommand(Commands.CYCLE_WEAPON) }
+        case _                     => { }
+      }
     }
-    if (inReadyRoom) {
-      if (key == CHAT_KEY) { chat.start }
-      else { readyRoom.menu.keyPressed(key, char) }
-      return
-    }
-    key match {
-      case CHAT_KEY              => { chat.start }
-      case MOVE_LEFT_KEY         => { sendCommand(Commands.MOVE_LEFT) }
-      case MOVE_RIGHT_KEY        => { sendCommand(Commands.MOVE_RIGHT) }
-      case AIM_ANTICLOCKWISE_KEY => { sendCommand(Commands.AIM_ANTICLOCKWISE) }
-      case AIM_CLOCKWISE_KEY     => { sendCommand(Commands.AIM_CLOCKWISE) }
-      case POWER_UP_KEY          => { sendCommand(Commands.POWER_UP) }
-      case POWER_DOWN_KEY        => { sendCommand(Commands.POWER_DOWN) }
-      case FIRE_KEY              => { sendCommand(Commands.FIRE) }
-      case CYCLE_WEAPON_KEY      => { sendCommand(Commands.CYCLE_WEAPON) }
-      case _                     => { }
+    catch {
+      case e: Exception => {
+        error(e.toString)
+      }
     }
   }
   
   def keyReleased(key : Int, char : Char) {
-    key match {
-      case MOVE_LEFT_KEY         => { sendCommand(Commands.STOP_MOVE_LEFT) }
-      case MOVE_RIGHT_KEY        => { sendCommand(Commands.STOP_MOVE_RIGHT) }
-      case AIM_ANTICLOCKWISE_KEY => { sendCommand(Commands.STOP_AIM_ANTICLOCKWISE) }
-      case AIM_CLOCKWISE_KEY     => { sendCommand(Commands.STOP_AIM_CLOCKWISE) }
-      case POWER_UP_KEY          => { sendCommand(Commands.STOP_POWER_UP) }
-      case POWER_DOWN_KEY        => { sendCommand(Commands.STOP_POWER_DOWN) }
-      case _ => {}
+    try {
+      key match {
+        case MOVE_LEFT_KEY         => { sendCommand(Commands.STOP_MOVE_LEFT) }
+        case MOVE_RIGHT_KEY        => { sendCommand(Commands.STOP_MOVE_RIGHT) }
+        case AIM_ANTICLOCKWISE_KEY => { sendCommand(Commands.STOP_AIM_ANTICLOCKWISE) }
+        case AIM_CLOCKWISE_KEY     => { sendCommand(Commands.STOP_AIM_CLOCKWISE) }
+        case POWER_UP_KEY          => { sendCommand(Commands.STOP_POWER_UP) }
+        case POWER_DOWN_KEY        => { sendCommand(Commands.STOP_POWER_DOWN) }
+        case _ => {}
+      }
+    }
+    catch {
+      case e: Exception =>  {
+        error(e.toString)
+      }
     }
   }
+
+  /*
+   * Everything below here is basically networking stuff.
+   */
 
   def addChatMessage = {
     val messageArray = new Array[byte](data.remaining)
