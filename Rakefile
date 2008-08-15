@@ -106,9 +106,10 @@ namespace :install do
   end
 
   task :native_lwjgl_libs => ['tmp', 'lib'] do
-    download_file 'lib/natives-linux.jar', 'http://slick.cokeandcode.com/demos/natives-linux.jar'
-    download_file 'lib/natives-mac.jar', 'http://slick.cokeandcode.com/demos/natives-mac.jar'
-    download_file 'lib/natives-win32.jar', 'http://slick.cokeandcode.com/demos/natives-win32.jar'
+    %w{linux mac win32}.each do |os|
+      download_file "lib/natives-#{os}.jar", "http://slick.cokeandcode.com/demos/natives-#{os}.jar"
+      system "zip -q -d lib/natives-#{os}.jar *.SF *.RSA *.DSA"
+    end
   end
 end
 
@@ -152,7 +153,6 @@ namespace :build do
     
     jars.each do |name|
       cp "lib/#{name}.jar", webstart_dir
-      system "zip -q -d #{webstart_dir}/#{name}.jar *.SF *.RSA *.DSA" #unsign the jar first.
       raise "jarsigner failed" unless system "jarsigner -keystore deathtank.ks -storepass '#{passphrase}' #{webstart_dir}/#{name}.jar mykey"
     end
   end
