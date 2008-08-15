@@ -1,0 +1,17 @@
+ * Figure out a good cross-platform place to store the username file or remove
+   it or something because at the moment it gets put wherever the current
+   working directory is, which is something like / on macs, ~ on linux and god
+   knows where on windows.
+
+ * Fix the bug that happens when someone joins in the middle of a round and
+   they don't get the ground sent until an explosion happens.
+ 
+ * For that matter, don't allow joining in the middle of a round, or have
+   someone only able to spectate until the round is over (simply by just not
+   creating a tank for them.)
+
+ * Go back and rework tank physics again.  Egglet says that tanks shouldn't get
+   stuck quite so much and he is basically the deathtank expert.  Also, the
+   slipping down hills seems to be worse again recently.
+
+
