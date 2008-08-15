@@ -4,18 +4,16 @@ This is a list of things that need to be done before release:
    - Boom Trapezoid
    - Totenpanzer
    - Horror Tank
-   - Death Tank Drei
-   - Death Tank Vier
-   - Death Tank Fear
    - ...
 
- * Display a meaningful error message to the client when it times out.
- 
- * Catch exceptions and display error messages to the client nicely.
- 
- * Clean up server and client stuff, separating all network stuff from game
+ * Clean up server and client classes, separating all network stuff from game
    logic stuff.
- 
+
+ * Figure out a good cross-platform place to store the username file or remove
+   it or something because at the moment it gets put wherever the current
+   working directory is, which is something like / on macs, ~ on linux and god
+   knows where on windows.
+
  * Fix the bug that happens when someone joins in the middle of a round and
    they don't get the ground sent until an explosion happens.
  
@@ -29,6 +27,8 @@ This is a list of things that need to be done before release:
 
  * Game search.  Servers need names and there should be a thing where you can
    search for servers by name or just find ones with a low ping to you.
+
+ * Set up a proper bug tracking/ticketing system.
 
  * More sound effects/music:
    - Opening theme (also an opening graphic).
