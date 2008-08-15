@@ -8,6 +8,7 @@ directory 'lib'
 
 JARFILES = %w(scala-library slick phys2d lwjgl sbinary jogg vorbisspi jorbis tritonus_share)
 WEBSTART_JARS = JARFILES - %w(lwjgl slick)
+WEBSTART_FILES = %w(index.html moneyshot.png tank.jar tank.jnlp)
 CLASSPATH = JARFILES.map{|lib| "lib/#{lib}.jar"}.join(":")
 
 case `uname`
@@ -152,9 +153,11 @@ end
 
 namespace :upload do
   task :libs do
-    sh "scp #{WEBSTART_JARS.map{|name| "dist/webstart/" + name + ".jar"}.join(" ")} deathtank@norgg.org:/var/www/norgg.org/htdocs/deathtank"
+    files = WEBSTART_JARS.map{|file| "dist/webstart/" + file + ".jar"}.join(" ")
+    sh "scp #{files} deathtank@norgg.org:/var/www/norgg.org/htdocs/deathtank"
   end
   task :webstart do
-    sh "scp dist/webstart/tank.jar dist/webstart/tank.jnlp deathtank@norgg.org:/var/www/norgg.org/htdocs/deathtank"
+    files = WEBSTART_FILES.map{|file| "dist/webstart/" + file}.join(" ")
+    sh "scp #{files} deathtank@norgg.org:/var/www/norgg.org/htdocs/deathtank"
   end
 end
