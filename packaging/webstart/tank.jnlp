@@ -19,8 +19,18 @@
     <jar href="jogg.jar"/>
     <jar href="jorbis.jar"/>
     <jar href="vorbisspi.jar"/>
-    <extension href="http://slick.cokeandcode.com/demos/slick.jnlp" version="b236"/>
+    <jar href="slick.jar"/>
+    <jar href="lwjgl.jar"/>
   </resources>
+  <resources os="Windows">
+    <nativelib href="natives-win32.jar"/>      
+  </resources>  
+  <resources os="Linux">
+    <nativelib href="natives-linux.jar"/>      
+  </resources>
+  <resources os="Mac">
+    <nativelib href="natives-mac.jar"/>  
+  </resources>  
 
   <security>
     <all-permissions/>

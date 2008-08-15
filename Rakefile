@@ -6,9 +6,9 @@ directory 'classes'
 directory 'tmp'
 directory 'lib'
 
-JARFILES = %w(scala-library slick phys2d lwjgl sbinary jogg vorbisspi jorbis tritonus_share)
-WEBSTART_JARS = JARFILES - %w(lwjgl slick)
-WEBSTART_FILES = %w(index.html moneyshot.png tank.jar tank.jnlp)
+JARFILES = %w(scala-library slick phys2d lwjgl sbinary jogg vorbisspi jorbis tritonus_share natives-linux natives-mac natives-win32)
+WEBSTART_JARS = JARFILES
+WEBSTART_FILES = %w(index.html screenshot.png tank.jar tank.jnlp)
 CLASSPATH = JARFILES.map{|lib| "lib/#{lib}.jar"}.join(":")
 
 case `uname`
@@ -46,7 +46,7 @@ end
 
 namespace :install do
   desc "install dependencies"
-  task :deps => [:scala, :slick, :phys2d, :lwjgl, :sbinary, :vorbisspi]
+  task :deps => [:scala, :slick, :phys2d, :lwjgl, :sbinary, :vorbisspi, :native_lwjgl_libs]
 
   task :clobber do
     rm_rf 'lib'
@@ -104,6 +104,12 @@ namespace :install do
     cp "#{lwjgl_dir}/jar/lwjgl.jar", "lib"
     cp_r "#{lwjgl_dir}/native", "lib/lwjgl"
   end
+
+  task :native_lwjgl_libs => ['tmp', 'lib'] do
+    download_file 'lib/natives-linux.jar', 'http://slick.cokeandcode.com/demos/natives-linux.jar'
+    download_file 'lib/natives-mac.jar', 'http://slick.cokeandcode.com/demos/natives-mac.jar'
+    download_file 'lib/natives-win32.jar', 'http://slick.cokeandcode.com/demos/natives-win32.jar'
+  end
 end
 
 def download_file path, url
@@ -146,6 +152,7 @@ namespace :build do
     
     jars.each do |name|
       cp "lib/#{name}.jar", webstart_dir
+      system "zip -q -d #{webstart_dir}/#{name}.jar *.SF *.RSA *.DSA" #unsign the jar first.
       raise "jarsigner failed" unless system "jarsigner -keystore deathtank.ks -storepass '#{passphrase}' #{webstart_dir}/#{name}.jar mykey"
     end
   end
