@@ -22,13 +22,13 @@ CLASSPATH = LIB_JAR_FILES.join(":")
 
 case `uname`
 when /Darwin/i
-  SUBDIR = 'macosx'
+  OS = 'macosx'
 when /Linux/i
-  SUBDIR = 'linux'
+  OS = 'linux'
 else
-  SUBDIR = 'win32'
+  OS = 'win32'
 end
-LIBPATH = "lib/lwjgl/#{SUBDIR}"
+LIBPATH = "lib/natives-#{OS}"
 
 TARGETS = Dir['src/**.scala'].map{|f| f.sub(/^src/, 'classes').sub(/scala$/, 'class')}
 
@@ -69,7 +69,8 @@ namespace :install do
   end
   
   task :slick do
-    download_file 'lib/slick.jar', 'http://slick.cokeandcode.com/downloads/slick.jar'
+    download_file 'lib/slick.jar', 'http://slick.cokeandcode.com/demos/slick.jar'
+    system "zip -q -d lib/slick.jar *.SF *.RSA *.DSA"
   end
   
   task :phys2d do
@@ -103,23 +104,15 @@ namespace :install do
   end
   
   task :lwjgl => ['tmp', 'lib'] do
-    tmp_dir = "tmp/lwjgl"
-    
-    rm_rf tmp_dir
-
-    download_file "tmp/lwjgl.zip", 'http://kent.dl.sourceforge.net/sourceforge/java-game-lib/lwjgl-2.0rc1.zip'
-    raise "extraction of lwjgl.zip failed" unless sh "unzip tmp/lwjgl.zip -d #{tmp_dir}"
-    
-    lwjgl_dir = Dir.glob("#{tmp_dir}/*").first
-    
-    cp "#{lwjgl_dir}/jar/lwjgl.jar", "lib"
-    cp_r "#{lwjgl_dir}/native", "lib/lwjgl"
+    download_file 'lib/lwjgl.jar', 'http://slick.cokeandcode.com/demos/lwjgl.jar'
+    system "zip -q -d lib/lwjgl.jar *.SF *.RSA *.DSA"
   end
 
   task :native_lwjgl_libs => ['tmp', 'lib'] do
     %w{linux mac win32}.each do |os|
       download_file "lib/natives-#{os}.jar", "http://slick.cokeandcode.com/demos/natives-#{os}.jar"
       system "zip -q -d lib/natives-#{os}.jar *.SF *.RSA *.DSA"
+      system "unzip lib/natives-#{os}.jar -d lib/natives-#{os}"
     end
   end
 end
