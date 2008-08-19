@@ -64,7 +64,8 @@ class Tank (session: Session, var id: Byte) extends Collider {
   var ammo = new HashMap[ProjectileTypes.Value, Int]()
   ammo(ProjectileTypes.PROJECTILE) = 999
   ammo(ProjectileTypes.NUKE) = 0
-  ammo(ProjectileTypes.ROLLER) = 2
+  ammo(ProjectileTypes.ROLLER) = 0
+  ammo(ProjectileTypes.MIRV) = 2
 
   var selectedWeapon = ProjectileTypes.PROJECTILE
 

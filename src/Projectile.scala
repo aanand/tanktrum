@@ -94,6 +94,7 @@ object ProjectileLoader {
         case ProjectileTypes.PROJECTILE => { p = new Projectile(session, null) }
         case ProjectileTypes.NUKE => { p = new Nuke(session, null) }
         case ProjectileTypes.ROLLER => { p = new Roller(session, null) }
+        case ProjectileTypes.MIRV => { p = new MIRV(session, null) }
       }
     }
     p.body.setPosition(x, y)
@@ -107,5 +108,14 @@ object ProjectileLoader {
 }
 
 object ProjectileTypes extends Enumeration {
-  val PROJECTILE, NUKE, ROLLER = Value
+  val PROJECTILE, NUKE, ROLLER, MIRV = Value
+
+  def newProjectile(session: Session, tank: Tank, projectileType: Value) : Projectile = {
+    projectileType match {
+      case PROJECTILE => { new Projectile(session, tank) }
+      case NUKE => { new Nuke(session, tank) }
+      case ROLLER => { new Roller(session, tank) }
+      case MIRV => { new MIRV(session, tank) }
+    }
+  }
 }

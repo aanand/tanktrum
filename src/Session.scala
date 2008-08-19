@@ -87,13 +87,7 @@ abstract class Session(container: slick.GameContainer) extends phys2d.raw.Collis
   def addProjectile(tank : Tank, x : Double, y : Double, angle : Double, speed : Double, projectileType : ProjectileTypes.Value) = {
     val radians = Math.toRadians(angle-90)
     val velocity = new phys2d.math.Vector2f((speed * Math.cos(radians)).toFloat, (speed * Math.sin(radians)).toFloat)
-    var p: Projectile = null
-
-    projectileType match {
-      case ProjectileTypes.PROJECTILE => { p = new Projectile(this, tank) }
-      case ProjectileTypes.NUKE => { p = new Nuke(this, tank) }
-      case ProjectileTypes.ROLLER => { p = new Roller(this, tank) }
-    }
+    var p: Projectile = ProjectileTypes.newProjectile(this, tank, projectileType)
 
     p.body.setPosition(x.toFloat, y.toFloat)
     p.body.adjustVelocity(velocity)

@@ -52,14 +52,23 @@ class Player (var tank: Tank, var name: String, var id: Byte) {
       
       tank.selectedWeapon match {
         case ProjectileTypes.PROJECTILE => {
+          g.setColor(new Color(1f, 1f, 1f))
           g.fillOval(-3, -3, 6, 6)
         }
         case ProjectileTypes.NUKE => {
+          g.setColor(new Color(1f, 1f, 1f))
           g.fillOval(-6, -6, 12, 12)
         }
         case ProjectileTypes.ROLLER => {
-          g.setColor(new Color(0f, 0f, 1f))
-          g.fillOval(-6, -6, 12, 12)
+          g.setColor(new Color(0.3f, 0.3f, 0.3f))
+          g.fillOval(-3, -3, 6, 6)
+        }
+        case ProjectileTypes.MIRV => {
+          g.setColor(new Color(1f, 1f, 1f))
+          g.fillOval(-2, -2, 4, 4)
+          g.fillOval(2, 2, 4, 4)
+          g.fillOval(-2, 2, 4, 4)
+          g.fillOval(2, -2, 4, 4)
         }
       }
       g.drawString(tank.ammo(tank.selectedWeapon).toString, 15, -10)
