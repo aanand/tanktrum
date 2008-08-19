@@ -3,10 +3,11 @@ import net.phys2d
 import sbinary.Instances._
 import sbinary.Operations
 
-object Nuke {
-  val name = "Nuke"
-  val cost = 50
-  val ammo = 1
+object NukeItem extends Item {
+  override def name = "Nuke"
+  override def cost = 50
+  override def units = 1
+  override val projectileType = ProjectileTypes.NUKE
 }
 
 class Nuke(session: Session, tank: Tank) extends Projectile(session, tank) {

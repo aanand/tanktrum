@@ -318,6 +318,10 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
     }
   }
 
+  def sendPurchase(item: byte) {
+    send(byteToArray(Commands.BUY) ++ Operations.toByteArray(item))
+  }
+
   def sendCommand(command: Byte) {
     send(byteToArray(command))
   }

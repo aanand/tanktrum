@@ -36,6 +36,5 @@ object Commands {
   val CYCLE_WEAPON = nextI
 
   val READY = nextI
-  val BUY_NUKE = nextI
-  val BUY_ROLLER = nextI
+  val BUY = nextI
 }

@@ -3,13 +3,16 @@ import net.phys2d
 import sbinary.Instances._
 import sbinary.Operations
 
-object MIRV {
-  val name = "MIRV"
-  val cost = 50
-  val ammo = 1
+object MIRVItem extends Item {
+  override def name = "MIRV"
+  override def cost = 100
+  override def units = 1
+  override val projectileType = ProjectileTypes.MIRV
 }
 
 class MIRV(session: Session, tank: Tank) extends Projectile(session, tank) {
+  override val projectileType = ProjectileTypes.MIRV
+
   override def update(delta: Int) {
     super.update(delta)
     if (session.isInstanceOf[Server]) {

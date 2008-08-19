@@ -251,8 +251,7 @@ class Server(port: Int) extends Session(null) {
       case Commands.CYCLE_WEAPON => { player.tank.cycleWeapon() }
 
       case Commands.READY => { player.ready = true; broadcastPlayers }
-      case Commands.BUY_NUKE => { if (inReadyRoom) player.buyNuke }
-      case Commands.BUY_ROLLER => { if (inReadyRoom) player.buyRoller }
+      case Commands.BUY => { handleBuy(player) }
 
       case Commands.CHAT_MESSAGE => { handleChat(player) }
 
@@ -265,6 +264,15 @@ class Server(port: Int) extends Session(null) {
     val message = player.name + ": " + Operations.fromByteArray[String](messageArray)
     println("Broadcasting chat message: " + message)
     broadcast(byteToArray(Commands.CHAT_MESSAGE) ++ Operations.toByteArray(message))
+  }
+
+  def handleBuy(player: Player) = {
+    val itemArray = new Array[byte](data.remaining)
+    data.get(itemArray)
+    val item = Operations.fromByteArray[Byte](itemArray)
+    if (inReadyRoom) {
+      player.buy(Items.items(Items(item)))
+    }
   }
 
   /***

@@ -49,28 +49,9 @@ class Player (var tank: Tank, var name: String, var id: Byte) {
 
     if (tank.isAlive) {
       g.translate(10, 30)
-      
-      tank.selectedWeapon match {
-        case ProjectileTypes.PROJECTILE => {
-          g.setColor(new Color(1f, 1f, 1f))
-          g.fillOval(-3, -3, 6, 6)
-        }
-        case ProjectileTypes.NUKE => {
-          g.setColor(new Color(1f, 1f, 1f))
-          g.fillOval(-6, -6, 12, 12)
-        }
-        case ProjectileTypes.ROLLER => {
-          g.setColor(new Color(0.3f, 0.3f, 0.3f))
-          g.fillOval(-3, -3, 6, 6)
-        }
-        case ProjectileTypes.MIRV => {
-          g.setColor(new Color(1f, 1f, 1f))
-          g.fillOval(-2, -2, 4, 4)
-          g.fillOval(2, 2, 4, 4)
-          g.fillOval(-2, 2, 4, 4)
-          g.fillOval(2, -2, 4, 4)
-        }
-      }
+
+      ProjectileTypes.render(g, tank.selectedWeapon)
+
       g.drawString(tank.ammo(tank.selectedWeapon).toString, 15, -10)
     }
     g.resetTransform
@@ -78,20 +59,15 @@ class Player (var tank: Tank, var name: String, var id: Byte) {
     tank.render(g)
   }
 
-  def buyNuke = {
-    if (money >= Nuke.cost) { 
-      money -= Nuke.cost
-      tank.ammo(ProjectileTypes.NUKE) = tank.ammo(ProjectileTypes.NUKE) + Nuke.ammo
+  def buy(item: Item) = {
+    if (money >= item.cost) { 
+      money -= item.cost
+      if (item.projectileType != null) {
+        tank.ammo(item.projectileType) = tank.ammo(item.projectileType) + item.units
+      }
     }
   }
   
-  def buyRoller = {
-    if (money >= Roller.cost) { 
-      money -= Roller.cost
-      tank.ammo(ProjectileTypes.ROLLER) = tank.ammo(ProjectileTypes.ROLLER) + Roller.ammo
-    }
-  }
-
   def serialise = {
     Operations.toByteArray((
       id,

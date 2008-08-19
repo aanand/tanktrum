@@ -1,10 +1,14 @@
 import org.newdawn.slick._
 
 class ReadyRoom (client: Client) {
-  val menu = new Menu(List(
-    (Nuke.name + ": " + Nuke.cost, MenuCommand(Unit => buyNuke)),
-    (Roller.name + ": " + Roller.cost, MenuCommand(Unit => buyRoller)),
-    ("Ready", MenuCommand(Unit => ready))))
+  val itemList = Items.map(itemVal => {
+      val item = Items.items(itemVal)
+      (item.name + ": " + item.cost, MenuCommand(Unit => buy(item)))
+  }).toList
+
+  val menu = new Menu(
+    itemList ++
+    List(("Ready", MenuCommand(Unit => ready))))
 
   def render(g: Graphics) {
     menu.showing = true
@@ -26,14 +30,9 @@ class ReadyRoom (client: Client) {
     }
   }
 
-  def buyNuke {
+  def buy(item: Item) {
     println("Buying a nuke.")
-    client.sendCommand(Commands.BUY_NUKE)
-  }
-
-  def buyRoller {
-    println("Buying a rollermine.")
-    client.sendCommand(Commands.BUY_ROLLER)
+    client.sendPurchase(item.itemType.id.toByte)
   }
 
   def ready {

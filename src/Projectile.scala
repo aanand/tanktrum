@@ -118,4 +118,28 @@ object ProjectileTypes extends Enumeration {
       case MIRV => { new MIRV(session, tank) }
     }
   }
+
+  def render(g: slick.Graphics, value: Value) {
+    value match {
+      case ProjectileTypes.PROJECTILE => {
+        g.setColor(new slick.Color(1f, 1f, 1f))
+        g.fillOval(-3, -3, 6, 6)
+      }
+      case ProjectileTypes.NUKE => {
+        g.setColor(new slick.Color(1f, 1f, 1f))
+        g.fillOval(-6, -6, 12, 12)
+      }
+      case ProjectileTypes.ROLLER => {
+        g.setColor(new slick.Color(0.3f, 0.3f, 0.3f))
+        g.fillOval(-3, -3, 6, 6)
+      }
+      case ProjectileTypes.MIRV => {
+        g.setColor(new slick.Color(1f, 1f, 1f))
+        g.fillOval(-2, -2, 4, 4)
+        g.fillOval(2, 2, 4, 4)
+        g.fillOval(-2, 2, 4, 4)
+        g.fillOval(2, -2, 4, 4)
+      }
+    }
+  }
 }
