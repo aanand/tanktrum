@@ -90,12 +90,9 @@ namespace :install do
     Dir.glob("tmp/vorbisspi/*").first
   end
 
-  file 'tmp/vorbisspi.zip' => [:lib, :tmp] do
+  file 'tmp/vorbisspi' do
     rm_rf 'tmp/vorbisspi'
     download_file "tmp/vorbisspi.zip", 'http://www.javazoom.net/vorbisspi/sources/vorbisspi1.0.3.zip'
-  end
-
-  file 'tmp/vorbisspi' => 'tmp/vorbisspi.zip' do
     raise "extraction of vorbisspi.zip failed" unless sh "unzip tmp/vorbisspi.zip -d tmp/vorbisspi"
   end
 
