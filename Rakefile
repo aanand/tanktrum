@@ -38,7 +38,7 @@ TARGETS.each do |target|
   end
 end
 
-task :compile => ['classes'] + TARGETS
+task :compile => (['install:deps', 'classes'] + TARGETS)
 
 task :run => :compile do
   sh "java -classpath classes:#{CLASSPATH} -Djava.library.path=#{LIBPATH} Main"
@@ -57,59 +57,70 @@ end
 
 namespace :install do
   desc "install dependencies"
-  task :deps => [:scala, :slick, :phys2d, :lwjgl, :sbinary, :vorbisspi, :native_lwjgl_libs]
+  task :deps => LIB_JAR_FILES
 
   task :clobber do
     rm_rf 'lib'
     rm_rf 'tmp'
   end
   
-  task :scala => :lib do
+  file 'lib/scala-library.jar' => :lib do
     cp File.join(File.dirname(`which scala`), '..', 'lib', 'scala-library.jar'), 'lib/'
   end
   
-  task :slick do
+  file 'lib/slick.jar' => :lib do
     download_file 'lib/slick.jar', 'http://slick.cokeandcode.com/demos/slick.jar'
     system "zip -q -d lib/slick.jar *.SF *.RSA *.DSA"
   end
   
-  task :phys2d do
+  file 'lib/phys2d.jar' => :lib do
     download_file 'lib/phys2d.jar', 'http://www.cokeandcode.com/phys2d/source/builds/phys2d-060408.jar'
   end
 
-  task :sbinary do
+  file 'lib/sbinary.jar' => :lib do
     download_file 'lib/sbinary.jar', 'http://sbinary.googlecode.com/files/sbinary-0.2.1.jar'
   end
 
-  task :vorbisspi do
-    tmp_dir = "tmp/vorbisspi"
-    rm_rf tmp_dir
-    
+  def vorbis_dir 
+    Dir.glob("tmp/vorbisspi/*").first
+  end
+
+  file 'tmp/vorbisspi.zip' => [:lib, :tmp] do
+    rm_rf 'tmp/vorbisspi'
     download_file "tmp/vorbisspi.zip", 'http://www.javazoom.net/vorbisspi/sources/vorbisspi1.0.3.zip'
-    raise "extraction of vorbisspi.zip failed" unless sh "unzip tmp/vorbisspi.zip -d #{tmp_dir}"
+  end
 
-    vorbis_dir = Dir.glob("#{tmp_dir}/*").first
+  file 'tmp/vorbisspi' => 'tmp/vorbisspi.zip' do
+    raise "extraction of vorbisspi.zip failed" unless sh "unzip tmp/vorbisspi.zip -d tmp/vorbisspi"
+  end
 
+  file 'lib/vorbisspi.jar' => 'tmp/vorbisspi' do
     vorbis_jar = Dir.glob("#{vorbis_dir}/vorbisspi*.jar").first
     cp vorbis_jar, "lib/vorbisspi.jar"
+  end
 
+  file 'lib/jogg.jar' => 'tmp/vorbisspi' do
     jogg_jar = Dir.glob("#{vorbis_dir}/lib/jogg*.jar").first
     cp jogg_jar, "lib/jogg.jar"
+  end
 
+  file 'lib/jorbis.jar' => 'tmp/vorbisspi' do
     jorbis_jar = Dir.glob("#{vorbis_dir}/lib/jorbis*.jar").first
     cp jorbis_jar, "lib/jorbis.jar"
+  end
 
+  file 'lib/tritonus_share.jar' => 'tmp/vorbisspi' do
     tritonus_share_jar = Dir.glob("#{vorbis_dir}/lib/tritonus_share*.jar").first
     cp tritonus_share_jar, "lib/tritonus_share.jar"
   end
   
-  task :lwjgl => ['tmp', 'lib'] do
+  file 'lib/lwjgl.jar' => ['tmp', 'lib'] do
     download_file 'lib/lwjgl.jar', 'http://slick.cokeandcode.com/demos/lwjgl.jar'
     system "zip -q -d lib/lwjgl.jar *.SF *.RSA *.DSA"
   end
 
-  task :native_lwjgl_libs => ['tmp', 'lib'] do
-    %w{linux mac win32}.each do |os|
+  %w{linux mac win32}.each do |os|
+    file "lib/natives-#{os}.jar" => :lib do
       download_file "lib/natives-#{os}.jar", "http://slick.cokeandcode.com/demos/natives-#{os}.jar"
       system "zip -q -d lib/natives-#{os}.jar *.SF *.RSA *.DSA"
       system "unzip lib/natives-#{os}.jar -d lib/natives-#{os}"
@@ -182,7 +193,6 @@ namespace :upload do
   
   def upload files
     files = [files].flatten
-    
     sh "scp #{files.join(" ")} deathtank@norgg.org:/var/www/norgg.org/htdocs/deathtank"
   end
 end
