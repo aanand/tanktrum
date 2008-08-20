@@ -38,7 +38,7 @@ TARGETS.each do |target|
   end
 end
 
-task :compile => TARGETS
+task :compile => ['classes'] + TARGETS
 
 task :run => :compile do
   sh "java -classpath classes:#{CLASSPATH} -Djava.library.path=#{LIBPATH} Main"

@@ -13,7 +13,7 @@ object MIRVItem extends Item {
 
 class MIRV(session: Session, tank: Tank) extends Projectile(session, tank) {
   val rand = new Random
-  val DISTRIBUTION = 10
+  val DISTRIBUTION = 50
   override val projectileType = ProjectileTypes.MIRV
 
   override def update(delta: Int) {
