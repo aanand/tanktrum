@@ -38,16 +38,20 @@ TARGETS.each do |target|
   end
 end
 
+desc "compile .class files"
 task :compile => TARGETS
 
+desc "start the game"
 task :run => :compile do
   sh "java -classpath classes:#{CLASSPATH} -Djava.library.path=#{LIBPATH} Main"
 end
 
+desc "start a server on the default port"
 task :run_server => :compile do
   sh "java -classpath classes:#{CLASSPATH} -Djava.library.path=#{LIBPATH} ServerMain"
 end
 
+desc "build #{GAME_JAR_NAME}.jar"
 task :jar => GAME_JAR_FILE
 
 file GAME_JAR_FILE => [:compile] + Dir['media/**'] do
@@ -59,6 +63,7 @@ namespace :install do
   desc "install dependencies"
   task :deps => [:scala, :slick, :phys2d, :lwjgl, :sbinary, :vorbisspi, :native_lwjgl_libs]
 
+  desc "remove dependencies and temporary files"
   task :clobber do
     rm_rf 'lib'
     rm_rf 'tmp'
@@ -160,22 +165,27 @@ namespace :build do
     chmod 0755, "#{executable_dir}/JavaApplicationStub"
   end
   
+  desc "build webstart"
   task :webstart => ["dist/webstart"] + WEBSTART_JAR_FILES do
     cp_r "packaging/webstart/.", "dist/webstart"
   end
 end
 
 namespace :upload do
+  desc "upload #{GAME_JAR_NAME}.jar and webstart files"
   task :webstart => [:game, :files]
   
+  desc "upload #{GAME_JAR_NAME}.jar"
   task :game do
     upload "dist/webstart/#{GAME_JAR_NAME}.jar"
   end
   
+  desc "upload webstart files - .jnlp, index.html, etc"
   task :files do
     upload(Dir["dist/webstart/*"] - WEBSTART_JAR_FILES)
   end
   
+  desc "upload dependencies"
   task :libs do
     upload(WEBSTART_JAR_FILES - ["dist/webstart/#{GAME_JAR_NAME}.jar"])
   end
