@@ -46,6 +46,7 @@ class Game(title: String) extends BasicGame(title) {
         ("hostname", serverHostname),
         ("port", serverPort),
         ("join", MenuCommand(Unit => startClient(serverHostname.value, serverPort.value.toInt, userName.value)))))),
+      ("practice", MenuCommand(Unit => startPractice(userName.value))),
       ("quit", MenuCommand(Unit => container.exit()))))
   }
 
@@ -94,6 +95,21 @@ class Game(title: String) extends BasicGame(title) {
     client = new Client(address, port, userName, container)
     println("Starting client.")
     client.enter()
+  }
+  
+  def startPractice(userName: String) {
+    if (server != null) {
+      server.leave
+      server = null
+    }
+
+    val port = 10000
+
+    server = new PracticeServer(port)
+    println("Starting practice server.")
+    server.enter
+
+    startClient("localhost", port, userName)
   }
   
   override def keyPressed(key : Int, char : Char) {
