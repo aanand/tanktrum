@@ -22,7 +22,7 @@ CLASSPATH = LIB_JAR_FILES.join(":")
 
 case `uname`
 when /Darwin/i
-  OS = 'macosx'
+  OS = 'mac'
 when /Linux/i
   OS = 'linux'
 else
