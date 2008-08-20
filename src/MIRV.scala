@@ -2,6 +2,7 @@ import org.newdawn.slick
 import net.phys2d
 import sbinary.Instances._
 import sbinary.Operations
+import java.util.Random;
 
 object MIRVItem extends Item {
   override def name = "MIRV"
@@ -11,6 +12,8 @@ object MIRVItem extends Item {
 }
 
 class MIRV(session: Session, tank: Tank) extends Projectile(session, tank) {
+  val rand = new Random
+  val DISTRIBUTION = 10
   override val projectileType = ProjectileTypes.MIRV
 
   override def update(delta: Int) {
@@ -20,7 +23,8 @@ class MIRV(session: Session, tank: Tank) extends Projectile(session, tank) {
         for (val i <- -2 until 3) {
           val p = new Projectile(session, tank)
           p.body.setPosition(x, y)
-          p.body.adjustVelocity(new phys2d.math.Vector2f(body.getVelocity.getX + i*5, body.getVelocity.getY))
+          p.body.adjustVelocity(new phys2d.math.Vector2f(body.getVelocity.getX + rand.nextFloat*DISTRIBUTION, 
+                                                         body.getVelocity.getY + rand.nextFloat*DISTRIBUTION))
           session.addProjectile(p)
         }
         session.removeProjectile(this)
