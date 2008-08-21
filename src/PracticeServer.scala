@@ -17,9 +17,9 @@ class PracticeServer(port : Int) extends Server(port) {
     val newPlayer = !players.isDefinedAt(addr)
     
     super.addPlayer(addr)
-    
+    players(addr).tank.health = 100
+
     if (newPlayer) {
-      sendGround(addr)
       for (projectileType <- ProjectileTypes) {
         players(addr).tank.ammo(projectileType) = 999
       }

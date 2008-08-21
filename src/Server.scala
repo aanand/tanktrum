@@ -188,6 +188,10 @@ class Server(port: Int) extends Session(null) {
       players.put(addr, player)
 
       broadcastPlayers
+      if (!inReadyRoom) {
+        sendGround(addr)
+        tank.health = 0
+      }
     }
   }
 
