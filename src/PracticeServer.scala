@@ -20,6 +20,9 @@ class PracticeServer(port : Int) extends Server(port) {
     
     if (newPlayer) {
       sendGround(addr)
+      for (projectileType <- ProjectileTypes) {
+        players(addr).tank.ammo(projectileType) = 999
+      }
     }
   }
 }

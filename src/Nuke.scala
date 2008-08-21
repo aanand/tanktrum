@@ -14,6 +14,6 @@ class Nuke(session: Session, tank: Tank) extends Projectile(session, tank) {
   override val radius = 5f
   override val EXPLOSION_RADIUS = 40f
   override val damage = 10
-  override val reloadTime = 5
+  override val reloadTime = 5f
   override val projectileType = ProjectileTypes.NUKE
 }
