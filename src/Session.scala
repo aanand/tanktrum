@@ -97,8 +97,9 @@ abstract class Session(container: slick.GameContainer) extends phys2d.raw.Collis
     p
   }
 
-  def addProjectile(projectile: Projectile) {
+  def addProjectile(projectile: Projectile) = {
     projectiles += projectile
+    projectile
   }
   
   def removeProjectile(p : Projectile) {

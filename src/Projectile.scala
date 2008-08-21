@@ -8,6 +8,7 @@ class Projectile(session: Session, val tank: Tank) extends Collider {
   val EXPLOSION_RADIUS = 20f
   val radius = 3f
   val damage = 5
+  val reloadTime = 4f
   val shape = new phys2d.raw.shapes.Circle(radius)
   val body: phys2d.raw.Body = new phys2d.raw.Body(shape, 1.0f)
 
@@ -89,13 +90,8 @@ object ProjectileLoader {
       if (oldProjectile != null) {
         session.removeProjectile(oldProjectile)
       }
-      ProjectileTypes.apply(projectileType) match {
         //TODO: Use a tank id to track which tank this projectile came from.
-        case ProjectileTypes.PROJECTILE => { p = new Projectile(session, null) }
-        case ProjectileTypes.NUKE => { p = new Nuke(session, null) }
-        case ProjectileTypes.ROLLER => { p = new Roller(session, null) }
-        case ProjectileTypes.MIRV => { p = new MIRV(session, null) }
-      }
+      p = ProjectileTypes.newProjectile(session, null, ProjectileTypes(projectileType))
     }
     p.body.setPosition(x, y)
     val vel = new phys2d.math.Vector2f(xVel, yVel)
@@ -108,7 +104,7 @@ object ProjectileLoader {
 }
 
 object ProjectileTypes extends Enumeration {
-  val PROJECTILE, NUKE, ROLLER, MIRV = Value
+  val PROJECTILE, NUKE, ROLLER, MIRV, MACHINE_GUN = Value
 
   def newProjectile(session: Session, tank: Tank, projectileType: Value) : Projectile = {
     projectileType match {
@@ -116,29 +112,34 @@ object ProjectileTypes extends Enumeration {
       case NUKE => { new Nuke(session, tank) }
       case ROLLER => { new Roller(session, tank) }
       case MIRV => { new MIRV(session, tank) }
+      case MACHINE_GUN => { new MachineGun(session, tank) }
     }
   }
 
   def render(g: slick.Graphics, value: Value) {
     value match {
-      case ProjectileTypes.PROJECTILE => {
+      case PROJECTILE => {
         g.setColor(new slick.Color(1f, 1f, 1f))
         g.fillOval(-3, -3, 6, 6)
       }
-      case ProjectileTypes.NUKE => {
+      case NUKE => {
         g.setColor(new slick.Color(1f, 1f, 1f))
         g.fillOval(-6, -6, 12, 12)
       }
-      case ProjectileTypes.ROLLER => {
+      case ROLLER => {
         g.setColor(new slick.Color(0.3f, 0.3f, 0.3f))
         g.fillOval(-3, -3, 6, 6)
       }
-      case ProjectileTypes.MIRV => {
+      case MIRV => {
         g.setColor(new slick.Color(1f, 1f, 1f))
         g.fillOval(-2, -2, 4, 4)
         g.fillOval(2, 2, 4, 4)
         g.fillOval(-2, 2, 4, 4)
         g.fillOval(2, -2, 4, 4)
+      }
+      case MACHINE_GUN => {
+        g.setColor(new slick.Color(1f, 1f, 1f))
+        g.fillRect(-2, -2, 4, 8)
       }
     }
   }

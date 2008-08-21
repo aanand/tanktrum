@@ -35,8 +35,6 @@ class Tank (session: Session, var id: Byte) extends Collider {
 
   val GUN_POWER_SCALE = 200.0f
 
-  val GUN_RELOAD_TIME = 4.0f
-  
   val GUN_OFFSET_X = 0
   val GUN_OFFSET_Y = -(1.5f*HEIGHT)
   
@@ -236,8 +234,8 @@ class Tank (session: Session, var id: Byte) extends Collider {
     
     if (gunReady && ammo(selectedWeapon) > 0) {
       ammo(selectedWeapon) = ammo(selectedWeapon) - 1
-      session.addProjectile(this, gunX, gunY, angle+gunAngle, gunPower, selectedWeapon)
-      gunTimer = GUN_RELOAD_TIME
+      val proj = session.addProjectile(this, gunX, gunY, angle+gunAngle, gunPower, selectedWeapon)
+      gunTimer = proj.reloadTime
     }
     
     if (ammo(selectedWeapon) == 0) {

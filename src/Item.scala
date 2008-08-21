@@ -23,4 +23,7 @@ object Items extends Enumeration {
   
   RollerItem.itemType = Value
   items.put(RollerItem.itemType, RollerItem)
+
+  MachineGunItem.itemType = Value
+  items.put(MachineGunItem.itemType, MachineGunItem)
 }
