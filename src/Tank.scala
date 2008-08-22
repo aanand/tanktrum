@@ -96,6 +96,7 @@ class Tank (session: Session, var id: Byte) extends Collider {
   var contactTime = 0
 
   var destroy = false
+  var firing = false
 
   def grounded : Boolean = contactTime > 0; true
 
@@ -186,10 +187,9 @@ class Tank (session: Session, var id: Byte) extends Collider {
   }
   
   def update(delta: Int): Unit = {
-    if (destroy) {
-      remove
-    }
+    if (destroy) remove
     if (isDead) return
+    if (firing) fire
     
     if (body.isTouchingStatic(new ArrayList[phys2d.raw.Body]) ||
         wheel1.isTouchingStatic(new ArrayList[phys2d.raw.Body]) ||

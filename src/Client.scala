@@ -162,7 +162,7 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
         case AIM_CLOCKWISE_KEY     => { sendCommand(Commands.AIM_CLOCKWISE) }
         case POWER_UP_KEY          => { sendCommand(Commands.POWER_UP) }
         case POWER_DOWN_KEY        => { sendCommand(Commands.POWER_DOWN) }
-        case FIRE_KEY              => { sendCommand(Commands.FIRE) }
+        case FIRE_KEY              => { sendCommand(Commands.START_FIRE) }
         case CYCLE_WEAPON_KEY      => { sendCommand(Commands.CYCLE_WEAPON) }
         case _                     => { }
       }
@@ -183,6 +183,7 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
         case AIM_CLOCKWISE_KEY     => { sendCommand(Commands.STOP_AIM_CLOCKWISE) }
         case POWER_UP_KEY          => { sendCommand(Commands.STOP_POWER_UP) }
         case POWER_DOWN_KEY        => { sendCommand(Commands.STOP_POWER_DOWN) }
+        case FIRE_KEY              => { sendCommand(Commands.STOP_FIRE) }
         case _ => {}
       }
     }

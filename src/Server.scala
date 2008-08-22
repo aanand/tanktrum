@@ -251,7 +251,8 @@ class Server(port: Int) extends Session(null) {
       case Commands.POWER_DOWN => { player.tank.gunPowerChange = -1 }
       case Commands.STOP_POWER_DOWN => { player.tank.gunPowerChange = 0 }
 
-      case Commands.FIRE => { player.tank.fire() }
+      case Commands.START_FIRE => { player.tank.firing = true }
+      case Commands.STOP_FIRE => { player.tank.firing = false }
       case Commands.CYCLE_WEAPON => { player.tank.cycleWeapon() }
 
       case Commands.READY => { player.ready = true; broadcastPlayers }
