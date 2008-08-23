@@ -9,9 +9,10 @@ import scala.collection.mutable.HashMap
 case class PlaySound(s: String) {}
 
 object SoundPlayer extends Actor {
-  var files = List[String]()
-  files += "explosion.ogg"
-  files += "explosion1.wav"
+  var files = List(
+    "explosion.ogg",
+    "explosion1.wav"
+  )
   
   val sounds = new HashMap[String, (AudioFormat, Array[Byte])]()
   
