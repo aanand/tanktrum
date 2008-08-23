@@ -68,6 +68,7 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
     }
     catch {
       case e:Exception => { 
+        e.printStackTrace()
         error(e.toString) 
       }
     }
@@ -169,6 +170,7 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
     }
     catch {
       case e: Exception => {
+        e.printStackTrace()
         error(e.toString)
       }
     }
@@ -189,6 +191,7 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
     }
     catch {
       case e: Exception =>  {
+        e.printStackTrace()
         error(e.toString)
       }
     }
