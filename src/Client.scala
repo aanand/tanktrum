@@ -22,7 +22,7 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
   val POWER_UP_KEY          = Input.KEY_UP
   val POWER_DOWN_KEY        = Input.KEY_DOWN
   val FIRE_KEY              = Input.KEY_SPACE
-  val CYCLE_WEAPON_KEY      = Input.KEY_TAB
+  val CYCLE_WEAPON_KEY      = Input.KEY_Q
 
   var channel: DatagramChannel = _
   val data = ByteBuffer.allocate(10000)
