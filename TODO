@@ -35,15 +35,14 @@ This is a list of things that need to be done before release:
    - Also need to check how Roller Mines are represented on the HUD in DTZ,
      having a blue circle is just wrong and confusing for the blue tank.  Maybe
      change to a circle with some arcs around it for now.
+   - Machine Gun needs to be changed to rectangles.
+   - MIRV: Needs a minimum time before switching.
    - Different projectiles need to have different reload times.
 
  * Weapons still to be implemented:
-   - Machine Gun: Should be simple, lots of rectangular projectiles.
    - Missiles: Missile shaped projectile, normal damage and explosion, left and
      right controls affect any missiles the player has fired instead of the
      tank.
-   - MIRV: Normal projectile to start with, splits into 5 projectiles as soon
-     as Y velocity < 0 (apex of the shot).  Possibly after a minimum time.
    - Air Strike: "Shooting down the planes will cause them to break open and
      drop all of remaining bombs at once." Yes.
    - Death's Head: Big MIRV.

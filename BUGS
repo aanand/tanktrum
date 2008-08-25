@@ -1,3 +1,6 @@
+ * Slows right the fuck down when there are a lot of projectiles.  Figure out
+   why and fix.
+ 
  * Figure out a good cross-platform place to store the username file or remove
    it or something because at the moment it gets put wherever the current
    working directory is, which is something like / on macs, ~ on linux and god
