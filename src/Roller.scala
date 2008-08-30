@@ -12,6 +12,8 @@ object RollerItem extends Item {
 
 class Roller(session : Session, tank : Tank) extends Projectile(session, tank) {
   override val projectileType = ProjectileTypes.ROLLER
+  
+  body.removeExcludedBody(session.ground.body)
 
   override def collide(obj : Collider, event : phys2d.raw.CollisionEvent) {
     if (!obj.isInstanceOf[Tank] || destroy) {

@@ -9,7 +9,7 @@ import sbinary.Operations
 
 class Ground(session : Session, width : Int, height : Int) extends Collider {
   val MIN_HEIGHT = 20
-  val granularity = 1
+  val granularity = 5
 
   val topsoilColor = new Color(0.5f, 0.5f, 0f)
   val earthColor = new Color(0.8f, 0.8f, 0f)
@@ -41,11 +41,15 @@ class Ground(session : Session, width : Int, height : Int) extends Collider {
   }
   
   def initPoints() {
-    val shapePoints = List(new Vector2f(-20, height), new Vector2f(0, -height)) ++ 
+    val shapePoints = (List(new Vector2f(-20, height), new Vector2f(0, -height)) ++ 
                       points ++ 
-                      List(new Vector2f(width, -height), new Vector2f(width+20, height), new Vector2f(-20, height))
+                      List(new Vector2f(width, -height), new Vector2f(width+20, height), new Vector2f(-20, height))).toArray
     
-    val drawShapePoints = shapePoints.foldLeft[List[Float]](List())((list, v) => list ++ List(v.getX(), v.getY()))
+    val drawShapePoints = new Array[float](shapePoints.length*2)
+    for (i <- 0 until shapePoints.length) {
+      drawShapePoints(i*2) = shapePoints(i).getX
+      drawShapePoints(i*2+1) = shapePoints(i).getY
+    }
     
     drawShape = new Polygon(drawShapePoints.toArray)
     
@@ -70,25 +74,24 @@ class Ground(session : Session, width : Int, height : Int) extends Collider {
 
       session.removeBody(body)
 
-      val point = points(x/granularity)
-      
-      for (i <- -radius until radius) {
-        if (x+i >= 0 && x+i < points.length) {
-          val groundHeight = heightAt(x+i)
+      for (i <- -radius/granularity until radius/granularity+1) {
+        val pointInd = (x/granularity)+i
+        if (pointInd >= 0 && pointInd < points.length) {
+          val groundHeight = points(pointInd).y
 
-          val yOffset = Math.sqrt(Math.pow(radius,2) - Math.pow(i,2))
+          val yOffset = Math.sqrt(Math.pow(radius,2) - Math.pow(i*granularity - x%granularity,2))
           val yTop = y - yOffset
           val yBottom = y + yOffset
 
           if (yBottom > groundHeight) {
             if (yTop < groundHeight) {
-              points(x+i).y += (yBottom - groundHeight).toFloat
+              points(pointInd).y += (yBottom - groundHeight).toFloat
             } else {
-              points(x+i).y += (yBottom - yTop).toFloat
+              points(pointInd).y += (yBottom - yTop).toFloat
             }
           }
-          if (points(x+i).y > Main.HEIGHT-MIN_HEIGHT) {
-            points(x+i).y = Main.HEIGHT-MIN_HEIGHT
+          if (points(pointInd).y > Main.HEIGHT-MIN_HEIGHT) {
+            points(pointInd).y = Main.HEIGHT-MIN_HEIGHT
           }
         }
       }
@@ -136,7 +139,7 @@ class Ground(session : Session, width : Int, height : Int) extends Collider {
     initPoints()
   }
 
-  def heightAt(x: Double): Double = {
+  def heightAt(x: Float): Float = {
     if (null == points) {
       return 0f
     }
@@ -152,10 +155,10 @@ class Ground(session : Session, width : Int, height : Int) extends Collider {
     val h1 = points(i).y
     val h2 = points(i+1).y
 
-    val r = x % granularity
+    val dist: Float = x % granularity //Pixels right of h1.
     
-    val f = r/granularity
+    val factor = dist/granularity //Interpolation factor.
 
-    h1*(1-r) + h2*r
+    h1*(1-factor) + h2*factor
   }
 }

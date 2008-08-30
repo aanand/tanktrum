@@ -11,6 +11,7 @@ object ServerMain {
       val delta = (newTime - time)
       time = newTime
       server.update(delta.toInt)
+      //TODO: Should be 10-delta
       Thread.sleep(10)
     }
   }

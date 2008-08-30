@@ -10,7 +10,17 @@ class Projectile(session: Session, val tank: Tank) extends Collider {
   val damage = 5
   val reloadTime = 4f
   val shape = new phys2d.raw.shapes.Circle(radius)
-  val body: phys2d.raw.Body = new phys2d.raw.Body(shape, 1.0f)
+  
+  var body: phys2d.raw.Body = _
+
+  if (session.isInstanceOf[Server]) {
+    body = new phys2d.raw.Body(shape, 1.0f)
+  }
+  else {
+    body = new phys2d.raw.StaticBody(shape)
+  }
+
+  body.addExcludedBody(session.ground.body)
 
   val projectileType = ProjectileTypes.PROJECTILE
 
@@ -25,7 +35,7 @@ class Projectile(session: Session, val tank: Tank) extends Collider {
     if (x < 0 || x > Main.WIDTH || y > Main.HEIGHT || destroy) {
       session.removeProjectile(this)
     }
-    if (y > session.ground.heightAt(x)) {
+    if (y + radius > session.ground.heightAt(x)) {
       collide(session.ground, null)
     }
   }

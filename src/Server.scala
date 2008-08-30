@@ -14,7 +14,7 @@ import sbinary.Instances._
 
 class Server(port: Int) extends Session(null) {
   val TANK_BROADCAST_INTERVAL = 25 //milliseconds
-  val PROJECTILE_BROADCAST_INTERVAL = 100
+  val PROJECTILE_BROADCAST_INTERVAL = 50
   val PLAYER_BROADCAST_INTERVAL = 1000
   val READY_ROOM_BROADCAST_INTERVAL = 500
   val MAX_PLAYERS = 6
