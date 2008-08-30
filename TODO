@@ -26,7 +26,8 @@ This is a list of things that need to be done before release:
      unit of intersection with a tank.
    - Scoring and prices needs balancing and a decision made whether to stick
      with points and money per point of damage or to go with the traditional
-     deathtank system.
+     deathtank system.  We should log the usage and damage done by weapons and
+     tweak costs appropriately.
    - Nuke: Possibly needs to do even more damage.
    - Roller mines probably need rethinking again, there is some jitter
      currently.  Trying to do projectile physics as interpolation on the client
@@ -37,7 +38,6 @@ This is a list of things that need to be done before release:
      change to a circle with some arcs around it for now.
    - Machine Gun needs to be changed to rectangles.
    - MIRV: Needs a minimum time before switching.
-   - Different projectiles need to have different reload times.
 
  * Weapons still to be implemented:
    - Missiles: Missile shaped projectile, normal damage and explosion, left and

@@ -20,6 +20,8 @@ WEBSTART_JAR_FILES = jar_files('dist/webstart', LIB_JAR_NAMES + [GAME_JAR_NAME])
 
 CLASSPATH = LIB_JAR_FILES.join(":")
 
+AGENTPATH = "/home/norgg/.netbeans/6.0/lib/deployed/jdk15/linux/libprofilerinterface.so=/home/norgg/.netbeans/6.0/lib,5140"
+
 case `uname`
 when /Darwin/i
   OS = 'mac'
@@ -44,6 +46,16 @@ task :compile => (['install:deps', 'classes'] + TARGETS)
 desc "start the game"
 task :run => :compile do
   sh "java -classpath classes:#{CLASSPATH} -Djava.library.path=#{LIBPATH} Main"
+end
+
+desc "profile the game"
+task :profile => :compile do
+  sh "java -agentpath:#{AGENTPATH} -classpath classes:#{CLASSPATH} -Djava.library.path=#{LIBPATH} Main"
+end
+
+desc "profile the server"
+task :profile_server => :compile do
+  sh "java -agentpath:#{AGENTPATH} -classpath classes:#{CLASSPATH} -Djava.library.path=#{LIBPATH} ServerMain"
 end
 
 desc "start a server on the default port"
