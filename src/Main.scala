@@ -9,7 +9,7 @@ object Main {
     
     val container = new slick.AppGameContainer(game)
     container.setDisplayMode(WIDTH, HEIGHT, false)
-    container.setShowFPS(true)
+    container.setShowFPS(false)
     container.setMaximumLogicUpdateInterval(1000/100)
     container.setMinimumLogicUpdateInterval(1000/100)
     
