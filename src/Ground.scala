@@ -158,8 +158,4 @@ class Ground(session : Session, width : Int, height : Int) extends Collider {
 
     h1*(1-r) + h2*r
   }
-
-  def normalAt(x: Float) = {
-    0f
-  }
 }
