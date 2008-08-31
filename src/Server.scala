@@ -230,9 +230,9 @@ class Server(port: Int) extends Session(null) {
   
   def processCommand(command: char, addr: SocketAddress) {
     val player = players(addr)
+    player.resetTimeout
     command match {
       case Commands.PING => {
-        player.resetTimeout
         sendPong(addr)
       }
 
@@ -259,7 +259,7 @@ class Server(port: Int) extends Session(null) {
       case Commands.BUY => { handleBuy(player) }
 
       case Commands.CHAT_MESSAGE => { handleChat(player) }
-
+      case _ => {println("Warning: Server got unknown command: " + command.toByte)}
     }
   }
 

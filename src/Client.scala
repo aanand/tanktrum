@@ -130,10 +130,11 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
   }
  
   def processCommand(command: Char) {
+    resetTimeout
     command match {
       case Commands.SERVER_FULL => {error("Server full.")}
       case Commands.GROUND => {loadGround}
-      case Commands.PING   => {resetTimeout}
+      case Commands.PING   => {}
       case Commands.TANKS => {processUpdate}
       case Commands.PROJECTILE => {loadProjectile}
       case Commands.PROJECTILES => {loadProjectiles}
@@ -141,6 +142,7 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
       case Commands.PLAYERS => {loadPlayers}
       case Commands.READY_ROOM => {inReadyRoom = true}
       case Commands.CHAT_MESSAGE => {addChatMessage}
+      case _ => {println("Warning: Client got unknown command: " + command.toByte)}
     }
   }
   
