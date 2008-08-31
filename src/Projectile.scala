@@ -127,28 +127,25 @@ object ProjectileTypes extends Enumeration {
   }
 
   def render(g: slick.Graphics, value: Value) {
+    g.setColor(new slick.Color(1f, 1f, 1f))
     value match {
       case PROJECTILE => {
-        g.setColor(new slick.Color(1f, 1f, 1f))
         g.fillOval(-3, -3, 6, 6)
       }
       case NUKE => {
-        g.setColor(new slick.Color(1f, 1f, 1f))
         g.fillOval(-6, -6, 12, 12)
       }
       case ROLLER => {
-        g.setColor(new slick.Color(0.3f, 0.3f, 0.3f))
         g.fillOval(-3, -3, 6, 6)
+        g.fillRect(-7, 3, 14, 4)
       }
       case MIRV => {
-        g.setColor(new slick.Color(1f, 1f, 1f))
         g.fillOval(-2, -2, 4, 4)
         g.fillOval(2, 2, 4, 4)
         g.fillOval(-2, 2, 4, 4)
         g.fillOval(2, -2, 4, 4)
       }
       case MACHINE_GUN => {
-        g.setColor(new slick.Color(1f, 1f, 1f))
         g.fillRect(-2, -2, 4, 8)
       }
     }
