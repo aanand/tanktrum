@@ -9,6 +9,8 @@ This is a list of things that need to be done before release:
  * Clean up server and client classes, separating all network stuff from game
    logic stuff.
 
+ * Split the ground into multiple shapes to help out the collision detector.
+
  * Game search.  Servers need names and there should be a thing where you can
    search for servers by name or just find ones with a low ping to you.
 
@@ -63,3 +65,10 @@ This is a list of things that need to be done before release:
 
  * Special weapon drops are a thing that should happen eventually too, but
    they're not really a priority right now.
+
+ * Game modes:
+   - Continuous, players join whenever they want, spectate if they join in the
+     middle of a round, counterstrike style.  Scores are reset occasionally
+     (every few rounds?).
+   - N Rounds, players join at the start of the game, can only spectate if they
+     join in the middle of a game.  Play through to the end.
