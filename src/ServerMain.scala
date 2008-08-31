@@ -1,6 +1,8 @@
 import java.util.Date
 
 object ServerMain {
+  val TICK = 10 //ms
+
   def main(args: Array[String]) {
     val server = new Server(10000)
     server.enter
@@ -11,8 +13,9 @@ object ServerMain {
       val delta = (newTime - time)
       time = newTime
       server.update(delta.toInt)
-      //TODO: Should be 10-delta
-      Thread.sleep(10)
+      if (TICK-delta > 0) {
+        Thread.sleep(TICK-delta)
+      }
     }
   }
 }
