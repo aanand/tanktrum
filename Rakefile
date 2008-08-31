@@ -157,8 +157,10 @@ WEBSTART_JAR_FILES.each do |target|
     
     require 'highline'
     jarsigner_passphrase ||= HighLine.new.ask("Enter jarsigner passphrase: ") { |q| q.echo = false }
-    
-    raise "jarsigner failed" unless system "jarsigner -keystore deathtank.ks -storepass '#{jarsigner_passphrase}' #{target} mykey"
+    unless system "jarsigner -keystore deathtank.ks -storepass '#{jarsigner_passphrase}' #{target} mykey"
+      rm target
+      raise "jarsigner failed"
+    end
   end
 end
 
