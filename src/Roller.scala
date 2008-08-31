@@ -12,13 +12,16 @@ object RollerItem extends Item {
 
 class Roller(session : Session, tank : Tank) extends Projectile(session, tank) {
   override val projectileType = ProjectileTypes.ROLLER
-  
+  override val color = new slick.Color(0.6f, 1.0f, 0.7f)
+  override val reloadTime = 0.4f
+
   body.removeExcludedBody(session.ground.body)
 
   override def collide(obj : Collider, event : phys2d.raw.CollisionEvent) {
-    if (!obj.isInstanceOf[Tank] || destroy) {
-      return
+    if (y - radius > session.ground.heightAt(x) || //It's below the ground.
+        obj.isInstanceOf[Tank] || //Or it's hit a tank.
+        obj.isInstanceOf[Projectile]) { //Or it's hit a projectile.)
+        super.collide(obj, event)
     }
-    super.collide(obj, event) //heh
   }
 }
