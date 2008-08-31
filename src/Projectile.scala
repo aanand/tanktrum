@@ -4,8 +4,8 @@ import sbinary.Instances._
 import sbinary.Operations
 
 class Projectile(session: Session, val tank: Tank) extends Collider {
-  val COLOR = new slick.Color(1.0f, 1.0f, 1.0f)
-  val EXPLOSION_RADIUS = 20f
+  val color = new slick.Color(1.0f, 1.0f, 1.0f)
+  val explosion_radius = 20f
   val radius = 3f
   val damage = 5
   val reloadTime = 4f
@@ -41,20 +41,20 @@ class Projectile(session: Session, val tank: Tank) extends Collider {
   }
   
   def render(g : slick.Graphics) {
-    g.setColor(COLOR)
+    g.setColor(color)
     g.fillOval(x - radius, y - radius, radius*2, radius*2)
   }
   
   override def collide(obj : Collider, event : phys2d.raw.CollisionEvent) {
-    if (obj.isInstanceOf[Projectile] || destroy) {
+    if ((obj.isInstanceOf[Projectile] && !this.isInstanceOf[Roller]) || destroy) {
       return
     }
 
     destroy = true
 
     if (session.isInstanceOf[Server]) {
-      session.addExplosion(x, y, EXPLOSION_RADIUS, this)
-      session.ground.deform(x.toInt, y.toInt, EXPLOSION_RADIUS.toInt)
+      session.addExplosion(x, y, explosion_radius, this)
+      session.ground.deform(x.toInt, y.toInt, explosion_radius.toInt)
     }
     
     if (obj.isInstanceOf[Tank] && session.isInstanceOf[Server]) {
