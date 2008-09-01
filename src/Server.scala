@@ -210,8 +210,11 @@ class Server(port: Int) extends Session(null) {
   def createTank(id: Byte) = {
     println("Creating a tank.")
     val tank = new Tank(this, id)
-    val loc = rand.nextFloat * (Main.WIDTH - 200) + 100
-    tank.create(loc)
+    var x = rand.nextFloat * (Main.WIDTH - tank.WIDTH) + tank.WIDTH
+    while (tanks.exists(tank => {x > tank.x - tank.WIDTH && x < tank.x + tank.WIDTH})) {
+      x = rand.nextFloat * (Main.WIDTH - tank.WIDTH) + tank.WIDTH
+    }
+    tank.create(x)
     tank
   }
 
