@@ -6,3 +6,16 @@
  * Go back and rework tank physics again.  Egglet says that tanks shouldn't get
    stuck quite so much and he is basically the deathtank expert.  Also, the
    slipping down hills seems to be worse again recently.
+
+ * When a new round is started, if the new ground heightmap takes a while to get
+   to the players, the old ground is displayed until it does.
+
+ * Network crapness can cause lag in gun aiming and weapon cycling, which is irritating.
+   If there aren't any hidden dangers, and I can't think of any, each player's
+   client should probably be the authority on the following variables, with the
+   server keeping stale copies and broadcasting them to the other players:
+    - gunAngle
+    - gunAngleChange
+    - gunPower
+    - gunPowerChange
+    - selectedWeapon
