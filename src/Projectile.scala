@@ -46,10 +46,16 @@ class Projectile(session: Session, val tank: Tank) extends Collider {
   }
   
   override def collide(obj : Collider, event : phys2d.raw.CollisionEvent) {
-    if ((obj.isInstanceOf[Projectile] && !this.isInstanceOf[Roller]) || destroy) {
+    if (!obj.isInstanceOf[Projectile]) {
+      explode(obj)
+    }
+  }
+  
+  def explode(obj : Collider) {
+    if (destroy) {
       return
     }
-
+    
     destroy = true
 
     if (session.isInstanceOf[Server]) {
