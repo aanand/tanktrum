@@ -144,8 +144,16 @@ class Server(port: Int) extends Session(null) {
 
   def endRound {
     world = createWorld
+    for (projectile <- projectiles) {
+      removeProjectile(projectile)
+    }
     projectiles = List[Projectile]()
-    explosions = new HashSet[Explosion]()
+
+    for (explosion <- explosions) {
+      removeExplosion(explosion)
+    }
+    explosions = new HashSet[Explosion]
+
     bodies = new HashMap[phys2d.raw.Body, Collider]
     for (player <- players.values) {
       player.money += 10
