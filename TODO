@@ -72,3 +72,12 @@ This is a list of things that need to be done before release:
      (every few rounds?).
    - N Rounds, players join at the start of the game, can only spectate if they
      join in the middle of a game.  Play through to the end.
+
+ * User interface improvements:
+   - Key repeat in edit boxes.
+   - Possibly use swing or some other real gui toolkit so that people can click
+     on things.
+   - Saving of username, last host(s?)/port(s?).
+   - Configurable keybindings.
+   - Chat messages should fade over time, possibly allow more than 5 at once.
+
