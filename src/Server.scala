@@ -67,6 +67,10 @@ class Server(port: Int) extends Session(null) {
    * to.
    */
   override def update(delta: Int) = {
+    if (!inReadyRoom) {
+      world.step(delta/1000f)
+    }
+
     super.update(delta)
     checkTimeouts()
 

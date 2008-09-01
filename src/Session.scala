@@ -29,7 +29,6 @@ abstract class Session(container: slick.GameContainer) extends phys2d.raw.Collis
   }
   
   def update(delta: Int) {
-    world.step(delta/1000f)
     
     ground.update(delta)
     for (tank <- tanks) {
