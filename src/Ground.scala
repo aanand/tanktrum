@@ -119,7 +119,7 @@ class Ground(session : Session, width : Int, height : Int) extends Collider {
       }
     }
 
-    g.setColor(new Color(0.5f, 0.5f, 0.5f))
+    g.setColor(earthColor)
     g.fillRect(0, Main.HEIGHT-MIN_HEIGHT, Main.WIDTH, MIN_HEIGHT)
   }
   
