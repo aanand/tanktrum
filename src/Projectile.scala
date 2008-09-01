@@ -5,7 +5,7 @@ import sbinary.Operations
 
 class Projectile(session: Session, val tank: Tank) extends Collider {
   val color = new slick.Color(1.0f, 1.0f, 1.0f)
-  val explosion_radius = 20f
+  val explosionRadius = 20f
   val radius = 3f
   val damage = 5
   val reloadTime = 4f
@@ -53,8 +53,8 @@ class Projectile(session: Session, val tank: Tank) extends Collider {
     destroy = true
 
     if (session.isInstanceOf[Server]) {
-      session.addExplosion(x, y, explosion_radius, this)
-      session.ground.deform(x.toInt, y.toInt, explosion_radius.toInt)
+      session.addExplosion(x, y, explosionRadius, this)
+      session.ground.deform(x.toInt, y.toInt, explosionRadius.toInt)
     }
     
     if (obj.isInstanceOf[Tank] && session.isInstanceOf[Server]) {
