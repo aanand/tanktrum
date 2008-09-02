@@ -23,6 +23,12 @@ This is a list of things that need to be done before release:
    - Sound effect for moving?
    - Death sound.
 
+ * Jump jets currently provide no air control.  The force they apply should
+   probably be adjusted left and right if the player tries to move that way.
+   The upwards force should probably be reduced as the tank gets higher and
+   there should possibly be a maximum velocity.  Jumpjets should leave a vapour
+   trail.
+
  * Tweaking of money and existing weapons.
    - Explosions possibly need a "damage factor" for how much damage they do per
      unit of intersection with a tank.
@@ -52,8 +58,6 @@ This is a list of things that need to be done before release:
      of carbomite purchased.
 
  * Other items that can be bought and need to be implemented:
-   - Jump Jets: Yes.  Give some lift.  Need to play with these in DTZ again to
-     remember exactly how they work.  Experiment.
    - Shields: Create a circle around the tank, if a projectile is in the circle
      (same test as between a tank and an explosion), give it a push away,
      possibly proportional to how far inside the circle it is.
