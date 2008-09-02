@@ -97,6 +97,11 @@ class Tank (session: Session, var id: Byte) extends Collider {
 
   var destroy = false
   var firing = false
+  var jumping = false
+
+  var maxJumpFuel = 10000
+  var jumpFuel = 1000
+  def fuelPercent = (jumpFuel.toFloat/maxJumpFuel) * 100
 
   def grounded : Boolean = contactTime > 0; true
 
@@ -199,12 +204,18 @@ class Tank (session: Session, var id: Byte) extends Collider {
     else if (contactTime > 0) {
       contactTime -= delta
     }
-    
-    if (grounded) {
-      val delta = new phys2d.math.Vector2f(Math.cos(body.getRotation).toFloat*speedDelta,
-                                           Math.sin(body.getRotation).toFloat*speedDelta)
+
+    if (jumping && jumpFuel > 0) {
+      jumpFuel -= delta
+      val force = new phys2d.math.Vector2f(Math.sin(body.getRotation).toFloat * 500,
+                                           -Math.cos(body.getRotation).toFloat * 500)
+      body.addForce(force)
+    }
+    else if (grounded) {
+      val acceleration = new phys2d.math.Vector2f(Math.cos(body.getRotation).toFloat*speedDelta,
+                                                  Math.sin(body.getRotation).toFloat*speedDelta)
       
-      body.adjustVelocity(delta)
+      body.adjustVelocity(acceleration)
 
       body.setIsResting(false)
       wheel1.setIsResting(false)
@@ -325,17 +336,18 @@ class Tank (session: Session, var id: Byte) extends Collider {
       gunPowerChange.toByte,
       selectedWeapon.id.toByte,
       ammo(selectedWeapon).toShort,
+      jumpFuel.toShort,
       id
     ))
   }
   
   def loadFrom(data: Array[Byte]) = {
-    val values = Operations.fromByteArray[(Float, Float, Short, Short, Short, Short, Short, Byte, Byte, Byte, Byte, Short, Byte)](data)
+    val values = Operations.fromByteArray[(Float, Float, Short, Short, Short, Short, Short, Byte, Byte, Byte, Byte, Short, Short, Byte)](data)
     
     val (newX, newY, newAngle, 
         newGunAngle, newGunPower, newGunTimer, 
         newHealth, newThrust, newGunAngleChange, newGunPowerChange, 
-        newSelectedWeapon, newSelectedAmmo,
+        newSelectedWeapon, newSelectedAmmo, newFuel,
         newID) = values
 
     body.setPosition(newX, newY)
@@ -349,6 +361,7 @@ class Tank (session: Session, var id: Byte) extends Collider {
     gunPowerChange = newGunPowerChange
     selectedWeapon = ProjectileTypes.apply(newSelectedWeapon)
     ammo(selectedWeapon) = newSelectedAmmo
+    jumpFuel = newFuel
     
     id = newID
     

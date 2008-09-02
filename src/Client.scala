@@ -17,6 +17,7 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
   val CHAT_KEY              = Input.KEY_T
   val MOVE_LEFT_KEY         = Input.KEY_A
   val MOVE_RIGHT_KEY        = Input.KEY_D
+  val JUMP_KEY              = Input.KEY_W
   val AIM_ANTICLOCKWISE_KEY = Input.KEY_LEFT
   val AIM_CLOCKWISE_KEY     = Input.KEY_RIGHT
   val POWER_UP_KEY          = Input.KEY_UP
@@ -161,6 +162,7 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
         case CHAT_KEY              => { chat.start }
         case MOVE_LEFT_KEY         => { sendCommand(Commands.MOVE_LEFT) }
         case MOVE_RIGHT_KEY        => { sendCommand(Commands.MOVE_RIGHT) }
+        case JUMP_KEY              => { sendCommand(Commands.JUMP) }
         case AIM_ANTICLOCKWISE_KEY => { sendCommand(Commands.AIM_ANTICLOCKWISE) }
         case AIM_CLOCKWISE_KEY     => { sendCommand(Commands.AIM_CLOCKWISE) }
         case POWER_UP_KEY          => { sendCommand(Commands.POWER_UP) }
@@ -183,6 +185,7 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
       key match {
         case MOVE_LEFT_KEY         => { sendCommand(Commands.STOP_MOVE_LEFT) }
         case MOVE_RIGHT_KEY        => { sendCommand(Commands.STOP_MOVE_RIGHT) }
+        case JUMP_KEY              => { sendCommand(Commands.STOP_JUMP) }
         case AIM_ANTICLOCKWISE_KEY => { sendCommand(Commands.STOP_AIM_ANTICLOCKWISE) }
         case AIM_CLOCKWISE_KEY     => { sendCommand(Commands.STOP_AIM_CLOCKWISE) }
         case POWER_UP_KEY          => { sendCommand(Commands.STOP_POWER_UP) }

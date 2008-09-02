@@ -47,6 +47,9 @@ class Player (var tank: Tank, var name: String, var id: Byte) {
     g.translate(0, 10)
     g.drawString(name + ": " + score, 0, 0)
 
+    g.translate(0, 20)
+    g.fillRect(0, 0, tank.fuelPercent, 5)
+
     if (tank.isAlive) {
       g.translate(10, 30)
 
@@ -64,6 +67,12 @@ class Player (var tank: Tank, var name: String, var id: Byte) {
       money -= item.cost
       if (item.projectileType != null) {
         tank.ammo(item.projectileType) = tank.ammo(item.projectileType) + item.units
+      }
+      if (item == JumpjetItem) {
+        tank.jumpFuel += item.units
+        if (tank.jumpFuel > tank.maxJumpFuel) {
+          tank.jumpFuel = tank.maxJumpFuel
+        }
       }
     }
   }

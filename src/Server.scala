@@ -255,6 +255,8 @@ class Server(port: Int) extends Session(null) {
       case Commands.STOP_MOVE_LEFT => { player.tank.thrust = 0 }
       case Commands.MOVE_RIGHT => { player.tank.thrust = 1 }
       case Commands.STOP_MOVE_RIGHT => { player.tank.thrust = 0 }
+      case Commands.JUMP => { player.tank.jumping = true }
+      case Commands.STOP_JUMP => { player.tank.jumping = false }
 
       case Commands.AIM_CLOCKWISE => { player.tank.gunAngleChange = 1 }
       case Commands.STOP_AIM_CLOCKWISE => { player.tank.gunAngleChange = 0 }

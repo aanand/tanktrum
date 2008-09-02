@@ -21,6 +21,8 @@ object Commands {
   val STOP_MOVE_LEFT = nextI
   val MOVE_RIGHT = nextI
   val STOP_MOVE_RIGHT = nextI
+  val JUMP = nextI
+  val STOP_JUMP = nextI
 
   val AIM_CLOCKWISE = nextI
   val STOP_AIM_CLOCKWISE = nextI

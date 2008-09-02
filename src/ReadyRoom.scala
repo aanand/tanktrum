@@ -31,7 +31,6 @@ class ReadyRoom (client: Client) {
   }
 
   def buy(item: Item) {
-    println("Buying a nuke.")
     client.sendPurchase(item.itemType.id.toByte)
   }
 
