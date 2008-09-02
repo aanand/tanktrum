@@ -9,12 +9,13 @@ class Projectile(session: Session, val tank: Tank) extends Collider {
   val radius = 3f
   val damage = 5
   val reloadTime = 4f
+  val mass = 1f
   val shape = new phys2d.raw.shapes.Circle(radius)
   
   var body: phys2d.raw.Body = _
 
   if (session.isInstanceOf[Server]) {
-    body = new phys2d.raw.Body(shape, 1.0f)
+    body = new phys2d.raw.Body(shape, mass)
   }
   else {
     body = new phys2d.raw.StaticBody(shape)

@@ -15,6 +15,7 @@ class MIRV(session: Session, tank: Tank) extends Projectile(session, tank) {
   val rand = new Random
   val DISTRIBUTION = 50
   override val projectileType = ProjectileTypes.MIRV
+  override val radius = 4f
 
   def clusterProjectile = new Projectile(session, tank)
 

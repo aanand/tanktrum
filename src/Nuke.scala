@@ -12,6 +12,7 @@ object NukeItem extends Item {
 
 class Nuke(session: Session, tank: Tank) extends Projectile(session, tank) {
   override val radius = 5f
+  override val mass = 3f
   override val explosionRadius = 40f
   override val damage = 10
   override val reloadTime = 5f
