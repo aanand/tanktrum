@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <jnlp spec="1.0+"
-      codebase="http://norgg.org/deathtank"
+      codebase="http://boomtrapezoid.com"
       href="tank.jnlp">
 
   <information>
-    <title>Tank</title>
-    <vendor>Deathtank</vendor>
+    <title>Boom Trapezoid</title>
+    <vendor>boomtrapezoid.com</vendor>
   </information> 
 
   <resources>
