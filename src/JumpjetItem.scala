@@ -1,5 +1,5 @@
 object JumpjetItem extends Item {
   override def name = "Jumpjets"
-  override def cost = 100
-  override def units = 5000
+  override def cost = 50
+  override def units = 2500
 }

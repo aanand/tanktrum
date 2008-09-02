@@ -6,7 +6,7 @@ import java.util.Random;
 
 object MIRVItem extends Item {
   override def name = "MIRV"
-  override def cost = 100
+  override def cost = 75
   override def units = 1
   override val projectileType = ProjectileTypes.MIRV
 }

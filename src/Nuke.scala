@@ -5,7 +5,7 @@ import sbinary.Operations
 
 object NukeItem extends Item {
   override def name = "Nuke"
-  override def cost = 50
+  override def cost = 75
   override def units = 1
   override val projectileType = ProjectileTypes.NUKE
 }

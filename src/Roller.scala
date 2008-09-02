@@ -5,7 +5,7 @@ import sbinary.Operations
 
 object RollerItem extends Item { 
   override def name = "Roller"
-  override def cost = 150
+  override def cost = 100
   override def units = 5
   override val projectileType = ProjectileTypes.ROLLER
 }
