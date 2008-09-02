@@ -191,7 +191,7 @@ class Server(port: Int) extends Session(null) {
       val nameArray = new Array[byte](data.remaining())
       data.get(nameArray)
       val name = new String(nameArray)
-      println("Adding player: " + name)
+      println(name + " has joined the game.")
 
       findNextID
       val tank = createTank(playerID)
@@ -208,7 +208,6 @@ class Server(port: Int) extends Session(null) {
   }
 
   def createTank(id: Byte) = {
-    println("Creating a tank.")
     val tank = new Tank(this, id)
     var x = rand.nextFloat * (Main.WIDTH - tank.WIDTH) + tank.WIDTH
     while (tanks.exists(tank => {x > tank.x - tank.WIDTH && x < tank.x + tank.WIDTH})) {
@@ -285,6 +284,7 @@ class Server(port: Int) extends Session(null) {
     data.get(messageArray)
     val message = player.name + ": " + Operations.fromByteArray[String](messageArray)
     println("Broadcasting chat message: " + message)
+    broadcastChat(message)
     broadcast(byteToArray(Commands.CHAT_MESSAGE) ++ Operations.toByteArray(message))
   }
 
@@ -347,10 +347,6 @@ class Server(port: Int) extends Session(null) {
   
   def broadcastGround() = {
     broadcast(byteToArray(Commands.GROUND) ++ ground.serialise)
-  }
-
-  def broadcastDamageUpdate(tank : Tank, damage : Int) {
-    println("broadcasting damage update: " + tank.toString + ", " + damage.toString)
   }
 
   def broadcastPlayers = {

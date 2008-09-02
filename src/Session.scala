@@ -92,7 +92,6 @@ abstract class Session(container: slick.GameContainer) extends phys2d.raw.Collis
     p.body.adjustVelocity(velocity)
     projectiles += p
     
-    println("added projectile at " + p.x + ", " + p.y + ", " + angle + ", " + speed)
     p
   }
 

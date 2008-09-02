@@ -69,6 +69,7 @@ class Projectile(session: Session, val tank: Tank) extends Collider {
       
       hitTank.damage(damage)
       if (tank != null && tank.player != null) {
+        println(tank.player.name + " hit " + hitTank.player.name + " directly with " + this + " for " + damage + " damage.")
         if (tank == hitTank) {
           tank.player.score -= damage
           tank.player.money -= damage
@@ -78,7 +79,6 @@ class Projectile(session: Session, val tank: Tank) extends Collider {
           tank.player.money += damage
         }
       }
-      server.broadcastDamageUpdate(hitTank, damage)
     }
   }
 

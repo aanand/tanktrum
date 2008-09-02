@@ -22,8 +22,6 @@ class Explosion (var x: Float, var y: Float, var radius: Float, session: Session
       
       if (numContacts > 0) {
         var maxOverlap = 0f
-        println("Tank in explosion.")
-        //Yeah, this should probably be done with a foldleft.
         for (i <- 0 until numContacts) {
           if (-contacts(i).getSeparation > maxOverlap) {
             maxOverlap = -contacts(i).getSeparation
@@ -32,6 +30,7 @@ class Explosion (var x: Float, var y: Float, var radius: Float, session: Session
         val damage = maxOverlap.toInt
         tank.damage(damage)
         if (null != projectile) {
+          println(projectile.tank.player.name + " hit " + tank.player.name + " with splash damage from " + projectile + " for " + damage + " damage.")
           if (tank == projectile.tank) {
             projectile.tank.player.score -= damage
             projectile.tank.player.money -= damage
@@ -42,7 +41,6 @@ class Explosion (var x: Float, var y: Float, var radius: Float, session: Session
           }
 
         }
-        session.asInstanceOf[Server].broadcastDamageUpdate(tank, damage)
       }
     }
   }

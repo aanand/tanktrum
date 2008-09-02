@@ -264,7 +264,7 @@ class Tank (session: Session, var id: Byte) extends Collider {
   }
   
   def remove =  {
-    println("Removing tank.")
+    println(player.name + " died.")
     if (null != body) session.removeBody(body)
     if (null != wheel1) session.removeBody(wheel1)
     if (null != wheel2) session.removeBody(wheel2)

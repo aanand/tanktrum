@@ -79,7 +79,6 @@ object SoundPlayer extends Actor {
 class SoundListener extends LineListener {
   def update(e: LineEvent) {
     if (e.getType == LineEvent.Type.STOP) {
-      println("closing line")
       e.getLine.close
     }
   }
