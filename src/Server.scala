@@ -191,6 +191,7 @@ class Server(port: Int) extends Session(null) {
       val nameArray = new Array[byte](data.remaining())
       data.get(nameArray)
       val name = new String(nameArray)
+      broadcastChat(name + " has joined the game.")
       println(name + " has joined the game.")
 
       findNextID
@@ -285,7 +286,6 @@ class Server(port: Int) extends Session(null) {
     val message = player.name + ": " + Operations.fromByteArray[String](messageArray)
     println("Broadcasting chat message: " + message)
     broadcastChat(message)
-    broadcast(byteToArray(Commands.CHAT_MESSAGE) ++ Operations.toByteArray(message))
   }
 
   def handleBuy(player: Player) = {
@@ -343,6 +343,10 @@ class Server(port: Int) extends Session(null) {
   }
 
   def broadcastFrags() {
+  }
+
+  def broadcastChat (message: String) {
+    broadcast(byteToArray(Commands.CHAT_MESSAGE) ++ Operations.toByteArray(message))
   }
   
   def broadcastGround() = {

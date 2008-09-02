@@ -254,17 +254,21 @@ class Tank (session: Session, var id: Byte) extends Collider {
     }
   }
   
-  def damage(d: Int) {
+  def damage(d: Int, source: Projectile) {
+    val oldHealth = health
+
     health -= d
     
-    if (isDead) {
+    if (isDead && oldHealth > 0) {
+      if (session.isInstanceOf[Server]) {
+        session.asInstanceOf[Server].broadcastChat(source.tank.player.name + " killed " + player.name + " with " + source.getClass.getName + ".")
+      }
       destroy = true
       health = 0
     }
   }
   
   def remove =  {
-    println(player.name + " died.")
     if (null != body) session.removeBody(body)
     if (null != wheel1) session.removeBody(wheel1)
     if (null != wheel2) session.removeBody(wheel2)
