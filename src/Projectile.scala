@@ -120,7 +120,7 @@ object ProjectileLoader {
 }
 
 object ProjectileTypes extends Enumeration {
-  val PROJECTILE, NUKE, ROLLER, MIRV, MACHINE_GUN = Value
+  val PROJECTILE, NUKE, ROLLER, MIRV, MACHINE_GUN, DEATHS_HEAD = Value
 
   def newProjectile(session: Session, tank: Tank, projectileType: Value) : Projectile = {
     projectileType match {
@@ -129,6 +129,7 @@ object ProjectileTypes extends Enumeration {
       case ROLLER => { new Roller(session, tank) }
       case MIRV => { new MIRV(session, tank) }
       case MACHINE_GUN => { new MachineGun(session, tank) }
+      case DEATHS_HEAD => { new DeathsHead(session, tank) }
     }
   }
 
@@ -153,6 +154,12 @@ object ProjectileTypes extends Enumeration {
       }
       case MACHINE_GUN => {
         g.fillRect(-2, -2, 4, 8)
+      }
+      case DEATHS_HEAD =>  {
+        g.fillOval(-4, -4, 8, 8)
+        g.fillOval(4, 4, 8, 8)
+        g.fillOval(-4, 4, 8, 8)
+        g.fillOval(4, -4, 8, 8)
       }
     }
   }

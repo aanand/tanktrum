@@ -16,12 +16,14 @@ class MIRV(session: Session, tank: Tank) extends Projectile(session, tank) {
   val DISTRIBUTION = 50
   override val projectileType = ProjectileTypes.MIRV
 
+  def clusterProjectile = new Projectile(session, tank)
+
   override def update(delta: Int) {
     super.update(delta)
     if (session.isInstanceOf[Server]) {
       if (body.getVelocity.getY > 0) {
         for (val i <- -2 until 3) {
-          val p = new Projectile(session, tank)
+          val p = clusterProjectile
           p.body.setPosition(x, y)
           p.body.adjustVelocity(new phys2d.math.Vector2f(body.getVelocity.getX + (rand.nextFloat*2f - 1f) * DISTRIBUTION, 
                                                          body.getVelocity.getY + (rand.nextFloat*2f - 1f) * DISTRIBUTION))
