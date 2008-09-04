@@ -1,11 +1,5 @@
 This is a list of things that need to be done before release:
  
- * Choose a name.  Possibilities so far are:
-   - Boom Trapezoid
-   - Totenpanzer
-   - Horror Tank
-   - ...
-
  * Clean up server and client classes, separating all network stuff from game
    logic stuff.
 
