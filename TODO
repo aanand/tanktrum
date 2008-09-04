@@ -14,8 +14,6 @@ This is a list of things that need to be done before release:
  * Game search.  Servers need names and there should be a thing where you can
    search for servers by name or just find ones with a low ping to you.
 
- * Set up a proper bug tracking/ticketing system.
-
  * More sound effects/music:
    - Opening theme (also an opening graphic).
    - Background sound (I like the idea of gentle bird song at the moment).
