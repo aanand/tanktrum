@@ -28,7 +28,7 @@ object Items extends Enumeration {
   items.put(MachineGunItem.itemType, MachineGunItem)
 
   DeathsHeadItem.itemType = Value
-  items.put(DeathsHeadItem.itemType, MachineGunItem)
+  items.put(DeathsHeadItem.itemType, DeathsHeadItem)
   
   JumpjetItem.itemType = Value
   items.put(JumpjetItem.itemType, JumpjetItem)
