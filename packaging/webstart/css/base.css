@@ -16,6 +16,18 @@ img {
     margin-bottom: 24px;
 }
 
+p {
+    text-align: justify;
+}
+
+.subtitle {
+    float: left;
+}
+
+.nav {
+    text-align: right;
+}
+
 .play-now {
     margin: 0;
 }
