@@ -187,6 +187,11 @@ namespace :build do
     chmod 0755, "#{executable_dir}/JavaApplicationStub"
   end
   
+  desc "build website"
+  task :www do
+    sh "webgen -d packaging/www/"
+  end
+  
   desc "build webstart"
   task :webstart => ["dist/webstart"] + WEBSTART_JAR_FILES do
     cp_r "packaging/webstart/.", "dist/webstart"
@@ -194,6 +199,11 @@ namespace :build do
 end
 
 namespace :upload do
+  desc "upload website"
+  task :www do
+    upload Dir["packaging/www/out/*"]
+  end
+  
   desc "upload #{GAME_JAR_NAME}.jar and webstart files"
   task :webstart => [:game, :files]
   

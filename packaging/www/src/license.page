@@ -1,0 +1,85 @@
+---
+name: license
+---
+<div class="span-24">
+    <h2>License</h2>
+    
+    <p>
+        We're putting Boom Trapezoid out under the <a href="http://www.opensource.org/licenses/mit-license.php">MIT License</a>:
+    </p>
+    
+    <pre>
+        The MIT License
+
+        Copyright (c) 2008 Aanand Prasad and John Turner
+
+        Permission is hereby granted, free of charge, to any person obtaining a copy
+        of this software and associated documentation files (the "Software"), to deal
+        in the Software without restriction, including without limitation the rights
+        to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+        copies of the Software, and to permit persons to whom the Software is
+        furnished to do so, subject to the following conditions:
+
+        The above copyright notice and this permission notice shall be included in
+        all copies or substantial portions of the Software.
+
+        THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+        IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+        FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+        AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+        LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+        OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+        THE SOFTWARE.
+    </pre>
+    
+    <hr>
+    
+    <h2>Other licensed works</h2>
+    
+    <p>
+        We used a whole load of other people's code to get this thing working.
+        Here's the full list, along with links to their respective licenses.
+    </p>
+    
+    <table>
+        <tr>
+            <td><a href="http://www.scala-lang.org/">Scala</a></td>
+            <td><a href="http://www.scala-lang.org/node/146">Scala License</a></td>
+        </tr>
+        
+        <tr>
+            <td><a href="http://slick.cokeandcode.com/">Slick</a></td>
+            <td><a href="http://slick.cokeandcode.com/static.php?page=license">BSD License</a></td>
+        </tr>
+        
+        <tr>
+            <td><a href="http://www.cokeandcode.com/phys2d/">Phys2D</a></td>
+            <td><a href="http://www.opensource.org/licenses/bsd-license.php">New BSD License</a></td>
+        </tr>
+        
+        <tr>
+            <td><a href="http://www.lwjgl.org/">LWJGL</a></td>
+            <td><a href="http://www.lwjgl.org/license.php">BSD License</a></td>
+        </tr>
+        
+        <tr>
+            <td><a href="http://code.google.com/p/sbinary/">sbinary</a></td>
+            <td><a href="http://www.opensource.org/licenses/mit-license.php">MIT License</a></td>
+        </tr>
+        
+        <tr>
+            <td><a href="http://tritonus.org/">Tritonus</a></td>
+            <td><a href="http://www.gnu.org/copyleft/lesser.html">GNU LGPL</a></td>
+        </tr>
+        
+        <tr>
+            <td><a href="http://www.jcraft.com/jorbis/">JOrbis</a></td>
+            <td><a href="http://www.gnu.org/copyleft/lesser.html">GNU LGPL</a></td>
+        </tr>
+        
+        <tr>
+            <td><a href="http://www.javazoom.net/vorbisspi/vorbisspi.html">VorbisSPI</a></td>
+            <td><a href="http://www.gnu.org/copyleft/lesser.html">GNU LGPL</a></td>
+        </tr>
+    </table>
+</div>

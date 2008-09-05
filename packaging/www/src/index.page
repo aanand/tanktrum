@@ -1,0 +1,131 @@
+---
+name: homepage
+---
+<div class="span-11 colborder">
+    <a href="screenshot.png">
+        <img src="screenshot-small.png" width="430" height="323" alt="A screenshot of it.">
+    </a>
+</div>
+
+<div class="span-12 last">
+    <p class="play-now">
+        <a href="tank.jnlp">Play it, now!</a><br>
+    </p>
+
+    <ul>
+        <li>You'll need a Java - any old 1.5+ will do.</li>
+
+        <li>
+            There should be a server running on <b>boomtrapezoid.com</b> on the default port (10000). If
+            there isn't then find some friends and start your own, unless you're a
+            terrible sociopath, in which case this expression is recommended:
+            <kbd>:(</kbd>
+        </li>
+
+        <li>
+            You will be asked to accept a security certificate. We recommend that you
+            do so, or you'll not be able to play it, and clicking on that link will have
+            been a gigantic waste of your time.
+        </li>
+        
+        <li>
+            If anything goes wrong, we're very sorry. Come and find us in
+            <a href="irc://irc.synirc.net#boomtrapezoid">irc.synirc.net#boomtrapezoid</a> and
+            we'll do our best to fix it.
+        </li>
+    </ul>
+</div>
+
+<div class="span-11 colborder">
+    <hr>
+    
+    <h2>Okay, so.</h2>
+
+    <p>
+        We started work on this a few weeks before <a href="http://www.deathtank.com/">discovering</a>
+        that a game called Death Tank appears to be coming to Xbox Live Arcade. While that's great
+        (the whole reason we started this thing is so we could play Death Tank online) it's admittedly
+        somewhat dispiriting - damn it, <em>we</em> were doing that!
+    </p>
+
+    <p>
+        However, we can think of several reasons this is still worth people's time:
+    </p>
+
+    <ul>
+        <li>
+            We're not charging money for it!
+        </li>
+
+        <li>
+            Their version might turn out to be rubbish!
+        </li>
+
+        <li>
+            You can play this on any PC or Mac or Linux machine, not just an Xbox 360!
+        </li>
+
+        <li>
+            We're staggeringly cool people, and you definitely want to be seen playing
+            our game.
+        </li>
+    </ul>
+</div>
+
+<div class="span-12 last">
+    <hr>
+    
+    <h2>Controls</h2>
+
+    <p>
+        <b>A</b> moves left.<br>
+        <b>D</b> moves right.<br>
+        <b>W</b> fires jumpjets.<br>
+        <b>Left and right arrows</b> aim.<br>
+        <b>Up and down arrows</b> control gun power.<br>
+        <b>Space</b> fires.<br>
+        <b>Q</b> changes weapon.<br>
+        <b>Arrow keys</b> and <b>Enter</b> control the menus.<br>
+        <b>T</b> is for chat.<br>
+    </p>
+</div>
+
+<div class="span-11 colborder">
+    <hr>
+    
+    <h2>It's not even nearly finished.</h2>
+
+    <p>
+        The netcode and physics are still somewhat rough around the edges.
+        There aren't all of the weapons in there, and hardly any sounds either.
+        So we've got some way to go. That's fine. We will DEFINITELY NOT give up on it, yet.
+    </p>
+
+    <p>
+        The source code is <a href="http://github.com/aanand/boomtrapezoid">on Github</a>.
+        On a whim, it's written in Scala, which is turning out to be quite a pleasant language.
+        So go ahead! Fork it! Play with it! Change stuff! Mess around!
+    </p>
+</div>
+
+<div class="span-12 last">
+    <hr>
+    
+    <h2>&ldquo;The Team&rdquo;</h2>
+
+    <ul>
+        <li>
+            We're <a href="http://norgg.org">this person</a> and <a href="http://www.aanandprasad.com">this person</a>.
+        </li>
+    
+        <li>
+            Come and find us on IRC, in
+            <strong><a href="irc://irc.synirc.net#boomtrapezoid">irc.synirc.net#boomtrapezoid</a></strong>.
+        </li>
+    
+        <li>
+            Follow development, report bugs and suggest features at
+            <strong><a href="http://boomtrapezoid.lighthouseapp.com/">Lighthouse</a></strong>.
+        </li>
+    </ul>
+</div>
