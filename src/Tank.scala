@@ -264,6 +264,8 @@ class Tank (session: Session, var id: Byte) extends Collider {
         session.asInstanceOf[Server].broadcastChat(source.tank.player.name + " killed " + player.name + " with " + source.getClass.getName + ".")
       }
       destroy = true
+    }
+    if (isDead) {
       health = 0
     }
   }

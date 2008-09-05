@@ -12,34 +12,34 @@ class Explosion (var x: Float, var y: Float, var radius: Float, session: Session
     SoundPlayer ! PlaySound(SOUND)
   }
   else {
+    val explodeBody = new phys2d.raw.StaticBody(new phys2d.raw.shapes.Circle(radius))
+    explodeBody.setPosition(x, y)
     for (tank <- session.tanks) {
-      val explodeBody = new phys2d.raw.StaticBody(new phys2d.raw.shapes.Circle(radius))
-      explodeBody.setPosition(x, y)
-      
-      val contacts = new Array[phys2d.raw.Contact](10)
-      for (i <- 0 until contacts.length) contacts(i) = new phys2d.raw.Contact
-      val numContacts = phys2d.raw.Collide.collide(contacts, explodeBody, tank.body, 0f) 
-      
-      if (numContacts > 0) {
-        var maxOverlap = 0f
-        for (i <- 0 until numContacts) {
-          if (-contacts(i).getSeparation > maxOverlap) {
-            maxOverlap = -contacts(i).getSeparation
+      if (tank.isAlive) {
+        val contacts = new Array[phys2d.raw.Contact](10)
+        for (i <- 0 until contacts.length) contacts(i) = new phys2d.raw.Contact
+        val numContacts = phys2d.raw.Collide.collide(contacts, explodeBody, tank.body, 0f) 
+        
+        if (numContacts > 0) {
+          var maxOverlap = 0f
+          for (i <- 0 until numContacts) {
+            if (-contacts(i).getSeparation > maxOverlap) {
+              maxOverlap = -contacts(i).getSeparation
+            }
           }
-        }
-        val damage = maxOverlap.toInt
-        tank.damage(damage, projectile)
-        if (null != projectile) {
-          println(projectile.tank.player.name + " hit " + tank.player.name + " with splash damage from a " + projectile.getClass.getName + " for " + damage + " damage.")
-          if (tank == projectile.tank) {
-            projectile.tank.player.score -= damage
-            projectile.tank.player.money -= damage
+          val damage = maxOverlap.toInt
+          tank.damage(damage, projectile)
+          if (null != projectile) {
+            println(projectile.tank.player.name + " hit " + tank.player.name + " with splash damage from a " + projectile.getClass.getName + " for " + damage + " damage.")
+            if (tank == projectile.tank) {
+              projectile.tank.player.score -= damage
+              projectile.tank.player.money -= damage
+            }
+            else {
+              projectile.tank.player.score += damage
+              projectile.tank.player.money += damage
+            }
           }
-          else {
-            projectile.tank.player.score += damage
-            projectile.tank.player.money += damage
-          }
-
         }
       }
     }
