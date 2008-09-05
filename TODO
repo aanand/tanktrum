@@ -45,7 +45,6 @@ This is a list of things that need to be done before release:
      tank.
    - Air Strike: "Shooting down the planes will cause them to break open and
      drop all of remaining bombs at once." Yes.
-   - Death's Head: Big MIRV.
    - Carbomite: On death create an explosion with radius relative to the amount
      of carbomite purchased.
 
@@ -73,7 +72,6 @@ This is a list of things that need to be done before release:
    - Key repeat in edit boxes.
    - Possibly use swing or some other real gui toolkit so that people can click
      on things.
-   - Saving of username, last host(s?)/port(s?).
    - Configurable keybindings.
    - Chat messages should fade over time, possibly allow more than 5 at once.
 
