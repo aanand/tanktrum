@@ -189,7 +189,9 @@ namespace :build do
   
   desc "build website"
   task :www do
-    sh "webgen -d packaging/www/"
+    sh "webgen -d packaging/www"
+    rm_rf "dist/www"
+    cp_r "packaging/www/out", "dist/www"
   end
   
   desc "build webstart"
@@ -201,7 +203,7 @@ end
 namespace :upload do
   desc "upload website"
   task :www do
-    upload Dir["packaging/www/out/*"]
+    upload Dir["dist/www/*"]
   end
   
   desc "upload #{GAME_JAR_NAME}.jar and webstart files"
