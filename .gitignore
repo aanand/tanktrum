@@ -1,6 +1,8 @@
 .DS_Store
 *.tmproj
 .*.swp
+webgen.cache
+packaging/www/out
 
 classes
 dist
