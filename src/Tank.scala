@@ -107,8 +107,9 @@ class Tank (session: Session, var id: Byte) extends Collider {
   var firing = false
   var jumping = false
 
-  var maxJumpFuel = 10000
-  var jumpFuel = 1000
+  var maxJumpFuel = 20000
+  var purchasedJumpFuel = 2000
+  var jumpFuel = 0
   def fuelPercent = (jumpFuel.toFloat/maxJumpFuel) * 100
 
   def grounded : Boolean = contactTime > 0; true
@@ -138,7 +139,7 @@ class Tank (session: Session, var id: Byte) extends Collider {
 
   def speedDelta = targetSpeed - actualSpeed
 
-  var previousValues: (Float, Float, Float, Float, Float, Int, Int, Int, Int, Boolean, Int, Int) = _
+  var previousValues: (Float, Float, Float, Float, Float, Int, Int, Int, Int, Boolean, Int, Int, Int) = _
 
   var jetEmitter: slick.particles.ConfigurableEmitter = _
   var vapourEmitter: slick.particles.ConfigurableEmitter = _
@@ -164,8 +165,8 @@ class Tank (session: Session, var id: Byte) extends Collider {
       wheel1.setPosition(x-WHEEL_OFFSET_X, y-100+WHEEL_OFFSET_Y)
       wheel2.setPosition(x+WHEEL_OFFSET_X, y-100+WHEEL_OFFSET_Y)
 
-      val joint1 = new phys2d.raw.BasicJoint(body, wheel1, new phys2d.math.Vector2f(x-WHEEL_OFFSET_X, y-100+WHEEL_OFFSET_Y))
-      val joint2 = new phys2d.raw.BasicJoint(body, wheel2, new phys2d.math.Vector2f(x+WHEEL_OFFSET_X, y-100+WHEEL_OFFSET_Y))
+      val joint1 = new phys2d.raw.FixedJoint(body, wheel1)
+      val joint2 = new phys2d.raw.FixedJoint(body, wheel2)
 
       session.world.add(joint1)
       session.world.add(joint2)
@@ -190,9 +191,9 @@ class Tank (session: Session, var id: Byte) extends Collider {
       }
     }
     
-    //body.setFriction(0.8f)
-    wheel1.setFriction(0.99f)
-    wheel2.setFriction(0.99f)
+    body.setFriction(0.99f)
+    wheel1.setFriction(0.1f)
+    wheel2.setFriction(0.1f)
     //body.setDamping(0.007f)
 
     session.addBody(this, body)
@@ -233,7 +234,7 @@ class Tank (session: Session, var id: Byte) extends Collider {
     }
 
     if (jumping) {
-      jumpFuel -= delta
+      jumpFuel -= delta*3
 
       body.addForce(new phys2d.math.Vector2f(airSpeedX * thrust, airSpeedY * lift))
 
@@ -260,16 +261,22 @@ class Tank (session: Session, var id: Byte) extends Collider {
       }
     } else {
       if (grounded) {
-        val acceleration = new phys2d.math.Vector2f(Math.cos(body.getRotation).toFloat*speedDelta,
+        if (thrust != 0) {
+          val acceleration = new phys2d.math.Vector2f(Math.cos(body.getRotation).toFloat*speedDelta,
                                                     Math.sin(body.getRotation).toFloat*speedDelta)
       
-        body.adjustVelocity(acceleration)
+          body.adjustVelocity(acceleration)
 
-        body.setIsResting(false)
-        wheel1.setIsResting(false)
-        wheel2.setIsResting(false)
+          body.setIsResting(false)
+          wheel1.setIsResting(false)
+          wheel2.setIsResting(false)
+        }
+
+        jumpFuel += delta
+        if (jumpFuel > purchasedJumpFuel) {
+          jumpFuel = purchasedJumpFuel
+        }
       }
-      
       if (session.isInstanceOf[Client]) {
         if (emitting) {
           for (e <- particleEmitters) {
@@ -383,7 +390,7 @@ class Tank (session: Session, var id: Byte) extends Collider {
   }
   
   def currentValues = {
-    (x, y, angle, gunAngle, gunPower, gunAngleChange, gunPowerChange, health, thrust, jumping, selectedWeapon.id, ammo(selectedWeapon))
+    (x, y, angle, gunAngle, gunPower, gunAngleChange, gunPowerChange, health, thrust, jumping, jumpFuel, selectedWeapon.id, ammo(selectedWeapon))
   }
 
   def serialise = {

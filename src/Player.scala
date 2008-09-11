@@ -69,9 +69,9 @@ class Player (var tank: Tank, var name: String, var id: Byte) {
         tank.ammo(item.projectileType) = tank.ammo(item.projectileType) + item.units
       }
       if (item == JumpjetItem) {
-        tank.jumpFuel += item.units
-        if (tank.jumpFuel > tank.maxJumpFuel) {
-          tank.jumpFuel = tank.maxJumpFuel
+        tank.purchasedJumpFuel += item.units
+        if (tank.purchasedJumpFuel > tank.maxJumpFuel) {
+          tank.purchasedJumpFuel = tank.maxJumpFuel
         }
       }
     }
