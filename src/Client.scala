@@ -44,6 +44,11 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
   
   val chat = new Chat(this)
 
+  val dot = new ImageBuffer(3, 3)
+  dot.setRGBA(1, 1, 255, 255, 255, 255)
+  
+  val particleSystem = new slick.particles.ParticleSystem(new Image(dot))
+
   override def enter() = {
     super.enter()
     channel = DatagramChannel.open()
@@ -66,6 +71,8 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
         val command = data.get.toChar
         processCommand(command)
       }
+      
+      particleSystem.update(delta)
     }
     catch {
       case e:Exception => { 
@@ -105,6 +112,8 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
       for (p <- players.values) {
         p.render(g)
       }
+      
+      particleSystem.render()
     }
 
     chat.render(g)

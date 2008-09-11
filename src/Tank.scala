@@ -103,6 +103,7 @@ class Tank (session: Session, var id: Byte) extends Collider {
 
   var destroy = false
   var firing = false
+  var jumping = false
 
   var maxJumpFuel = 10000
   var jumpFuel = 1000
@@ -135,7 +136,12 @@ class Tank (session: Session, var id: Byte) extends Collider {
 
   def speedDelta = targetSpeed - actualSpeed
 
-  var previousValues: (Float, Float, Float, Float, Float, Int, Int, Int, Int, Int, Int) = _
+  var previousValues: (Float, Float, Float, Float, Float, Int, Int, Int, Int, Boolean, Int, Int) = _
+
+  var jetEmitter: slick.particles.ConfigurableEmitter = _
+  var vapourEmitter: slick.particles.ConfigurableEmitter = _
+
+  def particleEmitters = List(jetEmitter, vapourEmitter)
 
   def create(x: Float) = {
     this.color = color
@@ -170,6 +176,14 @@ class Tank (session: Session, var id: Byte) extends Collider {
 
       body.addExcludedBody(wheel1)
       body.addExcludedBody(wheel2)
+      
+      jetEmitter = slick.particles.ParticleIO.loadEmitter("media/particles/jet.xml")
+      vapourEmitter = slick.particles.ParticleIO.loadEmitter("media/particles/vapour.xml")
+      
+      for (e <- particleEmitters) {
+        session.asInstanceOf[Client].particleSystem.addEmitter(e)
+        e.setEnabled(false)
+      }
     }
     
     //body.setFriction(0.8f)
@@ -210,7 +224,11 @@ class Tank (session: Session, var id: Byte) extends Collider {
       contactTime -= delta
     }
 
-    if (jumpFuel > 0 && (lift != 0 || (thrust != 0 && !grounded))) {
+    if (session.isInstanceOf[Server]) {
+      jumping = jumpFuel > 0 && (lift != 0 || (thrust != 0 && !grounded))
+    }
+
+    if (jumping) {
       jumpFuel -= delta
 
       body.addForce(new phys2d.math.Vector2f(airSpeedX * thrust, airSpeedY * lift))
@@ -224,15 +242,31 @@ class Tank (session: Session, var id: Byte) extends Collider {
       } else if (body.getRotation > targetRotation) {
         body.adjustAngularVelocity(-airAngularSpeed)
       }
-    } else if (grounded) {
-      val acceleration = new phys2d.math.Vector2f(Math.cos(body.getRotation).toFloat*speedDelta,
-                                                  Math.sin(body.getRotation).toFloat*speedDelta)
       
-      body.adjustVelocity(acceleration)
+      if (session.isInstanceOf[Client]) {
+        for (e <- particleEmitters) {
+          e.setEnabled(true)
+        }
+        
+        for (e <- particleEmitters) { e.setPosition(x, y) }
+      }
+    } else {
+      if (grounded) {
+        val acceleration = new phys2d.math.Vector2f(Math.cos(body.getRotation).toFloat*speedDelta,
+                                                    Math.sin(body.getRotation).toFloat*speedDelta)
+      
+        body.adjustVelocity(acceleration)
 
-      body.setIsResting(false)
-      wheel1.setIsResting(false)
-      wheel2.setIsResting(false)
+        body.setIsResting(false)
+        wheel1.setIsResting(false)
+        wheel2.setIsResting(false)
+      }
+      
+      if (session.isInstanceOf[Client]) {
+        for (e <- particleEmitters) {
+          e.setEnabled(false)
+        }
+      }
     }
     
     if (gunAngleChange != 0) {
@@ -337,7 +371,7 @@ class Tank (session: Session, var id: Byte) extends Collider {
   }
   
   def currentValues = {
-    (x, y, angle, gunAngle, gunPower, gunAngleChange, gunPowerChange, health, thrust, selectedWeapon.id, ammo(selectedWeapon))
+    (x, y, angle, gunAngle, gunPower, gunAngleChange, gunPowerChange, health, thrust, jumping, selectedWeapon.id, ammo(selectedWeapon))
   }
 
   def serialise = {
@@ -349,7 +383,8 @@ class Tank (session: Session, var id: Byte) extends Collider {
       gunPower.toShort,
       Math.ceil(gunTimer).toShort, 
       health.toShort, 
-      thrust.toByte, 
+      thrust.toByte,
+      if (jumping) 1.toByte else 0.toByte,
       gunAngleChange.toByte, 
       gunPowerChange.toByte,
       selectedWeapon.id.toByte,
@@ -360,11 +395,18 @@ class Tank (session: Session, var id: Byte) extends Collider {
   }
   
   def loadFrom(data: Array[Byte]) = {
-    val values = Operations.fromByteArray[(Float, Float, Short, Short, Short, Short, Short, Byte, Byte, Byte, Byte, Short, Short, Byte)](data)
+    val values = Operations.fromByteArray[(
+      Float, Float, Short,
+      Short, Short, Short,
+      Short, Byte, Byte,
+      Byte, Byte,
+      Byte, Short, Short,
+      Byte)](data)
     
     val (newX, newY, newAngle, 
         newGunAngle, newGunPower, newGunTimer, 
-        newHealth, newThrust, newGunAngleChange, newGunPowerChange, 
+        newHealth, newThrust, newJumping,
+        newGunAngleChange, newGunPowerChange, 
         newSelectedWeapon, newSelectedAmmo, newFuel,
         newID) = values
 
@@ -375,6 +417,7 @@ class Tank (session: Session, var id: Byte) extends Collider {
     gunTimer = newGunTimer
     health = newHealth
     thrust = newThrust
+    jumping = newJumping != 0
     gunAngleChange = newGunAngleChange
     gunPowerChange = newGunPowerChange
     selectedWeapon = ProjectileTypes.apply(newSelectedWeapon)

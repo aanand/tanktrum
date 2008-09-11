@@ -48,6 +48,11 @@ task :run => :compile do
   sh "java -classpath classes:#{CLASSPATH} -Djava.library.path=#{LIBPATH} Main"
 end
 
+desc "start the game from the jar file"
+task :run_jar => :jar do
+  sh "java -classpath #{GAME_JAR_FILE}:#{CLASSPATH} -Djava.library.path=#{LIBPATH} Main"
+end
+
 desc "profile the game"
 task :profile => :compile do
   sh "java -agentpath:#{AGENTPATH} -classpath classes:#{CLASSPATH} -Djava.library.path=#{LIBPATH} Main"
