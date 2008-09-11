@@ -98,22 +98,14 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
     else { 
       if (ground.initialised) {
         renderSky(g)
+        particleSystem.render()
         ground.render(g)
       }
-      for (p <- projectiles) {
-        p.render(g)
-      }
-      for (e <- explosions) {
-        e.render(g)
-      }
-      for (f <- frags) {
-        f.render(g)
-      }
-      for (p <- players.values) {
-        p.render(g)
-      }
       
-      particleSystem.render()
+      for (p <- projectiles)    { p.render(g) }
+      for (e <- explosions)     { e.render(g) }
+      for (f <- frags)          { f.render(g) }
+      for (p <- players.values) { p.render(g) }
     }
 
     chat.render(g)
