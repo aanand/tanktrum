@@ -31,8 +31,8 @@ class Tank (session: Session, var id: Byte) extends Collider {
   val WHEEL_OFFSET_X = WIDTH/2-BEVEL
   val WHEEL_OFFSET_Y = -BEVEL
 
-  val BODY_MASS = 1f
-  val WHEEL_MASS = 1f
+  val BODY_MASS = 2.8f
+  val WHEEL_MASS = 0.1f
   
   val GUN_ANGLE_SPEED = 20 // degrees/second
   val GUN_POWER_SPEED = 50 // pixels/second/second
