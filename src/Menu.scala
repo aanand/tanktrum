@@ -110,7 +110,7 @@ case class MenuEditable(initValue : String, maxLength: Int) extends MenuItem {
         }
       }
       case _ => {
-        if (value.length < maxLength) {
+        if (value.length < maxLength && char >= 32 && char <= 126) {
           value = value + char
         }
       }
