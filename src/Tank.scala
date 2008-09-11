@@ -88,6 +88,7 @@ class Tank (session: Session, var id: Byte) extends Collider {
   var color: Color = _
 
   var thrust = 0
+  var lift = 0
   var gunAngleChange = 0
   var gunPowerChange = 0
 
@@ -102,7 +103,6 @@ class Tank (session: Session, var id: Byte) extends Collider {
 
   var destroy = false
   var firing = false
-  var jumping = false
 
   var maxJumpFuel = 10000
   var jumpFuel = 1000
@@ -210,10 +210,10 @@ class Tank (session: Session, var id: Byte) extends Collider {
       contactTime -= delta
     }
 
-    if (jumping && jumpFuel > 0) {
+    if (jumpFuel > 0 && (lift != 0 || (thrust != 0 && !grounded))) {
       jumpFuel -= delta
 
-      body.addForce(new phys2d.math.Vector2f(airSpeedX * thrust, -airSpeedY))
+      body.addForce(new phys2d.math.Vector2f(airSpeedX * thrust, airSpeedY * lift))
 
       val targetRotation = airTilt * thrust
 
@@ -224,8 +224,7 @@ class Tank (session: Session, var id: Byte) extends Collider {
       } else if (body.getRotation > targetRotation) {
         body.adjustAngularVelocity(-airAngularSpeed)
       }
-    }
-    else if (grounded) {
+    } else if (grounded) {
       val acceleration = new phys2d.math.Vector2f(Math.cos(body.getRotation).toFloat*speedDelta,
                                                   Math.sin(body.getRotation).toFloat*speedDelta)
       
