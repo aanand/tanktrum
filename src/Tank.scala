@@ -135,10 +135,6 @@ class Tank (session: Session, var id: Byte) extends Collider {
   def targetSpeed = SPEED * thrust * (if (direction.getY * thrust < 0) direction.getX else (2-direction.getX))
   def targetVelocity = new phys2d.math.Vector2f(direction.getX*targetSpeed, direction.getY*targetSpeed)
 
-  def actualSpeed = velocity.dot(direction)
-
-  def speedDelta = targetSpeed - actualSpeed
-
   var previousValues: (Float, Float, Float, Float, Float, Int, Int, Int, Int, Boolean, Int, Int, Int) = _
 
   var jetEmitter: slick.particles.ConfigurableEmitter = _
@@ -191,9 +187,9 @@ class Tank (session: Session, var id: Byte) extends Collider {
       }
     }
     
-    body.setFriction(0.99f)
-    wheel1.setFriction(0.1f)
-    wheel2.setFriction(0.1f)
+    body.setFriction(1f)
+    wheel1.setFriction(0f)
+    wheel2.setFriction(0f)
     //body.setDamping(0.007f)
 
     session.addBody(this, body)
@@ -261,16 +257,12 @@ class Tank (session: Session, var id: Byte) extends Collider {
       }
     } else {
       if (grounded) {
-        if (thrust != 0) {
-          val acceleration = new phys2d.math.Vector2f(Math.cos(body.getRotation).toFloat*speedDelta,
-                                                    Math.sin(body.getRotation).toFloat*speedDelta)
-      
-          body.adjustVelocity(acceleration)
+          body.adjustVelocity(new phys2d.math.Vector2f(-body.getVelocity.getX, -body.getVelocity.getY));
+          body.adjustVelocity(targetVelocity)
 
           body.setIsResting(false)
           wheel1.setIsResting(false)
           wheel2.setIsResting(false)
-        }
 
         jumpFuel += delta
         if (jumpFuel > purchasedJumpFuel) {
