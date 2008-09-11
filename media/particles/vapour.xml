@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <emitter imageName="" name="Jet">
-  <spawnInterval enabled="false" max="200.0" min="200.0"/>
+  <spawnInterval enabled="false" max="50.0" min="50.0"/>
   <spawnCount enabled="true" max="1.0" min="1.0"/>
   <initialLife enabled="true" max="4000.0" min="4000.0"/>
   <initialSize enabled="true" max="28.0" min="28.0"/>
