@@ -1,5 +1,6 @@
 import org.newdawn.slick._
 import java.io._
+import java.util.prefs._
 
 class Game(title: String) extends BasicGame(title) {
   var client: Client = _
@@ -10,31 +11,21 @@ class Game(title: String) extends BasicGame(title) {
 
   var menu : Menu = _
   
-  val userNameFile = new File("username")
-
   val INTRO_SOUND = "explosion.ogg"
   SoundPlayer.start
   
+  val prefs = Preferences.userRoot.node("boomtrapezoid")
 
   def init(container: GameContainer) {
     this.container = container
 
-    val serverPort = MenuEditable("10000", 5);
-    val serverHostname = MenuEditable("localhost", 255)
 
-    var storedUserName = "Player"
-    if (userNameFile.exists) {
-      var len = userNameFile.length.toInt //There could be a problem here if the username file is more than 2 Gb.
-      if (len > Player.MAX_NAME_LENGTH) { len = Player.MAX_NAME_LENGTH }
-      
-      val userNameBytes = new Array[Byte](len)
-      new FileInputStream(userNameFile).read(userNameBytes)
-      storedUserName = new String(userNameBytes)
-    }
-    else {
-      userNameFile.createNewFile
-    }
+    val storedUserName = prefs.get("username", "Player")
+    val storedPort = prefs.get("port", "10000")
+    val storedHostname = prefs.get("hostname", "boomtrapezoid.com")
 
+    val serverPort = MenuEditable(storedPort, 5);
+    val serverHostname = MenuEditable(storedHostname, 255)
     val userName = MenuEditable(storedUserName, Player.MAX_NAME_LENGTH)
 
     this.menu = new Menu(List(
@@ -84,7 +75,9 @@ class Game(title: String) extends BasicGame(title) {
   }
 
   def startClient(address: String, port: Int, userName: String) = {
-    new FileOutputStream(userNameFile).write(userName.getBytes)
+    prefs.put("username", userName)
+    prefs.put("hostname", address)
+    prefs.put("port", port.toString)
 
     SoundPlayer ! PlaySound(INTRO_SOUND)
     if (client != null) {
