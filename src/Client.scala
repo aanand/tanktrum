@@ -45,7 +45,7 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
   val chat = new Chat(this)
 
   val dot = new ImageBuffer(3, 3)
-  dot.setRGBA(1, 1, 255, 255, 255, 255)
+  dot.setRGBA(1, 1, 255, 255, 255, 100)
   
   val particleSystem = new slick.particles.ParticleSystem(new Image(dot))
 
