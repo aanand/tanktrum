@@ -20,6 +20,11 @@ class Tank (session: Session, var id: Byte) extends Collider {
 
   val SPEED = WIDTH/2 // pixels/second
 
+  val airSpeedX = 250
+  val airSpeedY = 500
+  val airTilt = Math.toRadians(10f).toFloat
+  val airAngularSpeed = Math.toRadians(45f).toFloat
+
   val WHEEL_RADIUS = BEVEL
   val WHEEL_OFFSET_X = WIDTH/2-BEVEL
   val WHEEL_OFFSET_Y = -BEVEL
@@ -208,17 +213,16 @@ class Tank (session: Session, var id: Byte) extends Collider {
     if (jumping && jumpFuel > 0) {
       jumpFuel -= delta
 
-      body.addForce(new phys2d.math.Vector2f(250 * thrust, -500))
+      body.addForce(new phys2d.math.Vector2f(airSpeedX * thrust, -airSpeedY))
 
-      val targetRotation = Math.toRadians(10f).toFloat * thrust
-      val jumpJetAngularVelocity = Math.toRadians(45f).toFloat
+      val targetRotation = airTilt * thrust
 
       body.adjustAngularVelocity(-body.getAngularVelocity)
       
       if (body.getRotation < targetRotation) {
-        body.adjustAngularVelocity(jumpJetAngularVelocity)
+        body.adjustAngularVelocity(airAngularSpeed)
       } else if (body.getRotation > targetRotation) {
-        body.adjustAngularVelocity(-jumpJetAngularVelocity)
+        body.adjustAngularVelocity(-airAngularSpeed)
       }
     }
     else if (grounded) {
