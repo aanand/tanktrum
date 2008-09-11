@@ -236,7 +236,7 @@ class Tank (session: Session, var id: Byte) extends Collider {
     if (jumping) {
       jumpFuel -= delta*3
 
-      body.addForce(new phys2d.math.Vector2f(airSpeedX * thrust, airSpeedY * lift))
+      body.addForce(new phys2d.math.Vector2f(airSpeedX * thrust, (airSpeedY * lift) + session.ground.heightAt(x) - y))
 
       val targetRotation = airTilt * thrust
 
