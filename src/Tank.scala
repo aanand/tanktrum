@@ -12,6 +12,8 @@ import scala.collection.mutable.HashMap
 import sbinary.Instances._
 import sbinary.Operations
 
+import SwitchableParticleEmitter._
+
 class Tank (session: Session, var id: Byte) extends Collider {
   val WIDTH = 30f
   val HEIGHT = WIDTH/2
@@ -143,6 +145,8 @@ class Tank (session: Session, var id: Byte) extends Collider {
 
   def particleEmitters = List(jetEmitter, vapourEmitter)
 
+  var emitting = false
+
   def create(x: Float) = {
     this.color = color
     
@@ -182,7 +186,7 @@ class Tank (session: Session, var id: Byte) extends Collider {
       
       for (e <- particleEmitters) {
         session.asInstanceOf[Client].particleSystem.addEmitter(e)
-        e.setEnabled(false)
+        e.setEmitting(false)
       }
     }
     
@@ -244,8 +248,12 @@ class Tank (session: Session, var id: Byte) extends Collider {
       }
       
       if (session.isInstanceOf[Client]) {
-        for (e <- particleEmitters) {
-          e.setEnabled(true)
+        if (!emitting) {
+          for (e <- particleEmitters) {
+            e.setEmitting(true)
+          }
+          
+          emitting = true
         }
         
         for (e <- particleEmitters) { e.setPosition(x, y) }
@@ -263,8 +271,12 @@ class Tank (session: Session, var id: Byte) extends Collider {
       }
       
       if (session.isInstanceOf[Client]) {
-        for (e <- particleEmitters) {
-          e.setEnabled(false)
+        if (emitting) {
+          for (e <- particleEmitters) {
+            e.setEmitting(false)
+          }
+          
+          emitting = false
         }
       }
     }
