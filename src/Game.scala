@@ -16,9 +16,10 @@ class Game(title: String) extends BasicGame(title) {
   
   val prefs = Preferences.userRoot.node("boomtrapezoid")
 
+  var titleImage: Image = _
+
   def init(container: GameContainer) {
     this.container = container
-
 
     val storedUserName = prefs.get("username", "Player")
     val storedPort = prefs.get("port", "10000")
@@ -27,6 +28,8 @@ class Game(title: String) extends BasicGame(title) {
     val serverPort = MenuEditable(storedPort, 5);
     val serverHostname = MenuEditable(storedHostname, 255)
     val userName = MenuEditable(storedUserName, Player.MAX_NAME_LENGTH)
+
+    titleImage = new Image("media/images/title.png")
 
     this.menu = new Menu(List(
       ("name", userName),
@@ -53,6 +56,7 @@ class Game(title: String) extends BasicGame(title) {
 
   def render(container: GameContainer, graphics: Graphics) {
     if (menu != null && menu.showing) {
+      graphics.drawImage(titleImage, 0, 0)
       menu.render(graphics)
       return
     }
