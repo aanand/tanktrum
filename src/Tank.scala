@@ -217,8 +217,8 @@ class Tank (session: Session, var id: Byte) extends Collider {
     if (firing) fire
     
     if (body.isTouchingStatic(new ArrayList[phys2d.raw.Body]) ||
-        wheel1.isTouchingStatic(new ArrayList[phys2d.raw.Body]) ||
-        wheel2.isTouchingStatic(new ArrayList[phys2d.raw.Body])) {
+        (wheel1.isTouchingStatic(new ArrayList[phys2d.raw.Body]) &&
+         wheel2.isTouchingStatic(new ArrayList[phys2d.raw.Body]))) {
       contactTime = contactGrace
     }
     else if (contactTime > 0) {
