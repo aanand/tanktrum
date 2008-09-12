@@ -105,7 +105,9 @@ class Tank (session: Session, var id: Byte) extends Collider {
 
   var destroy = false
   var firing = false
+  
   var jumping = false
+  var airborne = false
 
   var maxJumpFuel = 20000
   var purchasedJumpFuel = 2000
@@ -225,10 +227,16 @@ class Tank (session: Session, var id: Byte) extends Collider {
       contactTime -= delta
     }
 
-    if (session.isInstanceOf[Server]) {
-      jumping = jumpFuel > 0 && (lift != 0 || (thrust != 0 && !grounded))
+    if (lift != 0) {
+      airborne = true
+    } else if (grounded) {
+      airborne = false
     }
-
+    
+    if (session.isInstanceOf[Server]) {
+      jumping = jumpFuel > 0 && (lift != 0 || (thrust != 0 && airborne))
+    }
+    
     if (jumping) {
       jumpFuel -= delta*3
 
