@@ -148,19 +148,19 @@ object ProjectileTypes extends Enumeration {
         g.fillRect(-7, 3, 14, 4)
       }
       case MIRV => {
-        g.fillOval(-2, -2, 4, 4)
-        g.fillOval(2, 2, 4, 4)
-        g.fillOval(-2, 2, 4, 4)
-        g.fillOval(2, -2, 4, 4)
+        g.fillOval(-4, -4, 4, 4)
+        g.fillOval(0, 0, 4, 4)
+        g.fillOval(-4, 0, 4, 4)
+        g.fillOval(0, -4, 4, 4)
       }
       case MACHINE_GUN => {
-        g.fillRect(-2, -2, 4, 8)
+        g.fillRect(-2, -4, 4, 8)
       }
       case DEATHS_HEAD =>  {
-        g.fillOval(-4, -4, 8, 8)
-        g.fillOval(4, 4, 8, 8)
-        g.fillOval(-4, 4, 8, 8)
-        g.fillOval(4, -4, 8, 8)
+        g.fillOval(-8, -8, 8, 8)
+        g.fillOval(0, 0, 8, 8)
+        g.fillOval(-8, 0, 8, 8)
+        g.fillOval(0, -8, 8, 8)
       }
     }
   }
