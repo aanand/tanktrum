@@ -79,6 +79,28 @@ class Player (var tank: Tank, var name: String, var id: Byte) {
       }
     }
   }
+
+  def awardHit(tank: Tank, damage: Int) {
+    var pointsAwarded = 0
+    if (tank == this.tank) {
+      pointsAwarded = -damage
+    }
+    else {
+      if (tank.grounded) {
+        pointsAwarded = damage
+      }
+      else {
+        println("Mid air hit for double points.")
+        pointsAwarded = damage*2
+      }
+    }
+    if (score + pointsAwarded > 0) {
+      score += pointsAwarded
+    }
+    if (money + pointsAwarded > 0) {
+      money  += pointsAwarded
+    }
+  }
   
   def serialise = {
     Operations.toByteArray((

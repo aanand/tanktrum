@@ -71,14 +71,7 @@ class Projectile(session: Session, val tank: Tank) extends Collider {
       hitTank.damage(damage, this)
       if (tank != null && tank.player != null) {
         println(tank.player.name + " hit " + hitTank.player.name + " directly with a " + this.getClass.getName + " for " + damage + " damage.")
-        if (tank == hitTank) {
-          tank.player.score -= damage
-          tank.player.money -= damage
-        }
-        else {
-          tank.player.score += damage
-          tank.player.money += damage
-        }
+        tank.player.awardHit(hitTank, damage)
       }
     }
   }
