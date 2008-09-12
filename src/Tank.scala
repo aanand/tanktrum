@@ -22,6 +22,8 @@ class Tank (session: Session, var id: Byte) extends Collider {
 
   val SPEED = WIDTH/2 // pixels/second
 
+  val STARTING_ALTITUDE = 100f
+
   val airSpeedX = 250
   val airSpeedY = 500
   val airTilt = Math.toRadians(10f).toFloat
@@ -31,8 +33,14 @@ class Tank (session: Session, var id: Byte) extends Collider {
   val WHEEL_OFFSET_X = WIDTH/2-BEVEL
   val WHEEL_OFFSET_Y = -BEVEL
 
+  val BASE_WIDTH = WIDTH - 2*WHEEL_RADIUS
+  val BASE_HEIGHT = 0.7f
+  val BASE_OFFSET_X = 0
+  val BASE_OFFSET_Y = -BASE_HEIGHT/2
+
   val BODY_MASS = 2.8f
   val WHEEL_MASS = 0.1f
+  val BASE_MASS = 0.1f
   
   val GUN_ANGLE_SPEED = 20 // degrees/second
   val GUN_POWER_SPEED = 50 // pixels/second/second
@@ -81,10 +89,13 @@ class Tank (session: Session, var id: Byte) extends Collider {
   val physShapePoints = shapePoints.map((point) => new phys2d.math.Vector2f(point.x, point.y))
   val physShape = new phys2d.raw.shapes.Polygon(physShapePoints.toArray)
 
+  val baseShape = new phys2d.raw.shapes.Box(BASE_WIDTH, BASE_HEIGHT);
+
   val wheelShape = new phys2d.raw.shapes.Circle(WHEEL_RADIUS)
   var body: phys2d.raw.Body = _
   var wheel1: phys2d.raw.Body = _
   var wheel2: phys2d.raw.Body = _
+  var base: phys2d.raw.Body = _
   //body.setMaxVelocity(20f, 20f)
 
   var color: Color = _
@@ -150,36 +161,51 @@ class Tank (session: Session, var id: Byte) extends Collider {
     this.color = color
     
     if (session.isInstanceOf[Server]) {
-      val y = session.ground.heightAt(x).toFloat
+      val y = session.ground.heightAt(x).toFloat - STARTING_ALTITUDE
       body = new phys2d.raw.Body(physShape, BODY_MASS)
-      body.setPosition(x, y - 100f)
+      body.setPosition(x, y)
 
       wheel1 = new phys2d.raw.Body(wheelShape, WHEEL_MASS)
       wheel2 = new phys2d.raw.Body(wheelShape, WHEEL_MASS)
+      base = new phys2d.raw.Body(baseShape, BASE_MASS)
 
+      //I see why excluded body groups in Box2D are a good idea.
       body.addExcludedBody(wheel1)
       body.addExcludedBody(wheel2)
+      body.addExcludedBody(base)
+      base.addExcludedBody(wheel1)
+      base.addExcludedBody(wheel2)
 
-      wheel1.setPosition(x-WHEEL_OFFSET_X, y-100+WHEEL_OFFSET_Y)
-      wheel2.setPosition(x+WHEEL_OFFSET_X, y-100+WHEEL_OFFSET_Y)
+      wheel1.setPosition(x-WHEEL_OFFSET_X, y+WHEEL_OFFSET_Y)
+      wheel2.setPosition(x+WHEEL_OFFSET_X, y+WHEEL_OFFSET_Y)
+      base.setPosition(x+BASE_OFFSET_X, y+BASE_OFFSET_Y)
 
       val joint1 = new phys2d.raw.FixedJoint(body, wheel1)
       val joint2 = new phys2d.raw.FixedJoint(body, wheel2)
+      val anc1 = new phys2d.math.Vector2f(x+BASE_OFFSET_X-BASE_WIDTH/3, y+BASE_OFFSET_Y)
+      val anc2 = new phys2d.math.Vector2f(x+BASE_OFFSET_X+BASE_WIDTH/3, y+BASE_OFFSET_Y)
+
+      //Apparantly a FixedJoint doesn't actually fix the angle.
+      //Trying a FixedAngleJoint made tanks fly off at high speeds.
+      //This will do I guess.
+      val baseJoint1 = new phys2d.raw.BasicJoint(body, base, anc1)
+      val baseJoint2 = new phys2d.raw.BasicJoint(body, base, anc2)
 
       session.world.add(joint1)
       session.world.add(joint2)
+      session.world.add(baseJoint1)
+      session.world.add(baseJoint2)
 
       session.addBody(this, wheel1)
       session.addBody(this, wheel2)
+      session.addBody(this, base)
     }
     else {
       body = new phys2d.raw.StaticBody(physShape)
       wheel1 = new phys2d.raw.StaticBody(wheelShape)
       wheel2 = new phys2d.raw.StaticBody(wheelShape)
+      base = new phys2d.raw.StaticBody(baseShape)
 
-      body.addExcludedBody(wheel1)
-      body.addExcludedBody(wheel2)
-      
       jetEmitter = slick.particles.ParticleIO.loadEmitter("media/particles/jet.xml")
       vapourEmitter = slick.particles.ParticleIO.loadEmitter("media/particles/vapour.xml")
       
@@ -218,7 +244,7 @@ class Tank (session: Session, var id: Byte) extends Collider {
     if (isDead) return
     if (firing) fire
     
-    if (body.isTouchingStatic(new ArrayList[phys2d.raw.Body]) ||
+    if (base.isTouchingStatic(new ArrayList[phys2d.raw.Body]) ||
         (wheel1.isTouchingStatic(new ArrayList[phys2d.raw.Body]) &&
          wheel2.isTouchingStatic(new ArrayList[phys2d.raw.Body]))) {
       contactTime = contactGrace
@@ -234,6 +260,7 @@ class Tank (session: Session, var id: Byte) extends Collider {
     }
     
     if (session.isInstanceOf[Server]) {
+      body.setRotation(base.getRotation)
       jumping = jumpFuel > 0 && (lift != 0 || (thrust != 0 && airborne))
     }
     
@@ -264,20 +291,22 @@ class Tank (session: Session, var id: Byte) extends Collider {
         for (e <- particleEmitters) { e.setPosition(x, y) }
       }
     } else {
-      if (grounded) {
-          body.adjustVelocity(new phys2d.math.Vector2f(-body.getVelocity.getX, -body.getVelocity.getY));
-          body.adjustVelocity(targetVelocity)
-
-          body.setIsResting(false)
-          wheel1.setIsResting(false)
-          wheel2.setIsResting(false)
-
+      if (session.isInstanceOf[Server]) {
         jumpFuel += delta
         if (jumpFuel > purchasedJumpFuel) {
           jumpFuel = purchasedJumpFuel
         }
+        if (grounded) {
+            body.adjustVelocity(new phys2d.math.Vector2f(-body.getVelocity.getX, -body.getVelocity.getY));
+            body.adjustVelocity(targetVelocity)
+
+            body.setIsResting(false)
+            wheel1.setIsResting(false)
+            wheel2.setIsResting(false)
+
+        }
       }
-      if (session.isInstanceOf[Client]) {
+      else {
         if (emitting) {
           for (e <- particleEmitters) {
             e.setEmitting(false)
@@ -371,6 +400,19 @@ class Tank (session: Session, var id: Byte) extends Collider {
 
     drawWheel(g, -WHEEL_OFFSET_X, wheel1.getRotation)
     drawWheel(g, WHEEL_OFFSET_X, wheel2.getRotation)
+    drawBase(g)
+
+  }
+
+  def drawArrow(g: Graphics) {
+  }
+
+  def drawBase(g: Graphics) {
+    g.translate(x, y)
+    g.rotate(0, 0, body.getRotation.toDegrees)
+    g.translate(BASE_OFFSET_X, BASE_OFFSET_Y)
+    g.fillRect(-BASE_WIDTH/2, -BASE_HEIGHT/2, BASE_WIDTH, BASE_HEIGHT)
+    g.resetTransform
   }
 
   def drawWheel(g : Graphics, offsetX : Float, rotation : Float) {
