@@ -135,6 +135,14 @@ case class MenuCommand(callback : Unit => Unit) extends MenuItem {
   }
 }
 
+case class MenuCommandWithLabel(override val callback : Unit => Unit, label: String) extends MenuCommand(callback) {
+  val offset = 100
+  
+  override def render(g: Graphics, menu: Menu, current: Boolean) {
+    g.drawString(label, offset, 0)
+  }
+}
+
 case class Submenu(tree : List[(String, MenuItem)]) extends MenuItem {
   override def perform(menu : Menu) {
     menu.path.push(this)
