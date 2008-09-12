@@ -40,23 +40,26 @@ class Player (var tank: Tank, var name: String, var id: Byte) {
     if (null == tank) {
       return
     }
+
     g.translate(10 + id*110, 10)
     g.setColor(tank.color)
+
+    g.drawString(name, 0, 0)
+
+    g.translate(0, 16)
     g.fillRect(0, 0, tank.health, 10)
     
-    g.translate(0, 10)
-    g.drawString(name + ": " + score, 0, 0)
-
-    g.translate(0, 20)
+    g.translate(0, 12)
     g.fillRect(0, 0, tank.fuelPercent, 5)
 
     if (tank.isAlive) {
-      g.translate(10, 30)
+      g.translate(10, 20)
 
       ProjectileTypes.render(g, tank.selectedWeapon)
 
-      g.drawString(tank.ammo(tank.selectedWeapon).toString, 15, -10)
+      g.drawString(tank.ammo(tank.selectedWeapon).toString, 15, -9)
     }
+
     g.resetTransform
 
     tank.render(g)
