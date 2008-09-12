@@ -5,7 +5,7 @@ object Main {
   val HEIGHT = 600
 
   def main(args : Array[String]) {
-    val game = new Game("tank")
+    val game = new Game("Boom Trapezoid")
     
     val container = new slick.AppGameContainer(game)
     container.setDisplayMode(WIDTH, HEIGHT, false)
