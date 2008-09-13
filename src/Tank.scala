@@ -216,8 +216,10 @@ class Tank (session: Session, var id: Byte) extends Collider {
     }
     
     body.setFriction(1f)
+    base.setFriction(1f)
     wheel1.setFriction(0f)
     wheel2.setFriction(0f)
+
     //body.setDamping(0.007f)
 
     session.addBody(this, body)
