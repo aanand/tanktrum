@@ -28,8 +28,8 @@ class Ground(session : Session, width : Int, height : Int) extends Collider {
   def buildPoints() {
     val rand = new Random()
     var x = 0f
-    val p = new PerlinNoise(width/granularity + 1, 6, 0.95f)
-
+    val p = new PerlinNoise(width/granularity, 6, 0.95f)
+    
     points = p.generate.map((h) => {
         val v = new Vector2f(x, height*(h+1)/2.0f)
         x += granularity

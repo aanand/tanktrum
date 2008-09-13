@@ -16,10 +16,10 @@ class PerlinNoise(size: Int, layers: Int, pers: float) {
       val layerSize = Math.ceil(size.toFloat/step).toInt + 1
       val layerNoise = new Range(0, layerSize, 1).map((i) => rand.nextFloat * 2 - 1).toArray
       
-      for (i <- new Range(0, layerSize-1, 1)) {
+      for (i <- 0 until layerSize) {
         noise(i*step) += layerNoise(i) * persistence
 
-        for (j <- new Range(1, step, 1)) {
+        for (j <- 1 until step) {
           if (i*step+j < size) {
             noise(i*step+j) += interpolate(layerNoise(i), layerNoise(i+1), j.toFloat/step) * persistence
           }
