@@ -89,6 +89,7 @@ abstract class Session(container: slick.GameContainer) extends phys2d.raw.Collis
     var p: Projectile = ProjectileTypes.newProjectile(this, tank, projectileType)
 
     p.body.setPosition(x.toFloat, y.toFloat)
+    p.body.adjustVelocity(new phys2d.math.Vector2f(tank.velocity))
     p.body.adjustVelocity(velocity)
     projectiles += p
     
