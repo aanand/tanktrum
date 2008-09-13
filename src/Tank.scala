@@ -34,7 +34,7 @@ class Tank (session: Session, var id: Byte) extends Collider {
   val WHEEL_OFFSET_Y = -BEVEL
 
   val BASE_WIDTH = WIDTH - 2*WHEEL_RADIUS
-  val BASE_HEIGHT = 0.7f
+  val BASE_HEIGHT = BEVEL
   val BASE_OFFSET_X = 0
   val BASE_OFFSET_Y = -BASE_HEIGHT/2
 
@@ -68,8 +68,8 @@ class Tank (session: Session, var id: Byte) extends Collider {
                       new slick.geom.Vector2f(-(WIDTH/2-TAPER), -HEIGHT),
                       new slick.geom.Vector2f(WIDTH/2-TAPER, -HEIGHT),
                       new slick.geom.Vector2f(WIDTH/2, -BEVEL),
-                      new slick.geom.Vector2f(WIDTH/2-BEVEL, 0),
-                      new slick.geom.Vector2f(-(WIDTH/2-BEVEL), 0),
+                      //new slick.geom.Vector2f(WIDTH/2-BEVEL, 0),
+                      //new slick.geom.Vector2f(-(WIDTH/2-BEVEL), 0),
                       new slick.geom.Vector2f(-WIDTH/2, -BEVEL)
                     ).toArray
   var player: Player = null
