@@ -68,8 +68,6 @@ class Tank (session: Session, var id: Byte) extends Collider {
                       new slick.geom.Vector2f(-(WIDTH/2-TAPER), -HEIGHT),
                       new slick.geom.Vector2f(WIDTH/2-TAPER, -HEIGHT),
                       new slick.geom.Vector2f(WIDTH/2, -BEVEL),
-                      //new slick.geom.Vector2f(WIDTH/2-BEVEL, 0),
-                      //new slick.geom.Vector2f(-(WIDTH/2-BEVEL), 0),
                       new slick.geom.Vector2f(-WIDTH/2, -BEVEL)
                     ).toArray
   var player: Player = null
@@ -96,7 +94,6 @@ class Tank (session: Session, var id: Byte) extends Collider {
   var wheel1: phys2d.raw.Body = _
   var wheel2: phys2d.raw.Body = _
   var base: phys2d.raw.Body = _
-  //body.setMaxVelocity(20f, 20f)
 
   var color: Color = _
 
@@ -127,7 +124,7 @@ class Tank (session: Session, var id: Byte) extends Collider {
 
   def grounded : Boolean = contactTime > 0; true
 
-  def wheelColor = color // new Color(0f, 0f, 1f)
+  def wheelColor = color
 
   def angle = body.getRotation.toDegrees
   def x = body.getPosition.getX
@@ -219,8 +216,6 @@ class Tank (session: Session, var id: Byte) extends Collider {
     base.setFriction(1f)
     wheel1.setFriction(0f)
     wheel2.setFriction(0f)
-
-    //body.setDamping(0.007f)
 
     session.addBody(this, body)
   }
@@ -380,11 +375,6 @@ class Tank (session: Session, var id: Byte) extends Collider {
     
     g.setColor(color)
     
-    // g.getFont.drawString(20, 0, wheel1.getAngularVelocity.toString)
-    // g.getFont.drawString(20, 0, "targetSpeed = " + targetSpeed)
-    // g.getFont.drawString(20, 10, "actualSpeed = " + actualSpeed)
-    // g.getFont.drawString(20, 20, "speedDelta = " + speedDelta)
-    
     g.translate(x, y)
     g.rotate(0, 0, angle)
     
@@ -424,11 +414,6 @@ class Tank (session: Session, var id: Byte) extends Collider {
     
     g.setColor(wheelColor)
     g.fillOval(-WHEEL_RADIUS, -WHEEL_RADIUS, WHEEL_RADIUS*2, WHEEL_RADIUS*2)
-    
-    // g.rotate(0, 0, rotation)
-    // 
-    // g.setColor(new Color(1f, 0f, 0f))
-    // g.drawLine(0, 0, WHEEL_RADIUS, 0)
     
     g.resetTransform
   }
