@@ -171,7 +171,7 @@ class Server(port: Int) extends Session(null) {
       player.tank.remove
       player.tank = createTank(player.id)
       player.tank.player = player //Oh no.
-      if (oldTank.isAlive) { player.tank.ammo = oldTank.ammo }
+      if (oldTank.isAlive) { player.gun.ammo = oldTank.gun.ammo }
     }
   }
   
@@ -258,19 +258,19 @@ class Server(port: Int) extends Session(null) {
       case Commands.JUMP => { player.tank.lift = -1 }
       case Commands.STOP_JUMP => { player.tank.lift = 0 }
 
-      case Commands.AIM_CLOCKWISE => { player.tank.gunAngleChange = 1 }
-      case Commands.STOP_AIM_CLOCKWISE => { player.tank.gunAngleChange = 0 }
-      case Commands.AIM_ANTICLOCKWISE => { player.tank.gunAngleChange = -1 }
-      case Commands.STOP_AIM_ANTICLOCKWISE => { player.tank.gunAngleChange = 0 }
+      case Commands.AIM_CLOCKWISE => { player.gun.angleChange = 1 }
+      case Commands.STOP_AIM_CLOCKWISE => { player.gun.angleChange = 0 }
+      case Commands.AIM_ANTICLOCKWISE => { player.gun.angleChange = -1 }
+      case Commands.STOP_AIM_ANTICLOCKWISE => { player.gun.angleChange = 0 }
 
-      case Commands.POWER_UP => { player.tank.gunPowerChange = 1 }
-      case Commands.STOP_POWER_UP => { player.tank.gunPowerChange = 0 }
-      case Commands.POWER_DOWN => { player.tank.gunPowerChange = -1 }
-      case Commands.STOP_POWER_DOWN => { player.tank.gunPowerChange = 0 }
+      case Commands.POWER_UP => { player.gun.powerChange = 1 }
+      case Commands.STOP_POWER_UP => { player.gun.powerChange = 0 }
+      case Commands.POWER_DOWN => { player.gun.powerChange = -1 }
+      case Commands.STOP_POWER_DOWN => { player.gun.powerChange = 0 }
 
-      case Commands.START_FIRE => { player.tank.firing = true }
-      case Commands.STOP_FIRE => { player.tank.firing = false }
-      case Commands.CYCLE_WEAPON => { player.tank.cycleWeapon() }
+      case Commands.START_FIRE => { player.gun.firing = true }
+      case Commands.STOP_FIRE => { player.gun.firing = false }
+      case Commands.CYCLE_WEAPON => { player.gun.cycleWeapon() }
 
       case Commands.READY => { player.ready = true; broadcastPlayers }
       case Commands.BUY => { handleBuy(player) }

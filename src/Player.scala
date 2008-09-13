@@ -22,6 +22,8 @@ class Player (var tank: Tank, var name: String, var id: Byte) {
   var updated = true
   var ready = false
 
+  def gun = tank.gun
+
   if (null != name && name.length > Player.MAX_NAME_LENGTH) {
     name = name.substring(0, Player.MAX_NAME_LENGTH)
   }
@@ -55,9 +57,9 @@ class Player (var tank: Tank, var name: String, var id: Byte) {
     if (tank.isAlive) {
       g.translate(10, 20)
 
-      ProjectileTypes.render(g, tank.selectedWeapon)
+      ProjectileTypes.render(g, gun.selectedWeapon)
 
-      g.drawString(tank.ammo(tank.selectedWeapon).toString, 15, -9)
+      g.drawString(gun.ammo(gun.selectedWeapon).toString, 15, -9)
     }
 
     g.resetTransform
@@ -69,7 +71,7 @@ class Player (var tank: Tank, var name: String, var id: Byte) {
     if (money >= item.cost) { 
       money -= item.cost
       if (item.projectileType != null) {
-        tank.ammo(item.projectileType) = tank.ammo(item.projectileType) + item.units
+        gun.ammo(item.projectileType) = gun.ammo(item.projectileType) + item.units
       }
       if (item == JumpjetItem) {
         tank.purchasedJumpFuel += item.units

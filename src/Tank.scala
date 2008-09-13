@@ -42,20 +42,8 @@ class Tank (session: Session, var id: Byte) extends Collider {
   val WHEEL_MASS = 0.1f
   val BASE_MASS = 0.1f
   
-  val GUN_ANGLE_SPEED = 20 // degrees/second
-  val GUN_POWER_SPEED = 50 // pixels/second/second
-
-  val GUN_ANGLE_RANGE = new Range(-90, 90, 1)
-  val GUN_POWER_RANGE = new Range(50, 300, 1)
-
-  val GUN_POWER_SCALE = 200.0f
-
-  val GUN_OFFSET_X = 0
-  val GUN_OFFSET_Y = -(1.5f*HEIGHT)
+  val gun = new Gun(session, this)
   
-  val GUN_READY_COLOR   = new Color(0.0f, 1.0f, 0.0f, 0.5f)
-  val GUN_LOADING_COLOR = new Color(1.0f, 0.0f, 0.0f, 0.5f)
-    
   val BODY_COLORS = List(
     new Color(1f, 0f, 0f),
     new Color(0f, 1f, 0f),
@@ -72,17 +60,8 @@ class Tank (session: Session, var id: Byte) extends Collider {
                     ).toArray
   var player: Player = null
 
-  var ammo = new HashMap[ProjectileTypes.Value, Int]()
-  for (projectileType <- ProjectileTypes) {
-    ammo(projectileType) = 0
-  }
-  ammo(ProjectileTypes.PROJECTILE) = 999
-
-  var selectedWeapon = ProjectileTypes.PROJECTILE
-
   val drawShapePoints = shapePoints.foldLeft[List[Float]](List())((list, v) => list ++ List(v.getX(), v.getY())).toArray
   val tankShape = new slick.geom.Polygon(drawShapePoints)
-  val arrowShape = new slick.geom.Polygon(List[Float](-5, 0, -5, -50, -10, -50, 0, -60, 10, -50, 5, -50, 5, 0).toArray)
 
   val physShapePoints = shapePoints.map((point) => new phys2d.math.Vector2f(point.x, point.y))
   val physShape = new phys2d.raw.shapes.Polygon(physShapePoints.toArray)
@@ -99,20 +78,12 @@ class Tank (session: Session, var id: Byte) extends Collider {
 
   var thrust = 0
   var lift = 0
-  var gunAngleChange = 0
-  var gunPowerChange = 0
-
-  var gunAngle = 0f
-  var gunPower = 200f
-  var gunTimer = 0f
-
   var health = 100
 
   val contactGrace = 50
   var contactTime = 0
 
   var destroy = false
-  var firing = false
   
   var jumping = false
   var airborne = false
@@ -120,6 +91,7 @@ class Tank (session: Session, var id: Byte) extends Collider {
   var maxJumpFuel = 20000
   var purchasedJumpFuel = 2000
   var jumpFuel = 0
+  
   def fuelPercent = (jumpFuel.toFloat/maxJumpFuel) * 100
 
   def grounded : Boolean = contactTime > 0; true
@@ -131,11 +103,6 @@ class Tank (session: Session, var id: Byte) extends Collider {
   def y = body.getPosition.getY
   def velocity = body.getVelocity
 
-  def gunReady = gunTimer <= 0
-  
-  def gunX = x - GUN_OFFSET_X * Math.cos(angle.toRadians) - GUN_OFFSET_Y * Math.sin(angle.toRadians)
-  def gunY = y - GUN_OFFSET_X * Math.sin(angle.toRadians) + GUN_OFFSET_Y * Math.cos(angle.toRadians)
-  
   def isAlive = health > 0
   def isDead = !isAlive
 
@@ -220,26 +187,11 @@ class Tank (session: Session, var id: Byte) extends Collider {
     session.addBody(this, body)
   }
 
-  def cycleWeapon() {
-    var id = (selectedWeapon.id + 1) % ProjectileTypes.maxId
-    
-    if (!ammo.values.exists((ammoType) => {ammoType > 0})) {
-      println("No ammo left.")
-      return
-    }
-
-    while(ammo(ProjectileTypes.apply(id)) <= 0) {
-      id = (id + 1) % ProjectileTypes.maxId
-    }
-
-    selectedWeapon = ProjectileTypes.apply(id)
-    println(selectedWeapon)
-  }
-  
   def update(delta: Int): Unit = {
     if (destroy) remove
     if (isDead) return
-    if (firing) fire
+    
+    gun.update(delta)
     
     if (base.isTouchingStatic(new ArrayList[phys2d.raw.Body]) ||
         (wheel1.isTouchingStatic(new ArrayList[phys2d.raw.Body]) &&
@@ -313,37 +265,8 @@ class Tank (session: Session, var id: Byte) extends Collider {
         }
       }
     }
-    
-    if (gunAngleChange != 0) {
-      val newAngle = gunAngle + gunAngleChange * GUN_ANGLE_SPEED * delta / 1000.0f
-      
-      gunAngle = Math.max(GUN_ANGLE_RANGE.start, Math.min(GUN_ANGLE_RANGE.end, newAngle))
-    }
-    
-    if (gunPowerChange != 0) {
-      val newPower = gunPower + gunPowerChange * GUN_POWER_SPEED * delta / 1000.0f
-      
-      gunPower = Math.max(GUN_POWER_RANGE.start, Math.min(GUN_POWER_RANGE.end, newPower))
-    }
-    
-    if (!gunReady) {
-      gunTimer -= delta / 1000.0f
-    }
   }
   
-  def fire() {
-    if (isDead) return
-    
-    if (gunReady && ammo(selectedWeapon) > 0) {
-      ammo(selectedWeapon) = ammo(selectedWeapon) - 1
-      val proj = session.addProjectile(this, gunX, gunY, angle+gunAngle, gunPower, selectedWeapon)
-      gunTimer = proj.reloadTime
-    }
-    
-    if (ammo(selectedWeapon) == 0) {
-      cycleWeapon
-    }
-  }
   
   def damage(d: Int, source: Projectile) {
     val oldHealth = health
@@ -361,14 +284,14 @@ class Tank (session: Session, var id: Byte) extends Collider {
     }
   }
   
-  def remove =  {
+  def remove = {
     if (null != body) session.removeBody(body)
     if (null != wheel1) session.removeBody(wheel1)
     if (null != wheel2) session.removeBody(wheel2)
     destroy = false
   }
 
-  def render(g: Graphics): Unit = {
+  def render(g: Graphics) {
     if (isDead) {
       return
     }
@@ -381,22 +304,12 @@ class Tank (session: Session, var id: Byte) extends Collider {
     //Tank body
     g.fill(tankShape)
     
-    //Tank gun arrow
-    g.translate(GUN_OFFSET_X, GUN_OFFSET_Y)
-    g.rotate(0, 0, gunAngle)
-    g.scale(1, gunPower/GUN_POWER_SCALE)
-    g.setColor(if (gunReady) GUN_READY_COLOR else GUN_LOADING_COLOR)
-    g.fill(arrowShape)
+    gun.render(g)
     
-    g.resetTransform
-
     drawWheel(g, -WHEEL_OFFSET_X, wheel1.getRotation)
     drawWheel(g, WHEEL_OFFSET_X, wheel2.getRotation)
     drawBase(g)
 
-  }
-
-  def drawArrow(g: Graphics) {
   }
 
   def drawBase(g: Graphics) {
@@ -419,7 +332,12 @@ class Tank (session: Session, var id: Byte) extends Collider {
   }
   
   def currentValues = {
-    (x, y, angle, gunAngle, gunPower, gunAngleChange, gunPowerChange, health, thrust, jumping, jumpFuel, selectedWeapon.id, ammo(selectedWeapon))
+    (x, y, angle, 
+     gun.angle, gun.power, 
+     gun.angleChange, gun.powerChange, 
+     health, thrust, jumping, jumpFuel, 
+     gun.selectedWeapon.id, 
+     gun.ammo(gun.selectedWeapon))
   }
 
   def serialise = {
@@ -427,16 +345,16 @@ class Tank (session: Session, var id: Byte) extends Collider {
       x.toFloat,
       y.toFloat,
       angle.toShort, 
-      gunAngle.toShort, 
-      gunPower.toShort,
-      Math.ceil(gunTimer).toShort, 
+      gun.angle.toShort, 
+      gun.power.toShort,
+      Math.ceil(gun.timer).toShort, 
       health.toShort, 
       thrust.toByte,
-      if (jumping) 1.toByte else 0.toByte,
-      gunAngleChange.toByte, 
-      gunPowerChange.toByte,
-      selectedWeapon.id.toByte,
-      ammo(selectedWeapon).toShort,
+      jumping,
+      gun.angleChange.toByte, 
+      gun.powerChange.toByte,
+      gun.selectedWeapon.id.toByte,
+      gun.ammo(gun.selectedWeapon).toShort,
       jumpFuel.toShort,
       id
     ))
@@ -444,12 +362,12 @@ class Tank (session: Session, var id: Byte) extends Collider {
   
   def loadFrom(data: Array[Byte]) = {
     val values = Operations.fromByteArray[(
-      Float, Float, Short,
-      Short, Short, Short,
-      Short, Byte, Byte,
-      Byte, Byte,
-      Byte, Short, Short,
-      Byte)](data)
+      Float, Float, Short,  //x, y, angle
+      Short, Short, Short,  //gun angle, gun power, gun timer
+      Short, Byte, Boolean, //health, thrust, jumping
+      Byte, Byte,           //gun angle change, gun power change
+      Byte, Short, Short,   //selected weapon, selected ammo, jump fuel
+      Byte)](data)          //id
     
     val (newX, newY, newAngle, 
         newGunAngle, newGunPower, newGunTimer, 
@@ -460,16 +378,16 @@ class Tank (session: Session, var id: Byte) extends Collider {
 
     body.setPosition(newX, newY)
     body.setRotation(newAngle.toFloat.toRadians)
-    gunAngle = newGunAngle
-    gunPower = newGunPower
-    gunTimer = newGunTimer
+    gun.angle = newGunAngle
+    gun.power = newGunPower
+    gun.timer = newGunTimer
     health = newHealth
     thrust = newThrust
-    jumping = newJumping != 0
-    gunAngleChange = newGunAngleChange
-    gunPowerChange = newGunPowerChange
-    selectedWeapon = ProjectileTypes.apply(newSelectedWeapon)
-    ammo(selectedWeapon) = newSelectedAmmo
+    jumping = newJumping
+    gun.angleChange = newGunAngleChange
+    gun.powerChange = newGunPowerChange
+    gun.selectedWeapon = ProjectileTypes.apply(newSelectedWeapon)
+    gun.ammo(gun.selectedWeapon) = newSelectedAmmo
     jumpFuel = newFuel
     
     id = newID

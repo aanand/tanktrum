@@ -21,7 +21,7 @@ class PracticeServer(port : Int) extends Server(port) {
 
     if (newPlayer) {
       for (projectileType <- ProjectileTypes) {
-        players(addr).tank.ammo(projectileType) = 999
+        players(addr).gun.ammo(projectileType) = 999
       }
       players(addr).tank.purchasedJumpFuel = players(addr).tank.maxJumpFuel
     }
