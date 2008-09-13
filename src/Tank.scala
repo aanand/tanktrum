@@ -180,7 +180,7 @@ class Tank (session: Session, var id: Byte) extends Collider {
     }
     
     body.setFriction(1f)
-    base.setFriction(1f)
+    base.setFriction(0.8f)
     wheel1.setFriction(0f)
     wheel2.setFriction(0f)
 
