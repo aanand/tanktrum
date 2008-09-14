@@ -123,12 +123,14 @@ class Ground(session : Session, width : Int, height : Int) extends Collider {
     g.fillRect(0, Main.HEIGHT-MIN_HEIGHT, Main.WIDTH, MIN_HEIGHT)
   }
   
-  def serialise() = {
-    Operations.toByteArray(points.map((p) => p.getY.toShort).toArray)
+  def serialise(seq: Short) = {
+    Operations.toByteArray((seq, points.map((p) => p.getY.toShort).toArray))
   }
   
-  def loadFrom(data: Array[byte]) = {
-    val shortPoints = Operations.fromByteArray[Array[short]](data)
+  def loadFrom(shortPoints: Array[Short]) = {
+    if (body != null) {
+      session.removeBody(body)
+    }
     var i = 0f
     points = shortPoints.map((s) => {
         val v = new Vector2f(i, s)

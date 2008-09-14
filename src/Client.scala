@@ -43,6 +43,10 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
   var inReadyRoom = true
   
   val chat = new Chat(this)
+  
+  val tankSequence = new Sequence
+  val projectileSequence = new Sequence
+  val groundSequence = new Sequence
 
   val dot = new ImageBuffer(3, 3)
   dot.setRGBA(1, 1, 255, 255, 255, 100)
@@ -233,13 +237,17 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
     lastPong = new Date
   }
 
-  def loadGround = {
+  def loadGround {
     val groundArray = new Array[byte](data.remaining)
-    if (ground != null && null != ground.body) {
-      removeBody(ground.body)
-    }
     data.get(groundArray)
-    ground.loadFrom(groundArray)
+    val (seq, shortPoints) = Operations.fromByteArray[(Short, Array[Short])](groundArray)
+    if (!groundSequence.inOrder(seq)) {
+      return
+    }
+
+    if (null != ground) {
+      ground.loadFrom(shortPoints)
+    }
   }
 
   def loadProjectile = {
@@ -248,11 +256,15 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
     addProjectile(ProjectileLoader.loadProjectile(null, projArray, this))
   }
 
-  def loadProjectiles = {
+  def loadProjectiles {
     val projArray = new Array[byte](data.remaining)
     data.get(projArray)
 
-    val projDataList = Operations.fromByteArray[List[Array[byte]]](projArray)
+    val (seq, projDataList) = Operations.fromByteArray[(Short, List[Array[byte]])](projArray)
+
+    if (!projectileSequence.inOrder(seq)) {
+      return
+    }
 
     var i = 0
 
@@ -305,12 +317,15 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
     }
   }
   
-  def processUpdate = {
+  def processUpdate {
     inReadyRoom = false
     val byteArray = new Array[byte](data.remaining)
     data.get(byteArray)
     
-    val tankDataList = Operations.fromByteArray[List[(Byte, Array[Byte])]](byteArray)
+    val (seq, tankDataList) = Operations.fromByteArray[(Short, List[(Byte, Array[Byte])])](byteArray)
+    if (!tankSequence.inOrder(seq)) {
+      return
+    }
   
     for (tankDataMap <- tankDataList) {
       val (id, tankData) = tankDataMap

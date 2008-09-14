@@ -35,6 +35,10 @@ class Server(port: Int) extends Session(null) {
 
   var inReadyRoom = true
   
+  val tankSequence = new Sequence
+  val projectileSequence = new Sequence
+  val groundSequence = new Sequence
+
   /**
    * Called to start the server.
    */
@@ -100,7 +104,7 @@ class Server(port: Int) extends Session(null) {
 
       timeToProjectileUpdate -= delta
 
-      if (timeToProjectileUpdate < 0) {
+      if (timeToProjectileUpdate < 0 && projectiles.size > 0) {
         broadcastProjectiles
         timeToProjectileUpdate = PROJECTILE_BROADCAST_INTERVAL
       }
@@ -224,6 +228,7 @@ class Server(port: Int) extends Session(null) {
   def checkTimeouts() = {
     for (addr <- players.keys) {
       if (players(addr).timedOut) {
+        broadcastChat(players(addr).name + " timed out.")
         println(players(addr).name + " timed out.")
         players(addr).tank.remove
         players -= addr
@@ -284,7 +289,7 @@ class Server(port: Int) extends Session(null) {
     val messageArray = new Array[byte](data.remaining)
     data.get(messageArray)
     val message = player.name + ": " + Operations.fromByteArray[String](messageArray)
-    println("Broadcasting chat message: " + message)
+    println("Broadcasting chat message: \"" + message+ "\"")
     broadcastChat(message)
   }
 
@@ -308,7 +313,7 @@ class Server(port: Int) extends Session(null) {
       changed
     })
     val tankDataList = movedPlayers.map(p => (p.tank.id, p.tank.serialise)).toList
-    byteToArray(Commands.TANKS) ++ Operations.toByteArray(tankDataList)
+    byteToArray(Commands.TANKS) ++ Operations.toByteArray((tankSequence.next.toShort, tankDataList))
   }
 
   def playerData = {
@@ -323,7 +328,7 @@ class Server(port: Int) extends Session(null) {
   def projectilesData() = {
     val projectileDataList = projectiles.map(p => p.serialise).toList
 
-    byteToArray(Commands.PROJECTILES) ++ Operations.toByteArray(projectileDataList)
+    byteToArray(Commands.PROJECTILES) ++ Operations.toByteArray((projectileSequence.next, projectileDataList))
   }
 
 
@@ -350,7 +355,7 @@ class Server(port: Int) extends Session(null) {
   }
   
   def broadcastGround() = {
-    broadcast(byteToArray(Commands.GROUND) ++ ground.serialise)
+    broadcast(byteToArray(Commands.GROUND) ++ ground.serialise(groundSequence.next))
   }
 
   def broadcastPlayers = {
@@ -378,7 +383,7 @@ class Server(port: Int) extends Session(null) {
   }
 
   def sendGround(addr: SocketAddress) = {
-    send(byteToArray(Commands.GROUND) ++ ground.serialise, addr)
+    send(byteToArray(Commands.GROUND) ++ ground.serialise(groundSequence.seq), addr)
   }
   
 

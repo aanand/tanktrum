@@ -394,5 +394,5 @@ class Tank (session: Session, var id: Byte) extends Collider {
     
     color = BODY_COLORS(id%BODY_COLORS.length)
   }
-
 }
+
