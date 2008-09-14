@@ -9,11 +9,8 @@ object Main {
     
     val container = new slick.AppGameContainer(game)
     container.setDisplayMode(WIDTH, HEIGHT, false)
+    container.setTargetFrameRate(100)
     container.setShowFPS(false)
-    container.setMaximumLogicUpdateInterval(1000/100)
-    container.setMinimumLogicUpdateInterval(1000/100)
-    
-    //it's useful if the server still sends updates when the player is alt-tabbed
     container.setUpdateOnlyWhenVisible(false)
     container.start()
   }
