@@ -3,7 +3,6 @@ import java.io._
 import java.util.prefs._
 
 class Game(title: String) extends BasicGame(title) {
-  val TICK = 10 //ms
   var client: Client = _
   var server: Server = _
   var error: String = _
@@ -52,9 +51,6 @@ class Game(title: String) extends BasicGame(title) {
     }
     if (server != null && server.isActive) {
       server.update(delta)
-    }
-    if (TICK-delta > 0) {
-      Thread.sleep(TICK-delta)
     }
   }
 
