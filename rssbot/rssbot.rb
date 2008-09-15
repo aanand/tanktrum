@@ -1,0 +1,128 @@
+#!/usr/bin/ruby
+
+require 'rubygems'
+require 'simple-rss'
+require 'irc'
+require 'pp'
+require 'open-uri'
+
+class Feed
+  def initialize url
+    @url = url
+  end
+
+  def new_items
+    new_items_list = []
+    rss = nil
+    rss = SimpleRSS.parse open(@url)
+
+    if rss.nil?
+      raise "Couldn't fetch rss"
+      return []
+    end
+
+    if @olditems.nil?
+      item = rss.items.first
+      new_items_list << item
+    else
+      rss.items.reverse.each do |item|
+        unless @olditems.find { |old_item| item.link == old_item.link }
+          new_items_list << item
+        end
+      end
+    end
+
+    @olditems = rss.items
+    new_items_list
+  end
+end
+
+class RssBot
+  IRC_USER = 'boombot'
+  IRC_CHAN = '#boomtrapezoid'
+  IRC_SERVER = 'irc.synirc.net'
+  IRC_PORT = 6667
+
+  LH_FEED  = Feed.new 'http://boomtrapezoid.lighthouseapp.com/events.atom'
+  GH_FEED  = Feed.new 'http://github.com/feeds/aanand/commits/boomtrapezoid/master'
+
+  SERVER_LOG = File.open('../boomtrapezoid/server.log')
+
+  def initialize
+    SERVER_LOG.seek SERVER_LOG.stat.size
+    @irc = IrcConnection.new(IRC_USER, IRC_USER, IRC_SERVER, IRC_PORT)
+    @irc.join(IRC_CHAN)
+    @irc.send(IRC_CHAN, "Yo.  Followin' some lighthouse.  Most recent thing was:")
+  end
+
+  def process_rss
+    LH_FEED.new_items.each{|item| send_lh_item item}
+    GH_FEED.new_items.each{|item| send_gh_item item}
+    rescue Exception => e
+      $stderr.puts("Error processing RSS: " + e)
+  end
+
+  def check_log
+    line = SERVER_LOG.gets
+    return unless line
+
+    if line.match(/has joined the game\.$/) ||
+       line.match(/has left the game\.$/) ||
+       line.match(/timed out\.$/)
+      puts line
+      @irc.send(IRC_CHAN, "Server: " + line)
+    end
+
+    rescue Exception => e
+      $stderr.puts("Error reading from server log: " + e)
+  end
+
+
+  def send_lh_item item
+    author = item.author
+    date = item.updated.strftime('%d/%m %H:%M:%S ')
+    link = open("http://tinyurl.com/api-create.php?url=#{item.link}"){|l| l.read}
+    
+    title = "Ticket: " +  item.title.split(": ")[1..-1].join(": ")
+    title_words = title.split(" ")
+    #Ignore git commits:
+    if title_words.length >= 3 && title_words[1] == "Changeset" && title_words[2].length == 42
+      return
+    end
+    item_str = date + author + " | " + title + ' | ' + link
+
+    @irc.send IRC_CHAN, item_str
+    puts item_str
+  end
+  
+  def send_gh_item item
+    author = item.author
+    date = item.updated.strftime('%d/%m %H:%M:%S ')
+    link = open("http://tinyurl.com/api-create.php?url=#{item.link}"){|l| l.read}
+    
+    title = "Git commit: " +  item.title
+    title_words = title.split(" ")
+    
+    item_str = date + author + " | " + title + ' | ' + link
+
+    @irc.send IRC_CHAN, item_str
+    puts item_str
+  end
+end
+
+if __FILE__ == $0
+
+  rssbot = RssBot.new
+
+  Thread.new do
+    loop do
+      rssbot.check_log
+      sleep 1
+    end
+  end
+
+  loop do
+    rssbot.process_rss
+    sleep 300
+  end
+end
