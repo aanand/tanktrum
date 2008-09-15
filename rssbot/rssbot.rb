@@ -39,20 +39,22 @@ end
 
 class RssBot
   IRC_USER = 'boombot'
-  IRC_CHAN = '#boomtrapezoid'
+  IRC_CHANS = ['#boomtrapezoid', '#groovecats']
   IRC_SERVER = 'irc.synirc.net'
   IRC_PORT = 6667
 
   LH_FEED  = Feed.new 'http://boomtrapezoid.lighthouseapp.com/events.atom'
   GH_FEED  = Feed.new 'http://github.com/feeds/aanand/commits/boomtrapezoid/master'
 
-  SERVER_LOG = File.open('../boomtrapezoid/server.log')
+  SERVER_LOG = File.open('../server.log')
 
   def initialize
     SERVER_LOG.seek SERVER_LOG.stat.size
     @irc = IrcConnection.new(IRC_USER, IRC_USER, IRC_SERVER, IRC_PORT)
-    @irc.join(IRC_CHAN)
-    @irc.send(IRC_CHAN, "Yo.  Followin' some lighthouse.  Most recent thing was:")
+    IRC_CHANS.each do |chan|
+      @irc.join(chan)
+    end
+    send("Yo.  Followin' some trapezoids.")
   end
 
   def process_rss
@@ -62,6 +64,13 @@ class RssBot
       $stderr.puts("Error processing RSS: " + e)
   end
 
+  def send message
+    IRC_CHANS.each do |chan|
+      @irc.send chan, message
+    end
+    puts message
+  end
+
   def check_log
     line = SERVER_LOG.gets
     return unless line
@@ -69,8 +78,7 @@ class RssBot
     if line.match(/has joined the game\.$/) ||
        line.match(/has left the game\.$/) ||
        line.match(/timed out\.$/)
-      puts line
-      @irc.send(IRC_CHAN, "Server: " + line)
+      send("Server: " + line)
     end
 
     rescue Exception => e
@@ -91,8 +99,7 @@ class RssBot
     end
     item_str = date + author + " | " + title + ' | ' + link
 
-    @irc.send IRC_CHAN, item_str
-    puts item_str
+    send item_str
   end
   
   def send_gh_item item
@@ -105,8 +112,7 @@ class RssBot
     
     item_str = date + author + " | " + title + ' | ' + link
 
-    @irc.send IRC_CHAN, item_str
-    puts item_str
+    send item_str
   end
 end
 
