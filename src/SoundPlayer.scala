@@ -23,7 +23,7 @@ object SoundPlayer extends Actor {
   def act {
     while (true) {
       receive {
-        case PlaySound(sound) => { play(sound) }
+        case PlaySound(sound) => play(sound)
       }
     }
   }
@@ -33,13 +33,16 @@ object SoundPlayer extends Actor {
 
     val (format, data) = sounds(filename)
     val clip = AudioSystem.getClip
+
     clip.addLineListener(new SoundListener)
+
     try {
       clip.open(format, data, 0, data.length)
     }
     catch {
-      case e:LineUnavailableException => { println("Warning: no available sound lines.") }
+      case e:LineUnavailableException => println("Warning: no available sound lines.")
     }
+
     clip.start
   }
 

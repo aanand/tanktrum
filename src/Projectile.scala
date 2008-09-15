@@ -118,12 +118,12 @@ object ProjectileTypes extends Enumeration {
 
   def newProjectile(session: Session, tank: Tank, projectileType: Value) : Projectile = {
     projectileType match {
-      case PROJECTILE => { new Projectile(session, tank) }
-      case NUKE => { new Nuke(session, tank) }
-      case ROLLER => { new Roller(session, tank) }
-      case MIRV => { new MIRV(session, tank) }
-      case MACHINE_GUN => { new MachineGun(session, tank) }
-      case DEATHS_HEAD => { new DeathsHead(session, tank) }
+      case PROJECTILE  => new Projectile(session, tank) 
+      case NUKE        => new Nuke(session, tank) 
+      case ROLLER      => new Roller(session, tank) 
+      case MIRV        => new MIRV(session, tank) 
+      case MACHINE_GUN => new MachineGun(session, tank) 
+      case DEATHS_HEAD => new DeathsHead(session, tank) 
     }
   }
 
@@ -133,22 +133,27 @@ object ProjectileTypes extends Enumeration {
       case PROJECTILE => {
         g.fillOval(-3, -3, 6, 6)
       }
+
       case NUKE => {
         g.fillOval(-6, -6, 12, 12)
       }
+
       case ROLLER => {
         g.fillOval(-3, -3, 6, 6)
         g.fillRect(-7, 3, 14, 4)
       }
+
       case MIRV => {
         g.fillOval(-4, -4, 4, 4)
         g.fillOval(0, 0, 4, 4)
         g.fillOval(-4, 0, 4, 4)
         g.fillOval(0, -4, 4, 4)
       }
+
       case MACHINE_GUN => {
         g.fillRect(-2, -4, 4, 8)
       }
+
       case DEATHS_HEAD =>  {
         g.fillOval(-8, -8, 8, 8)
         g.fillOval(0, 0, 8, 8)

@@ -37,17 +37,18 @@ class Menu(tree : List[(String, MenuItem)]) {
       currentItem.keyPressed(key, char, this)
     } else {
       key match {
-        case Input.KEY_UP   => { 
+        case Input.KEY_UP => { 
           selection = (selection-1) % subTree.length
           //Java modulo on a negative number returns a negative number, stupidly.
           if (selection < 0) {
             selection = subTree.length - 1
           }
         }
-        case Input.KEY_DOWN => { selection = (selection+1) % subTree.length }
-        case Input.KEY_RETURN => {
-          currentItem.perform(this)
-        }
+
+        case Input.KEY_DOWN => selection = (selection+1) % subTree.length 
+
+        case Input.KEY_RETURN => currentItem.perform(this)
+
         case Input.KEY_ESCAPE => {
           if (path.isEmpty) {
             hide()
@@ -57,7 +58,8 @@ class Menu(tree : List[(String, MenuItem)]) {
             selection = subTree.indexOf(subTree.find((item) => {item._2 == subMenu}).get)
           }
         }
-        case _ => {}
+
+        case _ => 
       }
     }
   }
@@ -102,13 +104,15 @@ case class MenuEditable(initValue : String, maxLength: Int) extends MenuItem {
   
   override def keyPressed(key : Int, char : Char, menu : Menu) {
     key match {
-      case Input.KEY_RETURN => { menu.editing = false }
-      case Input.KEY_ESCAPE => { menu.editing = false }
+      case Input.KEY_RETURN => menu.editing = false 
+      case Input.KEY_ESCAPE => menu.editing = false 
+
       case Input.KEY_BACK => {
         if (value.length > 0) {
           value = value.substring(0, value.length-1)
         }
       }
+
       case _ => {
         if (value.length < maxLength && char >= 32 && char <= 126) {
           value = value + char

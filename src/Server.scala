@@ -252,37 +252,34 @@ class Server(port: Int) extends Session(null) {
     val player = players(addr)
     player.resetTimeout
     command match {
-      case Commands.PING => {
-        sendPong(addr)
-      }
-
-      case Commands.MOVE_LEFT => { player.tank.thrust = -1 }
-      case Commands.STOP_MOVE_LEFT => { player.tank.thrust = 0 }
-      case Commands.MOVE_RIGHT => { player.tank.thrust = 1 }
-      case Commands.STOP_MOVE_RIGHT => { player.tank.thrust = 0 }
-      case Commands.JUMP => { player.tank.lift = -1 }
-      case Commands.STOP_JUMP => { player.tank.lift = 0 }
-
-      case Commands.AIM_CLOCKWISE => { player.gun.angleChange = 1 }
-      case Commands.STOP_AIM_CLOCKWISE => { player.gun.angleChange = 0 }
-      case Commands.AIM_ANTICLOCKWISE => { player.gun.angleChange = -1 }
-      case Commands.STOP_AIM_ANTICLOCKWISE => { player.gun.angleChange = 0 }
-
-      case Commands.POWER_UP => { player.gun.powerChange = 1 }
-      case Commands.STOP_POWER_UP => { player.gun.powerChange = 0 }
-      case Commands.POWER_DOWN => { player.gun.powerChange = -1 }
-      case Commands.STOP_POWER_DOWN => { player.gun.powerChange = 0 }
-
-      case Commands.START_FIRE => { player.gun.firing = true }
-      case Commands.STOP_FIRE => { player.gun.firing = false }
-      case Commands.CYCLE_WEAPON => { player.gun.cycleWeapon() }
-
-      case Commands.READY => { player.ready = true; broadcastPlayers }
-      case Commands.BUY => { handleBuy(player) }
-
-      case Commands.CHAT_MESSAGE => { handleChat(player) }
-      case _ => {println("Warning: Server got unknown command: " + command.toByte)}
-    }
+      case Commands.PING                   => sendPong(addr)
+                                           
+      case Commands.MOVE_LEFT              => player.tank.thrust = -1 
+      case Commands.STOP_MOVE_LEFT         => player.tank.thrust = 0 
+      case Commands.MOVE_RIGHT             => player.tank.thrust = 1 
+      case Commands.STOP_MOVE_RIGHT        => player.tank.thrust = 0 
+      case Commands.JUMP                   => player.tank.lift = -1 
+      case Commands.STOP_JUMP              => player.tank.lift = 0 
+                                           
+      case Commands.AIM_CLOCKWISE          => player.gun.angleChange = 1 
+      case Commands.STOP_AIM_CLOCKWISE     => player.gun.angleChange = 0 
+      case Commands.AIM_ANTICLOCKWISE      => player.gun.angleChange = -1 
+      case Commands.STOP_AIM_ANTICLOCKWISE => player.gun.angleChange = 0 
+                                           
+      case Commands.POWER_UP               => player.gun.powerChange = 1 
+      case Commands.STOP_POWER_UP          => player.gun.powerChange = 0 
+      case Commands.POWER_DOWN             => player.gun.powerChange = -1 
+      case Commands.STOP_POWER_DOWN        => player.gun.powerChange = 0 
+                                           
+      case Commands.START_FIRE             => player.gun.firing = true 
+      case Commands.STOP_FIRE              => player.gun.firing = false 
+      case Commands.CYCLE_WEAPON           => player.gun.cycleWeapon() 
+                                           
+      case Commands.READY                  => player.ready = true; broadcastPlayers 
+      case Commands.BUY                    => handleBuy(player) 
+                                           
+      case Commands.CHAT_MESSAGE           => handleChat(player) 
+      case _                               => println("Warning: Server got unknown command: " + command.toByte)}
   }
 
   def handleChat(player: Player) = {

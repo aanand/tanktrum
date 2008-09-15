@@ -46,9 +46,8 @@ class Chat(client: Client) {
 
   def keyPressed(key: Int, char: Char) {
     key match {
-      case Input.KEY_ENTER => { send }
-      case _ => { inputMenu.keyPressed(key, char) }
-    }
+      case Input.KEY_ENTER => send 
+      case _               => inputMenu.keyPressed(key, char) }
   }
 }
 
