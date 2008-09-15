@@ -104,7 +104,7 @@ class Server(port: Int) extends Session(null) {
 
       timeToProjectileUpdate -= delta
 
-      if (timeToProjectileUpdate < 0 && projectiles.size > 0) {
+      if (timeToProjectileUpdate < 0) {
         broadcastProjectiles
         timeToProjectileUpdate = PROJECTILE_BROADCAST_INTERVAL
       }
