@@ -288,6 +288,7 @@ class Tank (session: Session, var id: Byte) extends Collider {
     if (null != body) session.removeBody(body)
     if (null != wheel1) session.removeBody(wheel1)
     if (null != wheel2) session.removeBody(wheel2)
+    if (null != base) session.removeBody(base)
     destroy = false
   }
 
