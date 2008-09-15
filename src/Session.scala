@@ -49,7 +49,15 @@ abstract class Session(container: slick.GameContainer) extends phys2d.raw.Collis
   }
 
   def createWorld = {
-    val newWorld = new phys2d.raw.World(new phys2d.math.Vector2f(0.0f, 100.0f), 10, new phys2d.raw.strategies.QuadSpaceStrategy(20, 5))
+    val newWorld = new phys2d.raw.World(
+      new phys2d.math.Vector2f(0.0f, Config("physics.gravity").toFloat),
+
+      Config("physics.iterations").toInt,
+
+      new phys2d.raw.strategies.QuadSpaceStrategy(
+        Config("physics.quadSpace.maxInSpace").toInt,
+        Config("physics.quadSpace.maxLevels").toInt))
+
     newWorld.enableRestingBodyDetection(0.01f, 0.01f, 0.01f)
     newWorld.addListener(this)
     newWorld

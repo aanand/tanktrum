@@ -8,13 +8,13 @@ import sbinary.Instances._
 import sbinary.Operations
 
 class Ground(session : Session, width : Int, height : Int) extends Collider {
-  val MIN_HEIGHT = 20
-  val granularity = 5
+  val MIN_HEIGHT = Config("ground.minHeight").toFloat
+  val granularity = Config("ground.granularity").toInt
 
   val topsoilColor = new Color(0.5f, 0.5f, 0f)
   val earthColor = new Color(0.8f, 0.8f, 0f)
   
-  val topsoilDepth = 20f
+  val topsoilDepth = Config("ground.topsoilDepth").toFloat
   
   var points : Array[Vector2f] = _
   var drawShape : Shape = _

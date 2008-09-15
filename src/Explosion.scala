@@ -4,7 +4,7 @@ import sbinary.Operations
 import net.phys2d
 
 class Explosion (var x: Float, var y: Float, var radius: Float, session: Session, projectile: Projectile) {
-  val LIFETIME = 10f //second
+  val LIFETIME = Config("explosion.lifetime").toFloat
   var timeToDie = LIFETIME
 
   val SOUND = "explosion1.wav"

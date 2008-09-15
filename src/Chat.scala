@@ -3,7 +3,8 @@ import org.newdawn.slick._
 object ChatColor extends Color(0f, 0f, 1f)
 
 class Chat(client: Client) {
-  val MAX_MESSAGES = 5
+  val MAX_MESSAGES = Config("chat.maxMessages").toInt
+
   val inputField = new ChatMenuEditable("", 512)
   val inputMenu = new ChatMenu(List(("Chat: ", inputField)))
   var messages = List[String]()

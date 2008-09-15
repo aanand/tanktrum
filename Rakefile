@@ -74,6 +74,7 @@ task :jar => GAME_JAR_FILE
 file GAME_JAR_FILE => [:compile] + Dir['media/**'] do
   sh "jar -cf #{GAME_JAR_FILE} -C classes ."
   sh "jar -uf #{GAME_JAR_FILE} media "
+  sh "jar -uf #{GAME_JAR_FILE} config.properties "
 end
 
 namespace :install do

@@ -15,19 +15,19 @@ import sbinary.Operations
 import SwitchableParticleEmitter._
 
 class Tank (session: Session, var id: Byte) extends Collider {
-  val WIDTH = 30f
-  val HEIGHT = WIDTH/2
-  val TAPER = WIDTH/8
-  val BEVEL = WIDTH/10
+  val WIDTH  = Config("tank.width").toFloat
+  val HEIGHT = Config("tank.height").toFloat
+  val TAPER  = Config("tank.taper").toFloat
+  val BEVEL  = Config("tank.bevel").toFloat
 
-  val SPEED = WIDTH/2 // pixels/second
+  val SPEED = Config("tank.speed").toFloat
 
-  val STARTING_ALTITUDE = 100f
+  val STARTING_ALTITUDE = Config("tank.startingAltitude").toFloat
 
-  val airSpeedX = 250
-  val airSpeedY = 500
-  val airTilt = Math.toRadians(10f).toFloat
-  val airAngularSpeed = Math.toRadians(45f).toFloat
+  val airSpeedX       = Config("tank.air.speedX").toFloat
+  val airSpeedY       = Config("tank.air.speedY").toFloat
+  val airTilt         = Math.toRadians(Config("tank.air.tilt").toFloat).toFloat
+  val airAngularSpeed = Math.toRadians(Config("tank.air.angularSpeed").toFloat).toFloat
 
   val WHEEL_RADIUS = BEVEL
   val WHEEL_OFFSET_X = WIDTH/2-BEVEL
@@ -38,9 +38,9 @@ class Tank (session: Session, var id: Byte) extends Collider {
   val BASE_OFFSET_X = 0
   val BASE_OFFSET_Y = -BASE_HEIGHT/2
 
-  val BODY_MASS = 2.8f
-  val WHEEL_MASS = 0.1f
-  val BASE_MASS = 0.1f
+  val BODY_MASS = Config("tank.bodyMass").toFloat
+  val WHEEL_MASS = Config("tank.wheelMass").toFloat
+  val BASE_MASS = Config("tank.baseMass").toFloat
   
   val gun = new Gun(session, this)
   

@@ -13,11 +13,11 @@ import sbinary.Operations
 import sbinary.Instances._
 
 class Server(port: Int) extends Session(null) {
-  val TANK_BROADCAST_INTERVAL = 25 //milliseconds
-  val PROJECTILE_BROADCAST_INTERVAL = 50
-  val PLAYER_BROADCAST_INTERVAL = 1000
-  val READY_ROOM_BROADCAST_INTERVAL = 500
-  val MAX_PLAYERS = 6
+  val TANK_BROADCAST_INTERVAL       = Config("server.tankBroadcastInterval").toInt
+  val PROJECTILE_BROADCAST_INTERVAL = Config("server.projectileBroadcastInterval").toInt
+  val PLAYER_BROADCAST_INTERVAL     = Config("server.playerBroadcastInterval").toInt
+  val READY_ROOM_BROADCAST_INTERVAL = Config("server.readyRoomBroadcastInterval").toInt
+  val MAX_PLAYERS                   = Config("server.maxPlayers").toInt
 
   var nextTankColorIndex = 0
   

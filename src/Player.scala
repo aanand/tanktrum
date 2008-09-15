@@ -6,11 +6,11 @@ import sbinary.Instances._
 import sbinary.Operations
 
 object Player {
-  val MAX_NAME_LENGTH = 16
+  val MAX_NAME_LENGTH = Config("player.maxNameLength").toInt
 }
 
 class Player (var tank: Tank, var name: String, var id: Byte) {
-  val TIMEOUT = 10000 //in milliseconds
+  val TIMEOUT = Config("player.timeout").toInt
   
   var lastPing = new Date()
 

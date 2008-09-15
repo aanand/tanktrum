@@ -3,16 +3,16 @@ import org.newdawn.slick._
 import scala.collection.mutable.HashMap
 
 class Gun(session: Session, tank: Tank) {
-  val ANGLE_SPEED = 20 // degrees/second
-  val POWER_SPEED = 50 // pixels/second/second
+  val ANGLE_SPEED = Config("gun.angleSpeed").toFloat
+  val POWER_SPEED = Config("gun.powerSpeed").toFloat
 
-  val ANGLE_RANGE = new Range(-90, 90, 1)
-  val POWER_RANGE = new Range(50, 300, 1)
+  val ANGLE_RANGE = new Range(Config("gun.angleMin").toInt, Config("gun.angleMax").toInt, 1)
+  val POWER_RANGE = new Range(Config("gun.powerMin").toInt, Config("gun.powerMax").toInt, 1)
 
-  val POWER_SCALE = 200.0f
+  val POWER_SCALE = Config("gun.powerScale").toFloat
 
-  val OFFSET_X = 0
-  val OFFSET_Y = -(1.5f*tank.HEIGHT)
+  val OFFSET_X = 0f
+  val OFFSET_Y = Config("gun.offsetY").toFloat * tank.HEIGHT
   
   val READY_COLOR   = new Color(0.0f, 1.0f, 0.0f, 0.5f)
   val LOADING_COLOR = new Color(1.0f, 0.0f, 0.0f, 0.5f)

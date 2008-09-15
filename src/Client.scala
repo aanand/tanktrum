@@ -11,8 +11,8 @@ import sbinary.Operations
 import sbinary.Instances._
 
 class Client (hostname: String, port: Int, name: String, container: GameContainer) extends Session(container) {
-  val PING_PERIOD = 1000
-  val SERVER_TIMEOUT = 10000
+  val PING_PERIOD = Config("client.pingPeriod").toInt
+  val SERVER_TIMEOUT = Config("client.serverTimeout").toInt
 
   val CHAT_KEY              = Input.KEY_T
   val MOVE_LEFT_KEY         = Input.KEY_A
