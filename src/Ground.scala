@@ -128,7 +128,7 @@ class Ground(session : Session, width : Int, height : Int) extends Collider {
   }
   
   def loadFrom(shortPoints: Array[Short]) = {
-    if (body != null) {
+    if (null != body) {
       session.removeBody(body)
     }
     var i = 0f
