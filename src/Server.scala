@@ -152,10 +152,10 @@ class Server(port: Int) extends Session(null) {
 
   def endRound {
     world = createWorld
-    for (projectile <- projectiles) {
+    for (projectile <- projectiles.values) {
       removeProjectile(projectile)
     }
-    projectiles = List[Projectile]()
+    projectiles = new HashMap[Int, Projectile]
 
     for (explosion <- explosions) {
       removeExplosion(explosion)
@@ -323,9 +323,10 @@ class Server(port: Int) extends Session(null) {
   }
 
   def projectilesData() = {
-    val projectileDataList = projectiles.map(p => p.serialise).toList
+    val projectileDataArray = new Array[Array[byte]](projectiles.size)
+    projectiles.values.map(p => p.serialise).copyToArray(projectileDataArray, 0)
 
-    byteToArray(Commands.PROJECTILES) ++ Operations.toByteArray((projectileSequence.next, projectileDataList))
+    byteToArray(Commands.PROJECTILES) ++ Operations.toByteArray((projectileSequence.next, projectileDataArray))
   }
 
 

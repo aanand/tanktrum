@@ -78,6 +78,13 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
         processCommand(command)
       }
       
+      for (p <- projectiles.values) {
+        if (p.trailDead) {
+          println("Client: removing projectile " + p.id)
+          removeProjectile(p)
+        }
+      }
+      
       particleSystem.update(delta)
     }
     catch {
@@ -109,10 +116,10 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
         ground.render(g)
       }
       
-      for (p <- projectiles)    { p.render(g) }
-      for (e <- explosions)     { e.render(g) }
-      for (f <- frags)          { f.render(g) }
-      for (p <- players.values) { p.render(g) }
+      for (p <- projectiles.values) { p.render(g) }
+      for (e <- explosions)         { e.render(g) }
+      for (f <- frags)              { f.render(g) }
+      for (p <- players.values)     { p.render(g) }
     }
 
     g.resetTransform
@@ -258,31 +265,47 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
   }
 
   def loadProjectile = {
-    val projArray = new Array[byte](data.remaining)
-    data.get(projArray)
-    addProjectile(ProjectileLoader.loadProjectile(null, projArray, this))
+    val projData = new Array[byte](data.remaining)
+    data.get(projData)
+    loadProjectileFromDataArray(projData)
   }
 
   def loadProjectiles {
     val projArray = new Array[byte](data.remaining)
     data.get(projArray)
 
-    val (seq, projDataList) = Operations.fromByteArray[(Short, List[Array[byte]])](projArray)
+    val (seq, projDataArray) = Operations.fromByteArray[(Short, Array[Array[byte]])](projArray)
 
     if (!projectileSequence.inOrder(seq)) {
       return
     }
 
-    var i = 0
+    var liveProjectileIds: List[Int] = Nil
 
-    projectiles = projDataList.map(projectileData => {
-      var oldProjectile: Projectile = null
-      if (projectiles.isDefinedAt(i)) {
-        oldProjectile = projectiles(i)
+    for (projData <- projDataArray) {
+      val id = loadProjectileFromDataArray(projData)
+      
+      liveProjectileIds = id :: liveProjectileIds
+    }
+    
+    for (id <- projectiles.keys) {
+      if (!liveProjectileIds.contains(id) && !projectiles(id).dead) {
+        projectiles(id).dead = true
       }
-      i += 1
-      ProjectileLoader.loadProjectile(oldProjectile, projectileData, this)
-    })
+    }
+  }
+  
+  def loadProjectileFromDataArray(projData: Array[byte]): Int = {
+    val tuple = Projectile.deserialise(projData)
+    val id = tuple._1
+    
+    if (projectiles.isDefinedAt(id)) {
+      projectiles(id).updateFromTuple(tuple)
+    } else {
+      projectiles.put(id, Projectile.newFromTuple(this, tuple))
+    }
+    
+    id
   }
 
   def loadExplosion = {

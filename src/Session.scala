@@ -13,9 +13,11 @@ abstract class Session(container: slick.GameContainer) extends phys2d.raw.Collis
 
   var active = false
   var bodies = new HashMap[phys2d.raw.Body, Collider]
-  var projectiles = List[Projectile]()
+  var projectiles = new HashMap[Int, Projectile]
   var explosions = new HashSet[Explosion]
   val frags = new HashSet[Frag]
+
+  var nextProjectileId = 0
 
   def tanks: Iterator[Tank]
 
@@ -29,18 +31,18 @@ abstract class Session(container: slick.GameContainer) extends phys2d.raw.Collis
   }
   
   def update(delta: Int) {
-    
     ground.update(delta)
     for (tank <- tanks) {
       if (null != tank) { tank.update(delta) }
     }
-    for (p <- projectiles) {
+    for (p <- projectiles.values) {
       p.update(delta)
     }
     for (e <- explosions) {
       e.update(delta)
     }
   }
+  
   
   def byteToArray(c: Byte) = {
     val a = new Array[byte](1)
@@ -91,7 +93,7 @@ abstract class Session(container: slick.GameContainer) extends phys2d.raw.Collis
     frags -= f
   }
   
-  def addProjectile(tank : Tank, x : Double, y : Double, angle : Double, speed : Double, projectileType : ProjectileTypes.Value) = {
+  def addProjectile(tank : Tank, x : Double, y : Double, angle : Double, speed : Double, projectileType : ProjectileTypes.Value): Projectile = {
     val radians = Math.toRadians(angle-90)
     val velocity = new phys2d.math.Vector2f((speed * Math.cos(radians)).toFloat, (speed * Math.sin(radians)).toFloat)
     var p: Projectile = ProjectileTypes.newProjectile(this, tank, projectileType)
@@ -99,20 +101,21 @@ abstract class Session(container: slick.GameContainer) extends phys2d.raw.Collis
     p.body.setPosition(x.toFloat, y.toFloat)
     p.body.adjustVelocity(new phys2d.math.Vector2f(tank.velocity))
     p.body.adjustVelocity(velocity)
-    projectiles += p
-    
-    p
+
+    addProjectile(p)
   }
 
-  def addProjectile(projectile: Projectile) = {
-    projectiles += projectile
+  def addProjectile(projectile: Projectile): Projectile = {
+    projectile.id = nextProjectileId
+    projectiles.put(nextProjectileId, projectile)
+    nextProjectileId += 1
+
     projectile
   }
   
   def removeProjectile(p : Projectile) {
-    removeBody(p.body)
-    
-    projectiles -= p
+    p.onRemove
+    projectiles -= p.id
   }
   
   override def collisionOccured(event : phys2d.raw.CollisionEvent) {

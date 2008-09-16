@@ -3,7 +3,23 @@ import net.phys2d
 import sbinary.Instances._
 import sbinary.Operations
 
+object Projectile {
+  def deserialise(data: Array[byte]) = Operations.fromByteArray[(Int, Float, Float, Float, Float, Float, Float, Byte)](data)
+  
+  def newFromTuple(session: Session, tuple: (Int, Float, Float, Float, Float, Float, Float, Byte)) = {
+    val (id, _, _, _, _, _, _, projectileType) = tuple
+    
+    val p = ProjectileTypes.newProjectile(session, null, ProjectileTypes(projectileType))
+    p.id = id
+    p.updateFromTuple(tuple)
+    
+    p
+  }
+}
+
 class Projectile(session: Session, val tank: Tank) extends Collider {
+  var id: Int = -1
+
   val color = new slick.Color(1.0f, 1.0f, 1.0f)
   val explosionRadius = 20f
   val radius = 3f
@@ -13,6 +29,14 @@ class Projectile(session: Session, val tank: Tank) extends Collider {
   val shape = new phys2d.raw.shapes.Circle(radius)
   
   var body: phys2d.raw.Body = _
+  
+  val trailLifetime = Config("projectile.trail.lifetime").toInt
+
+  var trail: List[(Float, Float, Int)] = Nil
+  var stationaryTime = 0
+  var dead = false
+  
+  def trailDead = stationaryTime > trailLifetime
 
   if (session.isInstanceOf[Server]) {
     body = new phys2d.raw.Body(shape, mass)
@@ -39,11 +63,55 @@ class Projectile(session: Session, val tank: Tank) extends Collider {
     if (y + radius > session.ground.heightAt(x)) {
       collide(session.ground, null)
     }
+    
+    if (session.isInstanceOf[Client]) {
+      updateTrail(delta)
+    }
+  }
+  
+  def updateTrail(delta: Int) {
+    if (!trail.isEmpty) {
+      val (lastX, lastY, _) = trail.head
+
+      if ((x, y) != (lastX, lastY)) {
+        trail = (x, y, delta + stationaryTime) :: trail
+        stationaryTime = 0
+      } else {
+        stationaryTime += delta
+      }
+    } else {
+      trail = (x, y, delta + stationaryTime) :: trail
+    }
   }
   
   def render(g : slick.Graphics) {
-    g.setColor(color)
-    g.fillOval(x - radius, y - radius, radius*2, radius*2)
+    if (!dead) {
+      g.setColor(color)
+      g.fillOval(x - radius, y - radius, radius*2, radius*2)
+    }
+    
+    renderTrail(g)
+  }
+  
+  def renderTrail(g: slick.Graphics) {
+    var prevX: Float = 0
+    var prevY: Float = 0
+    var t = stationaryTime
+    
+    for ((x, y, delta) <- trail) {
+      if (t > trailLifetime) {
+        return
+      }
+      
+      if (prevX > 0) {
+        g.setColor(new slick.Color(color.r, color.g, color.b, 1f - (t.toFloat / trailLifetime)))
+        g.drawLine(x, y, prevX, prevY)
+      }
+      
+      prevX = x
+      prevY = y
+      t += delta
+    }
   }
   
   override def collide(obj : Collider, event : phys2d.raw.CollisionEvent) {
@@ -75,9 +143,14 @@ class Projectile(session: Session, val tank: Tank) extends Collider {
       }
     }
   }
+  
+  def onRemove {
+    session.removeBody(body)
+  }
 
   def serialise = {
     Operations.toByteArray((
+      id,
       x,
       y,
       body.getVelocity.getX,
@@ -87,29 +160,17 @@ class Projectile(session: Session, val tank: Tank) extends Collider {
       projectileType.id.toByte
     ))
   }
-}
+  
+  def updateFromTuple(tuple: (Int, Float, Float, Float, Float, Float, Float, Byte)) {
+    val (id, x, y, xVel, yVel, rot, angVel, projectileType) = tuple
+    
+    val velocityDelta = new phys2d.math.Vector2f(xVel, yVel)
+    velocityDelta.sub(body.getVelocity)
 
-object ProjectileLoader {
-  def loadProjectile(oldProjectile: Projectile, data: Array[byte], session: Session) = {
-    val (x, y, xVel, yVel, rot, angVel, projectileType) = Operations.fromByteArray[(Float, Float, Float, Float, Float, Float, Byte)](data)
-    var p: Projectile = null
-    if (null != oldProjectile && oldProjectile.projectileType.id == projectileType) {
-      p = oldProjectile
-    }
-    else {
-      if (oldProjectile != null) {
-        session.removeProjectile(oldProjectile)
-      }
-        //TODO: Use a tank id to track which tank this projectile came from.
-      p = ProjectileTypes.newProjectile(session, null, ProjectileTypes(projectileType))
-    }
-    p.body.setPosition(x, y)
-    val vel = new phys2d.math.Vector2f(xVel, yVel)
-    vel.sub(p.body.getVelocity)
-    p.body.adjustVelocity(vel)
-    p.body.setRotation(rot)
-    p.body.adjustAngularVelocity(angVel - p.body.getAngularVelocity)
-    p
+    body.setPosition(x, y)
+    body.adjustVelocity(velocityDelta)
+    body.setRotation(rot)
+    body.adjustAngularVelocity(angVel - body.getAngularVelocity)
   }
 }
 
