@@ -27,8 +27,10 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
 
   var channel: DatagramChannel = _
   val data = ByteBuffer.allocate(10000)
+  
   var lastPing = new Date()
-  var lastPong = new Date()
+  var lastMessageReceived = new Date()
+  var latency: Long = 0
 
   val skyTopColor    = new Color(0f, 0f, 0.25f)
   val skyBottomColor = new Color(0.3f, 0.125f, 0.125f)
@@ -96,6 +98,7 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
       g.drawString(errorMessage, 300, 300)
       return
     }
+
     if (inReadyRoom) {
       readyRoom.render(g)
     }
@@ -111,6 +114,10 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
       for (f <- frags)          { f.render(g) }
       for (p <- players.values) { p.render(g) }
     }
+
+    g.resetTransform
+    g.setColor(new Color(1f, 1f, 1f))
+    g.drawString("Ping: " + latency, 735, 575)
 
     chat.render(g)
   }
@@ -140,7 +147,7 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
     command match {
       case Commands.SERVER_FULL  => error("Server full.")
       case Commands.GROUND       => loadGround
-      case Commands.PING         => 
+      case Commands.PING         => latency = new Date().getTime - lastPing.getTime
       case Commands.TANKS        => processUpdate
       case Commands.PROJECTILE   => loadProjectile
       case Commands.PROJECTILES  => loadProjectiles
@@ -225,16 +232,16 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
       lastPing = new Date()
     }
   }
-
+  
   def checkTimeout = {
-    if (new Date().getTime - lastPong.getTime > SERVER_TIMEOUT) {
+    if (new Date().getTime - lastMessageReceived.getTime > SERVER_TIMEOUT) {
       println("Connection timed out.")
       super.leave()
     }
   }
 
   def resetTimeout = {
-    lastPong = new Date
+    lastMessageReceived = new Date
   }
 
   def loadGround {
