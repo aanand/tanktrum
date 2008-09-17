@@ -1,6 +1,7 @@
 class Sequence {
   val window = Math.MAX_SHORT
   var seq: Short = 0
+  val initialised = false;
 
   def next = {
     if (seq == Math.MAX_SHORT) {
@@ -14,7 +15,9 @@ class Sequence {
 
   def inOrder(newSeq: Short) = {
     if ((newSeq > seq && (newSeq - seq) < window ) ||
-         newSeq < 0 && seq > 0) {
+         newSeq < 0 && seq > 0 ||
+         !initialised) {
+      initialised = true;
       seq = newSeq
       true
     }
