@@ -14,12 +14,6 @@ import sbinary.Operations
 import sbinary.Instances._
 
 class Server(port: Int) extends Session(null) {
-  val TANK_BROADCAST_INTERVAL       = Config("server.tankBroadcastInterval").toInt
-  val PROJECTILE_BROADCAST_INTERVAL = Config("server.projectileBroadcastInterval").toInt
-  val PLAYER_BROADCAST_INTERVAL     = Config("server.playerBroadcastInterval").toInt
-  val READY_ROOM_BROADCAST_INTERVAL = Config("server.readyRoomBroadcastInterval").toInt
-  val MAX_PLAYERS                   = Config("server.maxPlayers").toInt
-
   var nextTankColorIndex = 0
   
   var playerID: Byte = -1
@@ -39,9 +33,6 @@ class Server(port: Int) extends Session(null) {
   val tankSequence = new Sequence
   val projectileSequence = new Sequence
   val groundSequence = new Sequence
-
-  var numTankUpdates = 0
-  val startTime = new Date().getTime
 
   /**
    * Called to start the server.
@@ -64,15 +55,6 @@ class Server(port: Int) extends Session(null) {
 
     channel.socket.close()
     channel.disconnect()
-    
-    val runTime = (new Date().getTime - startTime).toFloat
-    
-    println("Server: numTankUpdates = " + numTankUpdates)
-    println("Server: runTime = " + runTime/1000)
-    
-    if (numTankUpdates > 0) {
-      println("Server: avg tank update interval = " + runTime/numTankUpdates)
-    }
   }
   
   override def tanks = {
@@ -163,7 +145,9 @@ class Server(port: Int) extends Session(null) {
     broadcastExplosion(e)
   }
 
-  def endRound {
+  override def endRound {
+    super.endRound()
+    
     world = createWorld
     for (projectile <- projectiles.values) {
       removeProjectile(projectile)
@@ -193,6 +177,10 @@ class Server(port: Int) extends Session(null) {
   }
   
   def startRound {
+    startTime = new Date().getTime
+    supposedRunTime = 0
+    numTankUpdates = 0
+    
     println("Starting game.")
     inReadyRoom = false
     broadcastGround

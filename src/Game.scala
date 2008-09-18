@@ -19,9 +19,6 @@ class Game(title: String) extends BasicGame(title) {
 
   var titleImage: Image = _
 
-  var supposedRunTime = 0
-  var startTime = new Date().getTime
-
   def init(container: GameContainer) {
     this.container = container
 
@@ -49,8 +46,6 @@ class Game(title: String) extends BasicGame(title) {
   }
 
   def update(container: GameContainer, delta: Int) {
-    supposedRunTime += delta
-    
     //println("Updating: " + new java.util.Random().nextInt)
     if (client != null && client.isActive) {
       client.update(delta)
@@ -140,13 +135,6 @@ class Game(title: String) extends BasicGame(title) {
       if (null != server) {
         server.leave
       }
-      
-      val actualRunTime = new Date().getTime - startTime
-      val error = (supposedRunTime - actualRunTime).toFloat / actualRunTime * 100
-      
-      println("Game: supposedRunTime = " + supposedRunTime)
-      println("Game: actualRunTime = " + actualRunTime)
-      println("Game: error = " + error)
       
       true
     } else {

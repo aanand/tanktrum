@@ -55,9 +55,6 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
   
   val particleSystem = new slick.particles.ParticleSystem(new Image(dot))
 
-  var numTankUpdates = 0
-  val startTime = new Date().getTime
-
   override def enter() = {
     super.enter()
     channel = DatagramChannel.open()
@@ -163,7 +160,12 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
       case Commands.PROJECTILES  => loadProjectiles
       case Commands.EXPLOSION    => loadExplosion
       case Commands.PLAYERS      => loadPlayers
-      case Commands.READY_ROOM   => inReadyRoom = true
+      case Commands.READY_ROOM   => {
+        if (!inReadyRoom) {
+          inReadyRoom = true
+          endRound()
+        }
+      }
       case Commands.CHAT_MESSAGE => addChatMessage
       case _                     => println("Warning: Client got unknown command: " + command.toByte)
     }
@@ -224,19 +226,6 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
     }
   }
   
-  override def leave {
-    super.leave()
-    
-    val runTime = (new Date().getTime - startTime).toFloat
-    
-    println("Client: numTankUpdates = " + numTankUpdates)
-    println("Client: runTime = " + runTime/1000)
-    
-    if (numTankUpdates > 0) {
-      println("Client: avg tank update interval = " + runTime/numTankUpdates)
-    }
-  }
-
   /*
    * Everything below here is basically networking stuff.
    */
@@ -366,7 +355,13 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
   def processUpdate {
     numTankUpdates += 1
     
-    inReadyRoom = false
+    if (inReadyRoom) {
+      inReadyRoom = false
+      startTime = new Date().getTime
+      supposedRunTime = 0
+      numTankUpdates = 0
+    }
+    
     val byteArray = new Array[byte](data.remaining)
     data.get(byteArray)
     
