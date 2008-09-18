@@ -142,9 +142,11 @@ class Game(title: String) extends BasicGame(title) {
       }
       
       val actualRunTime = new Date().getTime - startTime
+      val error = (supposedRunTime - actualRunTime).toFloat / actualRunTime * 100
       
       println("Game: supposedRunTime = " + supposedRunTime)
       println("Game: actualRunTime = " + actualRunTime)
+      println("Game: error = " + error)
       
       true
     } else {
