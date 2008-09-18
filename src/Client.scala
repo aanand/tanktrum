@@ -55,6 +55,9 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
   
   val particleSystem = new slick.particles.ParticleSystem(new Image(dot))
 
+  var numTankUpdates = 0
+  val startTime = new Date().getTime
+
   override def enter() = {
     super.enter()
     channel = DatagramChannel.open()
@@ -220,6 +223,19 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
       }
     }
   }
+  
+  override def leave {
+    super.leave()
+    
+    val runTime = (new Date().getTime - startTime).toFloat
+    
+    println("Client: numTankUpdates = " + numTankUpdates)
+    println("Client: runTime = " + runTime/1000)
+    
+    if (numTankUpdates > 0) {
+      println("Client: avg tank update interval = " + runTime/numTankUpdates)
+    }
+  }
 
   /*
    * Everything below here is basically networking stuff.
@@ -243,7 +259,7 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
   def checkTimeout = {
     if (new Date().getTime - lastMessageReceived.getTime > SERVER_TIMEOUT) {
       println("Connection timed out.")
-      super.leave()
+      leave()
     }
   }
 
@@ -348,6 +364,8 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
   }
   
   def processUpdate {
+    numTankUpdates += 1
+    
     inReadyRoom = false
     val byteArray = new Array[byte](data.remaining)
     data.get(byteArray)

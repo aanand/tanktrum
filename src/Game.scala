@@ -1,6 +1,7 @@
 import org.newdawn.slick._
 import java.io._
 import java.util.prefs._
+import java.util.Date
 
 class Game(title: String) extends BasicGame(title) {
   var client: Client = _
@@ -17,6 +18,9 @@ class Game(title: String) extends BasicGame(title) {
   val prefs = Preferences.userRoot.node("boomtrapezoid")
 
   var titleImage: Image = _
+
+  var supposedRunTime = 0
+  var startTime = new Date().getTime
 
   def init(container: GameContainer) {
     this.container = container
@@ -45,6 +49,8 @@ class Game(title: String) extends BasicGame(title) {
   }
 
   def update(container: GameContainer, delta: Int) {
+    supposedRunTime += delta
+    
     //println("Updating: " + new java.util.Random().nextInt)
     if (client != null && client.isActive) {
       client.update(delta)
@@ -122,6 +128,27 @@ class Game(title: String) extends BasicGame(title) {
   override def keyReleased(key : Int, char : Char) {
     if (client != null) {
       client.keyReleased(key, char)
+    }
+  }
+  
+  override def closeRequested = {
+    if (super.closeRequested) {
+      if (null != client) {
+        client.leave
+      }
+      
+      if (null != server) {
+        server.leave
+      }
+      
+      val actualRunTime = new Date().getTime - startTime
+      
+      println("Game: supposedRunTime = " + supposedRunTime)
+      println("Game: actualRunTime = " + actualRunTime)
+      
+      true
+    } else {
+      false
     }
   }
 }

@@ -5,6 +5,7 @@ import java.nio.channels._
 import java.nio._
 import java.net._
 import java.util.Random
+import java.util.Date
 
 import scala.collection.mutable.HashMap
 import scala.collection.mutable.HashSet
@@ -39,6 +40,9 @@ class Server(port: Int) extends Session(null) {
   val projectileSequence = new Sequence
   val groundSequence = new Sequence
 
+  var numTankUpdates = 0
+  val startTime = new Date().getTime
+
   /**
    * Called to start the server.
    */
@@ -60,6 +64,15 @@ class Server(port: Int) extends Session(null) {
 
     channel.socket.close()
     channel.disconnect()
+    
+    val runTime = (new Date().getTime - startTime).toFloat
+    
+    println("Server: numTankUpdates = " + numTankUpdates)
+    println("Server: runTime = " + runTime/1000)
+    
+    if (numTankUpdates > 0) {
+      println("Server: avg tank update interval = " + runTime/numTankUpdates)
+    }
   }
   
   override def tanks = {
@@ -335,6 +348,7 @@ class Server(port: Int) extends Session(null) {
    */
   def broadcastTanks {
     broadcast(tankPositionData)
+    numTankUpdates += 1
   }
 
   def broadcastProjectiles {
