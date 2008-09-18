@@ -1,7 +1,7 @@
 class Sequence {
   val window = Math.MAX_SHORT
   var seq: Short = 0
-  val initialised = false;
+  var initialised = false;
 
   def next = {
     if (seq == Math.MAX_SHORT) {
