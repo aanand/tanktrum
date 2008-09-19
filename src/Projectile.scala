@@ -72,17 +72,24 @@ class Projectile(session: Session, val tank: Tank) extends Collider {
   }
   
   def updateTrail(delta: Int) {
+    if (shouldDrawTrail) {    
+      trail = (x, y, delta + stationaryTime) :: trail
+      stationaryTime = 0
+    } else {
+      stationaryTime += delta
+    }
+  }
+  
+  def shouldDrawTrail: Boolean = {
     if (!trail.isEmpty) {
       val (lastX, lastY, _) = trail.head
 
       if ((x, y) == (lastX, lastY)) {
-        stationaryTime += delta
-        return
+        return false
       }
     }
-
-    trail = (x, y, delta + stationaryTime) :: trail
-    stationaryTime = 0
+    
+    return true
   }
   
   def render(g : slick.Graphics) {
