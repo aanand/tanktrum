@@ -101,7 +101,7 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
       }
       
       for (p <- projectiles.values) {
-        if (p.trailDead) {
+        if (p.dead && p.trailDead) {
           removeProjectile(p)
         }
       }
