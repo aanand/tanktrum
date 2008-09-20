@@ -50,9 +50,7 @@ class ClientTank(client: Client) extends Tank(client, 0) {
 
   override def update(delta: Int) {
     super.update(delta)
-    if (isDead) stopEmitting
-    
-    if (jumping) {
+    if (jumping && isAlive) {
       startEmitting
       for (e <- particleEmitters) { e.setPosition(x, y) }
     }
