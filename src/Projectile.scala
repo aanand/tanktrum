@@ -57,15 +57,16 @@ class Projectile(session: Session, val tank: Tank) extends Collider {
   def y = body.getPosition.getY
   
   def update(delta : Int) {
-    if (x < 0 || x > Main.WIDTH || y > Main.HEIGHT || destroy) {
-      session.removeProjectile(this)
-    }
-    if (y + radius > session.ground.heightAt(x)) {
-      collide(session.ground, null)
-    }
-    
     if (session.isInstanceOf[Client]) {
       updateTrail(delta)
+    }
+    else {
+      if (x < 0 || x > Main.WIDTH || y > Main.HEIGHT || destroy) {
+        session.removeProjectile(this)
+      }
+      if (y + radius > session.ground.heightAt(x)) {
+        collide(session.ground, null)
+      }
     }
   }
   
