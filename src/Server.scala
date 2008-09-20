@@ -279,6 +279,8 @@ class Server(port: Int) extends Session(null) {
       case Commands.BUY                    => handleBuy(player) 
                                            
       case Commands.CHAT_MESSAGE           => handleChat(player) 
+      
+      case Commands.GOODBYE                => handleGoodbye(addr)
       case _                               => println("Warning: Server got unknown command: " + command.toByte)}
   }
 
@@ -297,6 +299,14 @@ class Server(port: Int) extends Session(null) {
     if (inReadyRoom) {
       player.buy(Items.items(Items(item)))
     }
+  }
+
+  def handleGoodbye(addr: SocketAddress) = {
+    val player = players(addr)
+    println(player.name + " has left the game.")
+    broadcastChat(player.name + " has left the game.")
+    player.tank.remove
+    players -= addr
   }
 
   /***

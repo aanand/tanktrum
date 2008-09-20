@@ -6,6 +6,7 @@ object Commands {
   }
 
   val HELLO = nextI
+  val GOODBYE = nextI
   val PING  = nextI
   val GROUND = nextI
   val TANKS = nextI

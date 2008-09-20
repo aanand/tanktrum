@@ -41,7 +41,7 @@ class Game(title: String) extends BasicGame(title) {
         ("port", serverPort),
         ("join", MenuCommand(Unit => startClient(serverHostname.value, serverPort.value.toInt, userName.value)))))),
       ("practice", MenuCommand(Unit => startPractice(userName.value))),
-      ("quit", MenuCommand(Unit => container.exit()))))
+      ("quit", MenuCommand(Unit => quit))))
   }
 
   def update(container: GameContainer, delta: Int) {
@@ -122,6 +122,18 @@ class Game(title: String) extends BasicGame(title) {
   override def keyReleased(key : Int, char : Char) {
     if (client != null) {
       client.keyReleased(key, char)
+    }
+  }
+
+  def quit {
+    if (client != null) {
+      client.leave
+    }
+    if (server != null) {
+      server.leave
+    }
+    if (container != null) {
+      container.exit
     }
   }
 }

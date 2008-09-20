@@ -64,6 +64,11 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
     sendHello
   }
 
+  override def leave = {
+    super.leave()
+    sendCommand(Commands.GOODBYE)
+  }
+
   override def update(delta: Int) {
     try {
       super.update(delta)
