@@ -92,8 +92,8 @@ class ServerTank(server: Server, id: Byte) extends Tank(server, id) {
 
   override def update(delta: Int) {
     super.update(delta)
-    if (isDead) return
     if (destroy) remove
+    if (isDead) return
     
     if (base.isTouchingStatic(new ArrayList[Body]) ||
         (wheel1.isTouchingStatic(new ArrayList[Body]) &&
@@ -170,6 +170,7 @@ class ServerTank(server: Server, id: Byte) extends Tank(server, id) {
   }
 
   override def remove = {
+    println("Removing tank.")
     super.remove
     destroy = false
   }
