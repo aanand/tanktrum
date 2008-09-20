@@ -175,7 +175,10 @@ class Server(port: Int) extends Session(null) {
       player.tank.remove
       player.tank = createTank(player.id)
       player.tank.player = player //Oh no.
-      if (oldTank.isAlive) { player.gun.ammo = oldTank.gun.ammo }
+      if (oldTank.isAlive) { 
+        player.gun.ammo = oldTank.gun.ammo 
+        player.tank.purchasedJumpFuel = oldTank.purchasedJumpFuel
+      }
     }
   }
   
