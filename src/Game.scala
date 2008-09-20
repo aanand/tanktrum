@@ -91,7 +91,7 @@ class Game(title: String) extends BasicGame(title) {
 
     client = new Client(address, port, userName, container)
     println("Starting client.")
-    client.enter()
+    client.enter
   }
   
   def startPractice(userName: String) {

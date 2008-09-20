@@ -57,21 +57,36 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
   
   val particleSystem = new slick.particles.ParticleSystem(new Image(dot))
 
-  override def enter() = {
+  override def enter {
     super.enter()
     channel = DatagramChannel.open()
-    channel.connect(new InetSocketAddress(hostname, port))
-    channel.configureBlocking(false)
+    try {
+      channel.connect(new InetSocketAddress(hostname, port))
+      channel.configureBlocking(false)
+    }
+    catch {
+      case e: UnresolvedAddressException => {
+        error("Could not resolve server name, please try again.")
+        return
+      }
+      case e: Exception => { 
+        e.printStackTrace()
+        error(e.toString) 
+        return
+      }
+    }
 
     sendHello
   }
 
-  override def leave = {
+  override def leave {
     super.leave()
+    if (!channel.isConnected) return
     sendCommand(Commands.GOODBYE)
   }
 
   override def update(delta: Int) {
+    if (!channel.isConnected) return
     try {
       super.update(delta)
       ping
@@ -182,18 +197,20 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
         else { readyRoom.menu.keyPressed(key, char) }
         return
       }
-      key match {
-        case CHAT_KEY              => chat.start 
-        case MOVE_LEFT_KEY         => sendCommand(Commands.MOVE_LEFT) 
-        case MOVE_RIGHT_KEY        => sendCommand(Commands.MOVE_RIGHT) 
-        case JUMP_KEY              => sendCommand(Commands.JUMP) 
-        case AIM_ANTICLOCKWISE_KEY => sendCommand(Commands.AIM_ANTICLOCKWISE) 
-        case AIM_CLOCKWISE_KEY     => sendCommand(Commands.AIM_CLOCKWISE) 
-        case POWER_UP_KEY          => sendCommand(Commands.POWER_UP) 
-        case POWER_DOWN_KEY        => sendCommand(Commands.POWER_DOWN) 
-        case FIRE_KEY              => sendCommand(Commands.START_FIRE) 
-        case CYCLE_WEAPON_KEY      => sendCommand(Commands.CYCLE_WEAPON) 
-        case _                     => 
+      else {
+        key match {
+          case CHAT_KEY              => chat.start 
+          case MOVE_LEFT_KEY         => sendCommand(Commands.MOVE_LEFT) 
+          case MOVE_RIGHT_KEY        => sendCommand(Commands.MOVE_RIGHT) 
+          case JUMP_KEY              => sendCommand(Commands.JUMP) 
+          case AIM_ANTICLOCKWISE_KEY => sendCommand(Commands.AIM_ANTICLOCKWISE) 
+          case AIM_CLOCKWISE_KEY     => sendCommand(Commands.AIM_CLOCKWISE) 
+          case POWER_UP_KEY          => sendCommand(Commands.POWER_UP) 
+          case POWER_DOWN_KEY        => sendCommand(Commands.POWER_DOWN) 
+          case FIRE_KEY              => sendCommand(Commands.START_FIRE) 
+          case CYCLE_WEAPON_KEY      => sendCommand(Commands.CYCLE_WEAPON) 
+          case _                     => 
+        }
       }
     }
     catch {
@@ -206,16 +223,18 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
   
   def keyReleased(key : Int, char : Char) {
     try {
-      key match {
-        case MOVE_LEFT_KEY         => sendCommand(Commands.STOP_MOVE_LEFT) 
-        case MOVE_RIGHT_KEY        => sendCommand(Commands.STOP_MOVE_RIGHT) 
-        case JUMP_KEY              => sendCommand(Commands.STOP_JUMP) 
-        case AIM_ANTICLOCKWISE_KEY => sendCommand(Commands.STOP_AIM_ANTICLOCKWISE) 
-        case AIM_CLOCKWISE_KEY     => sendCommand(Commands.STOP_AIM_CLOCKWISE) 
-        case POWER_UP_KEY          => sendCommand(Commands.STOP_POWER_UP) 
-        case POWER_DOWN_KEY        => sendCommand(Commands.STOP_POWER_DOWN) 
-        case FIRE_KEY              => sendCommand(Commands.STOP_FIRE) 
-        case _ => 
+      if (!inReadyRoom) {
+        key match {
+          case MOVE_LEFT_KEY         => sendCommand(Commands.STOP_MOVE_LEFT) 
+          case MOVE_RIGHT_KEY        => sendCommand(Commands.STOP_MOVE_RIGHT) 
+          case JUMP_KEY              => sendCommand(Commands.STOP_JUMP) 
+          case AIM_ANTICLOCKWISE_KEY => sendCommand(Commands.STOP_AIM_ANTICLOCKWISE) 
+          case AIM_CLOCKWISE_KEY     => sendCommand(Commands.STOP_AIM_CLOCKWISE) 
+          case POWER_UP_KEY          => sendCommand(Commands.STOP_POWER_UP) 
+          case POWER_DOWN_KEY        => sendCommand(Commands.STOP_POWER_DOWN) 
+          case FIRE_KEY              => sendCommand(Commands.STOP_FIRE) 
+          case _ => 
+        }
       }
     }
     catch {
