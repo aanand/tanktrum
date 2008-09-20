@@ -10,6 +10,8 @@ import scala.collection.mutable.HashMap
 import sbinary.Operations
 import sbinary.Instances._
 
+import ClientTank._
+
 class Client (hostname: String, port: Int, name: String, container: GameContainer) extends Session(container) {
   val PING_PERIOD = Config("client.pingPeriod").toInt
   val SERVER_TIMEOUT = Config("client.serverTimeout").toInt
@@ -100,9 +102,7 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
     }
   }
 
-  override def tanks = {
-    players.values.map(player => player.tank)
-  }
+  override def tanks = players.values.map(player => player.tank)
   
   def render(g: Graphics) {
     if (errorState) {
@@ -121,10 +121,11 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
         ground.render(g)
       }
       
-      for (p <- projectiles.values) { p.render(g) }
-      for (e <- explosions)         { e.render(g) }
-      for (f <- frags)              { f.render(g) }
-      for (p <- players.values)     { p.render(g) }
+      projectiles.values.foreach(_.render(g))
+      explosions.foreach        (_.render(g))
+      frags.foreach             (_.render(g))
+      players.values.foreach    (_.render(g))
+      players.values.foreach    (_.tank.render(g))
     }
 
     g.resetTransform
@@ -369,7 +370,7 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
           players(id).tank.loadFrom(tankData)
         }
         else {
-          val t = new Tank(this, 0)
+          val t = new ClientTank(this)
           t.create(0)
           t.loadFrom(tankData)
           players(t.id).tank = t

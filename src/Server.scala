@@ -12,6 +12,8 @@ import scala.collection.mutable.HashSet
 import sbinary.Operations
 import sbinary.Instances._
 
+import ServerTank._
+
 class Server(port: Int) extends Session(null) {
   val TANK_BROADCAST_INTERVAL       = Config("server.tankBroadcastInterval").toInt
   val PROJECTILE_BROADCAST_INTERVAL = Config("server.projectileBroadcastInterval").toInt
@@ -62,9 +64,7 @@ class Server(port: Int) extends Session(null) {
     channel.disconnect()
   }
   
-  override def tanks = {
-    players.values.map(player => player.tank)
-  }
+  override def tanks = players.values.map(player => player.tank)
 
   /**
    * Updates the server, processing physics and sending updates if it is time
@@ -213,7 +213,7 @@ class Server(port: Int) extends Session(null) {
   }
 
   def createTank(id: Byte) = {
-    val tank = new Tank(this, id)
+    val tank = new ServerTank(this, id)
     var x = rand.nextFloat * (Main.WIDTH - tank.WIDTH * 2) + tank.WIDTH
     while (tanks.exists(tank => {x > tank.x - tank.WIDTH && x < tank.x + tank.WIDTH})) {
       x = rand.nextFloat * (Main.WIDTH - tank.WIDTH * 2) + tank.WIDTH

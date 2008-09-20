@@ -63,8 +63,6 @@ class Player (var tank: Tank, var name: String, var id: Byte) {
     }
 
     g.resetTransform
-
-    tank.render(g)
   }
 
   def buy(item: Item) = {
