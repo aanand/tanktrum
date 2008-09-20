@@ -23,15 +23,19 @@ class ReadyRoom (client: Client) {
 
     menu.render(g)
 
-    for (player <- client.players.values) {
+    var offset = 0
+    for (player <- client.players.values.toList.sort((p1, p2) => {p1.score > p2.score})) {
+      val col = (player.color)
       if (player.ready) {
-        g.setColor(new Color(0f, 1f, 0f))
+        g.setColor(new Color(col.getRed, col.getGreen, col.getBlue, 1f))
+        g.drawString(player.name + " is go.",     300, 20 + offset * 20)
       }
       else {
-        g.setColor(new Color(1f, 0f, 0f))
+        g.setColor(new Color(col.getRed, col.getGreen, col.getBlue, 0.5f))
+        g.drawString(player.name,     300, 20 + offset * 20)
       }
-      g.drawString(player.name + ":",     300, 20 + player.id * 20)
-      g.drawString(player.score.toString, 400, 20 + player.id * 20)
+      g.drawString(player.score.toString, 400, 20 + offset * 20)
+      offset += 1
     }
   }
 

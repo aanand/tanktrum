@@ -29,6 +29,8 @@ class Player (var tank: Tank, var name: String, var id: Byte) {
   }
 
   override def toString = "Player: " + name
+  
+  def color = Colors(id)
 
   def resetTimeout() = {
     lastPing = new Date()
@@ -44,7 +46,7 @@ class Player (var tank: Tank, var name: String, var id: Byte) {
     }
 
     g.translate(10 + id*110, 10)
-    g.setColor(tank.color)
+    g.setColor(color)
 
     g.drawString(name, 0, 0)
 
@@ -131,4 +133,16 @@ class Player (var tank: Tank, var name: String, var id: Byte) {
     money = newMoney
     id = newID
   }
+}
+
+object Colors {
+  def apply(i: Int) = colors(i%colors.length)
+
+  val colors = Array(
+    new Color(1f, 0f, 0f),
+    new Color(0f, 1f, 0f),
+    new Color(0f, 0f, 1f),
+    new Color(1f, 1f, 0f),
+    new Color(1f, 0f, 1f),
+    new Color(0f, 1f, 1f))
 }

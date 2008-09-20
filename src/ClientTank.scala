@@ -14,14 +14,6 @@ object ClientTank {
 }
 
 class ClientTank(client: Client) extends Tank(client, 0) {
-  val BODY_COLORS = List(
-    new Color(1f, 0f, 0f),
-    new Color(0f, 1f, 0f),
-    new Color(0f, 0f, 1f),
-    new Color(1f, 1f, 0f),
-    new Color(1f, 0f, 1f),
-    new Color(0f, 1f, 1f))
- 
   val drawShapePoints = shapePoints.foldLeft[List[Float]](List())((list, v) => list ++ List(v.getX(), v.getY())).toArray
   val tankShape = new Polygon(drawShapePoints)
   def wheelColor = color
@@ -149,7 +141,5 @@ class ClientTank(client: Client) extends Tank(client, 0) {
     jumpFuel = newFuel
     
     id = newID
-    
-    color = BODY_COLORS(id%BODY_COLORS.length)
   }
 }

@@ -28,7 +28,7 @@ abstract class Tank (val session: Session, var id: Byte) extends Collider {
   val BASE_OFFSET_X = 0
   val BASE_OFFSET_Y = -BASE_HEIGHT/2
   
-  var color: Color = _
+  def color = Colors(id)
  
   val gun = new Gun(session, this)
 
