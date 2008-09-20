@@ -239,6 +239,16 @@ class Server(port: Int) extends Session(null) {
     }
   }
 
+  def leader = {
+    var leadPlayer: Player = null
+    for (player <- players.values) {
+      if (null == leadPlayer || player.score > leadPlayer.score) {
+        leadPlayer = player
+      }
+    }
+    leadPlayer
+  }
+
   /**
    * Finds the next available player id.
    * TODO: Decide if this should be the lowest possible id or the next

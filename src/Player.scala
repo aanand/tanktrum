@@ -86,14 +86,17 @@ class Player (var tank: Tank, var name: String, var id: Byte) {
       pointsAwarded = -damage
     }
     else {
-      if (tank.grounded) {
-        pointsAwarded = damage
-      }
-      else {
-        println("Mid air hit for double points.")
-        pointsAwarded = damage*2
+      pointsAwarded = damage
+      if (!tank.grounded) pointsAwarded *= 2
+      
+      //Ugly ugly ugly. :(
+      if (tank.session.asInstanceOf[Server].leader.tank == tank) {
+        pointsAwarded = (1.5 * pointsAwarded).toInt
+        println("Extra points for hitting the leader.")
       }
     }
+
+    //Don't allow negative score or money.
     if (score + pointsAwarded > 0) {
       score += pointsAwarded
     }

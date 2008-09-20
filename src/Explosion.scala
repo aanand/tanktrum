@@ -13,6 +13,7 @@ class Explosion (var x: Float, var y: Float, var radius: Float, session: Session
   }
   else {
     val explodeBody = new phys2d.raw.StaticBody(new phys2d.raw.shapes.Circle(radius))
+    val server = session.asInstanceOf[Server]
     explodeBody.setPosition(x, y)
     for (tank <- session.tanks) {
       if (tank.isAlive) {
