@@ -39,7 +39,6 @@ class Projectile(session: Session, val tank: Tank) extends Collider {
   def trailDead = stationaryTime > trailLifetime
 
   if (session.isInstanceOf[Server]) {
-    println(shape)
     body = new phys2d.raw.Body(shape, mass)
   }
   else {
