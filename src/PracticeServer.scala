@@ -17,13 +17,17 @@ class PracticeServer(port : Int) extends Server(port) {
     val newPlayer = !players.isDefinedAt(addr)
     
     super.addPlayer(addr)
-    players(addr).tank.health = 100
+    val player = players(addr)
+    
+    player.tank.health = 100
 
     if (newPlayer) {
       for (projectileType <- ProjectileTypes) {
-        players(addr).gun.ammo(projectileType) = 999
+        player.gun.ammo(projectileType) = 999
       }
-      players(addr).tank.purchasedJumpFuel = players(addr).tank.maxJumpFuel
+      player.gun.ammo(ProjectileTypes.MIRV_CLUSTER) = 0
+      player.gun.ammo(ProjectileTypes.DEATHS_HEAD_CLUSTER) = 0
+      player.tank.purchasedJumpFuel = players(addr).tank.maxJumpFuel
     }
   }
 }

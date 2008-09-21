@@ -14,16 +14,17 @@ object MIRVItem extends Item {
 class MIRV(session: Session, tank: Tank) extends Projectile(session, tank) {
   val rand = new Random
   val DISTRIBUTION = 50
+  val clusterSize = 10
   override val projectileType = ProjectileTypes.MIRV
   override val radius = 4f
 
-  def clusterProjectile = new Projectile(session, tank)
+  def clusterProjectile: Projectile = new MIRVCluster(session, tank)
 
   override def update(delta: Int) {
     super.update(delta)
     if (session.isInstanceOf[Server]) {
       if (body.getVelocity.getY > 0) {
-        for (val i <- -2 until 3) {
+        for (val i <- 0 until clusterSize) {
           val p = clusterProjectile
           p.body.setPosition(x, y)
           p.body.adjustVelocity(new phys2d.math.Vector2f(body.getVelocity.getX + (rand.nextFloat*2f - 1f) * DISTRIBUTION, 
@@ -34,4 +35,11 @@ class MIRV(session: Session, tank: Tank) extends Projectile(session, tank) {
       }
     }
   }
+}
+
+class MIRVCluster(session: Session, tank: Tank) extends Projectile(session, tank) {
+  override val radius = 2f
+  override val damage = 3
+  override val explosionRadius = 13f
+  override val projectileType = ProjectileTypes.MIRV_CLUSTER
 }

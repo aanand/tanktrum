@@ -180,16 +180,19 @@ class Projectile(session: Session, val tank: Tank) extends Collider {
 }
 
 object ProjectileTypes extends Enumeration {
-  val PROJECTILE, NUKE, ROLLER, MIRV, MACHINE_GUN, DEATHS_HEAD = Value
+  val PROJECTILE, NUKE, ROLLER, MIRV, MIRV_CLUSTER, 
+      MACHINE_GUN, DEATHS_HEAD, DEATHS_HEAD_CLUSTER = Value
 
   def newProjectile(session: Session, tank: Tank, projectileType: Value) : Projectile = {
     projectileType match {
-      case PROJECTILE  => new Projectile(session, tank) 
-      case NUKE        => new Nuke(session, tank) 
-      case ROLLER      => new Roller(session, tank) 
-      case MIRV        => new MIRV(session, tank) 
-      case MACHINE_GUN => new MachineGun(session, tank) 
-      case DEATHS_HEAD => new DeathsHead(session, tank) 
+      case PROJECTILE          => new Projectile(session, tank) 
+      case NUKE                => new Nuke(session, tank) 
+      case ROLLER              => new Roller(session, tank) 
+      case MIRV                => new MIRV(session, tank) 
+      case MIRV_CLUSTER        => new MIRVCluster(session, tank) 
+      case MACHINE_GUN         => new MachineGun(session, tank) 
+      case DEATHS_HEAD         => new DeathsHead(session, tank)
+      case DEATHS_HEAD_CLUSTER => new DeathsHeadCluster(session, tank)
     }
   }
 
