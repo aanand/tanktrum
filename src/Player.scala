@@ -79,6 +79,9 @@ class Player (var tank: Tank, var name: String, var id: Byte) {
           tank.purchasedJumpFuel = tank.maxJumpFuel
         }
       }
+      if (item == CorbomiteItem) {
+        tank.corbomite += item.units
+      }
     }
   }
 

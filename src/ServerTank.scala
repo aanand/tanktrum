@@ -27,7 +27,7 @@ class ServerTank(server: Server, id: Byte) extends Tank(server, id) {
   var thrust = 0
   var lift = 0
   var destroy = false
-  
+
   var previousValues: (Float, Float, Float, Float, Float, Int, Int, Int, Int, Boolean, Int, Int, Int) = _
   
   def currentValues = {
@@ -172,6 +172,10 @@ class ServerTank(server: Server, id: Byte) extends Tank(server, id) {
   override def remove = {
     println("Removing tank.")
     super.remove
+    val rand = new Random
+    for (i <- 0 until corbomite) {
+      server.addProjectile(this, gun.x, gun.y, -50f+rand.nextFloat()*100f, rand.nextFloat()*150f, ProjectileTypes.CORBOMITE)
+    }
     destroy = false
   }
   

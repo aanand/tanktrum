@@ -32,4 +32,7 @@ object Items extends Enumeration {
   
   JumpjetItem.itemType = Value
   items.put(JumpjetItem.itemType, JumpjetItem)
+  
+  CorbomiteItem.itemType = Value
+  items.put(CorbomiteItem.itemType, CorbomiteItem)
 }

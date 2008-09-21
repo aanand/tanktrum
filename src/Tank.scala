@@ -63,6 +63,8 @@ abstract class Tank (val session: Session, var id: Byte) extends Collider {
   var purchasedJumpFuel = 2000
   var jumpFuel = 0
   
+  var corbomite = 0
+  
   def fuelPercent = (jumpFuel.toFloat/maxJumpFuel) * 100
 
   def grounded : Boolean = contactTime > 0; true
