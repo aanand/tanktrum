@@ -162,6 +162,10 @@ class ServerTank(server: Server, id: Byte) extends Tank(server, id) {
     
     if (isDead && oldHealth > 0) {
       server.broadcastChat(source.tank.player.name + " killed " + player.name + " with " + source.getClass.getName + ".")
+      val rand = new Random
+      for (i <- 0 until corbomite) {
+        server.addProjectile(this, gun.x, gun.y, -50f+rand.nextFloat()*100f, rand.nextFloat()*150f, ProjectileTypes.CORBOMITE)
+      }
       destroy = true
     }
     if (isDead) {
@@ -172,10 +176,6 @@ class ServerTank(server: Server, id: Byte) extends Tank(server, id) {
   override def remove = {
     println("Removing tank.")
     super.remove
-    val rand = new Random
-    for (i <- 0 until corbomite) {
-      server.addProjectile(this, gun.x, gun.y, -50f+rand.nextFloat()*100f, rand.nextFloat()*150f, ProjectileTypes.CORBOMITE)
-    }
     destroy = false
   }
   
