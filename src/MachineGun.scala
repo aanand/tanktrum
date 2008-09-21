@@ -11,7 +11,7 @@ object MachineGunItem extends Item {
 }
 
 class MachineGun(session: Session, tank: Tank) extends Projectile(session, tank) {
-  override val radius = 3f
+  override val radius = 2f
   override val mass = 0.2f
   override val explosionRadius = 4f
   override val damage = 3
