@@ -15,15 +15,18 @@ class MIRV(session: Session, tank: Tank) extends Projectile(session, tank) {
   val rand = new Random
   val DISTRIBUTION = 50
   val clusterSize = 10
+  var timeUntilSplit = 2000
   override val projectileType = ProjectileTypes.MIRV
   override val radius = 4f
+  override val explosionRadius = 13f
 
   def clusterProjectile: Projectile = new MIRVCluster(session, tank)
 
   override def update(delta: Int) {
     super.update(delta)
+    timeUntilSplit -= delta
     if (session.isInstanceOf[Server]) {
-      if (body.getVelocity.getY > 0) {
+      if (body.getVelocity.getY > 0 && timeUntilSplit < 0) {
         for (val i <- 0 until clusterSize) {
           val p = clusterProjectile
           p.body.setPosition(x, y)

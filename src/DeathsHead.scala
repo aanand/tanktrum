@@ -14,7 +14,7 @@ object DeathsHeadItem extends Item {
 class DeathsHead(session: Session, tank: Tank) extends MIRV(session, tank) {
   override val radius = 6f
   override val mass = 3f
-  override val explosionRadius = 60f
+  override val explosionRadius = 20f
   override val projectileType = ProjectileTypes.DEATHS_HEAD
   override val clusterSize = 8
 
