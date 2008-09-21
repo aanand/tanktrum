@@ -5,7 +5,7 @@ import sbinary.Operations
 
 object CorbomiteItem extends Item {
   override def name = "Corbomite"
-  override def cost = 50
+  override def cost = 25
   override def units = 5
 }
 
