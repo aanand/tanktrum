@@ -26,7 +26,7 @@ class Projectile(session: Session, val tank: Tank) extends Collider {
   val damage = 5
   val reloadTime = 4f
   val mass = 1f
-  val shape = new phys2d.raw.shapes.Circle(radius)
+  def shape: phys2d.raw.shapes.DynamicShape = new phys2d.raw.shapes.Circle(radius)
   
   var body: phys2d.raw.Body = _
   
@@ -39,6 +39,7 @@ class Projectile(session: Session, val tank: Tank) extends Collider {
   def trailDead = stationaryTime > trailLifetime
 
   if (session.isInstanceOf[Server]) {
+    println(shape)
     body = new phys2d.raw.Body(shape, mass)
   }
   else {
@@ -86,11 +87,15 @@ class Projectile(session: Session, val tank: Tank) extends Collider {
   
   def render(g : slick.Graphics) {
     if (!dead) {
-      g.setColor(color)
-      g.fillOval(x - radius, y - radius, radius*2, radius*2)
+      renderBody(g)
     }
     
     renderTrail(g)
+  }
+
+  def renderBody(g: slick.Graphics) {
+    g.setColor(color)
+    g.fillOval(x - radius, y - radius, radius*2, radius*2)
   }
   
   def renderTrail(g: slick.Graphics) {
