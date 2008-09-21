@@ -184,6 +184,7 @@ class Server(port: Int) extends Session(null) {
       if (oldTank.isAlive) { 
         player.gun.ammo = oldTank.gun.ammo 
         player.tank.purchasedJumpFuel = oldTank.purchasedJumpFuel
+        player.tank.corbomite = oldTank.corbomite
       }
     }
   }
