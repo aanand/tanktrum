@@ -59,6 +59,7 @@ class Ground(session : Session, width : Int, height : Int) extends Collider {
     
     body = new phys2d.raw.StaticBody(physShape)
     body.setFriction(1f)
+    body.setRestitution(0.8f)
     session.addBody(this, body)
     
     initialised = true
