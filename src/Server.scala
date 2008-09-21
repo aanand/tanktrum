@@ -37,10 +37,13 @@ class Server(port: Int) extends Session(null) {
 
   var inReadyRoom = true
   
+  var endRoundTimer = 0
+  val endRoundRunnoffTime = Config("server.roundRunoffTime").toInt
+
   val tankSequence = new Sequence
   val projectileSequence = new Sequence
   val groundSequence = new Sequence
-
+  
   /**
    * Called to start the server.
    */
@@ -93,7 +96,10 @@ class Server(port: Int) extends Session(null) {
     }
     else {
       if (players.values.toList.filter(player => player.tank.isAlive).size <= 1) {
-        endRound
+        endRoundTimer += delta
+        if (endRoundTimer > endRoundRunnoffTime) {
+          endRound
+        }
       }
       timeToTankUpdate -= delta
 
@@ -186,6 +192,7 @@ class Server(port: Int) extends Session(null) {
     println("Starting game.")
     inReadyRoom = false
     broadcastGround
+    endRoundTimer = 0
   }
 
   def addPlayer(addr: SocketAddress) {
