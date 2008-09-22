@@ -19,6 +19,12 @@ class ServerTank(server: Server, id: Byte) extends Tank(server, id) {
   val airSpeedY       = Config("tank.air.speedY").toFloat
   val airTilt         = Math.toRadians(Config("tank.air.tilt").toFloat).toFloat
   val airAngularSpeed = Math.toRadians(Config("tank.air.angularSpeed").toFloat).toFloat
+  
+  val fallThreshold     = Config("tank.fall.threshold").toInt
+  val fallDamageDivider = Config("tank.fall.damageDivider").toInt
+  val fallImmuneTime    = Config("tank.fall.immuneTime").toInt
+  var fallImmuneTimer = fallImmuneTime
+
 
   val BODY_MASS = Config("tank.bodyMass").toFloat
   val WHEEL_MASS = Config("tank.wheelMass").toFloat
@@ -103,6 +109,11 @@ class ServerTank(server: Server, id: Byte) extends Tank(server, id) {
     else if (contactTime > 0) {
       contactTime -= delta
     }
+    
+    if (fallImmuneTimer >= 0) {
+      fallImmuneTimer -= delta
+    }
+
     if (lift != 0) {
       airborne = true
     } else if (grounded) {
@@ -166,7 +177,13 @@ class ServerTank(server: Server, id: Byte) extends Tank(server, id) {
     health -= damageDone
     
     if (isDead && oldHealth > 0) {
-      server.broadcastChat(source.tank.player.name + " killed " + player.name + " with " + source.getClass.getName + ".")
+      if (null != source) {
+        server.broadcastChat(source.tank.player.name + " killed " + player.name + " with " + source.getClass.getName + ".")
+      }
+      else {
+        server.broadcastChat(player.name + " went splat.")
+      }
+      
       val rand = new Random
       for (i <- 0 until corbomite) {
         server.addProjectile(this, gun.x, gun.y, -50f+rand.nextFloat()*100f, rand.nextFloat()*150f, ProjectileTypes.CORBOMITE)
@@ -182,6 +199,16 @@ class ServerTank(server: Server, id: Byte) extends Tank(server, id) {
     println("Removing tank.")
     super.remove
     destroy = false
+  }
+
+  override def collide(other : Collider, event: CollisionEvent) {
+    if (other.isInstanceOf[Ground]) {
+      if (body.getVelocity.length > fallThreshold && fallImmuneTimer < 0) {
+        println(player + " hit the ground at velocity " + body.getVelocity);
+        damage((body.getVelocity.length.toInt - fallThreshold)/fallDamageDivider, null)
+        fallImmuneTimer = fallImmuneTime
+      }
+    }
   }
   
   def serialise = {
