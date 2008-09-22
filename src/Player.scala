@@ -92,7 +92,6 @@ class Player (var tank: Tank, var name: String, var id: Byte) {
     }
     else {
       pointsAwarded = damage
-      if (!tank.grounded) pointsAwarded *= 2
       
       //Ugly ugly ugly. :(
       if (tank.session.asInstanceOf[Server].leader.tank == tank) {

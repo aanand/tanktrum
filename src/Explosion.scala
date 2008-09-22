@@ -32,7 +32,6 @@ class Explosion (var x: Float, var y: Float, var radius: Float, session: Session
           tank.damage(damage, projectile)
           if (null != projectile) {
             println(projectile.tank.player.name + " hit " + tank.player.name + " with splash damage from a " + projectile.getClass.getName + " for " + damage + " damage.")
-            projectile.tank.player.awardHit(tank, damage)
           }
         }
       }

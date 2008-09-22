@@ -19,6 +19,8 @@ class ServerTank(server: Server, id: Byte) extends Tank(server, id) {
   val airSpeedY       = Config("tank.air.speedY").toFloat
   val airTilt         = Math.toRadians(Config("tank.air.tilt").toFloat).toFloat
   val airAngularSpeed = Math.toRadians(Config("tank.air.angularSpeed").toFloat).toFloat
+
+  var altitudeDamageFactor = Config("tank.air.altitudeDamageFactor").toFloat
   
   val fallThreshold     = Config("tank.fall.threshold").toInt
   val fallDamageDivider = Config("tank.fall.damageDivider").toInt
@@ -171,10 +173,19 @@ class ServerTank(server: Server, id: Byte) extends Tank(server, id) {
     var damageDone = d
 
     if (!grounded) {
-      damageDone = (damageDone * 1.5f).toInt
-      println(player.name + " hit in the air, damage adjusted to " + damageDone)
+      val altitude = server.ground.heightAt(x) - y
+      val scale = 1 + altitude/altitudeDamageFactor
+      
+      if (scale > 1) {
+        damageDone = (damageDone * scale).toInt
+        println(player.name + " hit in the air, damage adjusted to " + damageDone)
+      }
     }
     health -= damageDone
+    
+    if (null != source) {
+      source.tank.player.awardHit(this, damageDone)
+    }
     
     if (isDead && oldHealth > 0) {
       if (null != source) {
