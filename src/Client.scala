@@ -139,7 +139,7 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
       explosions.foreach        (_.render(g))
       frags.foreach             (_.render(g))
       players.values.foreach    (_.render(g))
-      players.values.foreach    (_.tank.render(g))
+      players.values.foreach    ((player) => if (null != player.tank) {player.tank.render(g)})
     }
 
     g.resetTransform
