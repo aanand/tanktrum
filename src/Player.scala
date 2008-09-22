@@ -81,6 +81,9 @@ class Player (var tank: Tank, var name: String, var id: Byte) {
       }
       if (item == CorbomiteItem) {
         tank.corbomite += item.units
+        if (tank.corbomite > tank.maxCorbomite) {
+          tank.corbomite = tank.maxCorbomite
+        }
       }
     }
   }

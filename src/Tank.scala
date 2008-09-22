@@ -64,6 +64,7 @@ abstract class Tank (val session: Session, var id: Byte) extends Collider {
   var jumpFuel = 0
   
   var corbomite = 0
+  val maxCorbomite = Config("tank.maxCorbomite").toInt
   
   def fuelPercent = (jumpFuel.toFloat/maxJumpFuel) * 100
 
