@@ -213,7 +213,7 @@ namespace :upload do
   end
   
   desc "upload #{GAME_JAR_NAME}.jar and webstart files"
-  task :webstart => [:game, :files]
+  task :webstart => ["build:webstart", :game, :files]
   
   desc "upload #{GAME_JAR_NAME}.jar"
   task :game do
