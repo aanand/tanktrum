@@ -157,8 +157,13 @@ class ServerTank(server: Server, id: Byte) extends Tank(server, id) {
   
   override def damage(d: Int, source: Projectile) {
     val oldHealth = health
+    var damageDone = d
 
-    health -= d
+    if (!grounded) {
+      damageDone = (damageDone * 1.5f).toInt
+      println(player.name + " hit in the air, damage adjusted to " + damageDone)
+    }
+    health -= damageDone
     
     if (isDead && oldHealth > 0) {
       server.broadcastChat(source.tank.player.name + " killed " + player.name + " with " + source.getClass.getName + ".")
