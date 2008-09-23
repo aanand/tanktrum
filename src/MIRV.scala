@@ -1,8 +1,8 @@
 import org.newdawn.slick
-import net.phys2d
 import sbinary.Instances._
 import sbinary.Operations
 import java.util.Random;
+import org.jbox2d.common._
 
 object MIRVItem extends Item {
   override def name = "MIRV"
@@ -26,12 +26,12 @@ class MIRV(session: Session, tank: Tank) extends Projectile(session, tank) {
     super.update(delta)
     timeUntilSplit -= delta
     if (session.isInstanceOf[Server]) {
-      if (body.getVelocity.getY > 0 && timeUntilSplit < 0) {
+      if (body.getLinearVelocity.y > 0 && timeUntilSplit < 0) {
         for (val i <- 0 until clusterSize) {
           val p = clusterProjectile
-          p.body.setPosition(x, y)
-          p.body.adjustVelocity(new phys2d.math.Vector2f(body.getVelocity.getX + (rand.nextFloat*2f - 1f) * DISTRIBUTION, 
-                                                         body.getVelocity.getY + (rand.nextFloat*2f - 1f) * DISTRIBUTION))
+          p.body.setXForm(new Vec2(x, y), 0)
+          p.body.setLinearVelocity(new Vec2(body.getLinearVelocity.x + (rand.nextFloat*2f - 1f) * DISTRIBUTION, 
+                                            body.getLinearVelocity.x + (rand.nextFloat*2f - 1f) * DISTRIBUTION))
           session.addProjectile(p)
         }
         session.removeProjectile(this)

@@ -2,18 +2,19 @@ import org.newdawn.slick.geom._
 import org.newdawn.slick._
 import org.newdawn.slick
 
-import net.phys2d.raw.shapes._
-import net.phys2d.math._
-import net.phys2d
-
 import scala.collection.mutable.HashMap
 
 import sbinary.Instances._
 import sbinary.Operations
 
+import org.jbox2d.dynamics._
+import org.jbox2d.dynamics.contacts._
+import org.jbox2d.common._
+import org.jbox2d.collision._
+
 import ClientTank._
 
-abstract class Tank (val session: Session, var id: Byte) extends Collider {
+abstract class Tank (val session: Session, var id: Byte) extends GameObject(session) {
   val WIDTH  = Config("tank.width").toFloat
   val HEIGHT = Config("tank.height").toFloat
   val TAPER  = Config("tank.taper").toFloat
@@ -32,24 +33,37 @@ abstract class Tank (val session: Session, var id: Byte) extends Collider {
  
   val gun = new Gun(session, this)
 
-  val shapePoints = List[slick.geom.Vector2f] (
+  def shapePoints = List[slick.geom.Vector2f] (
                       new slick.geom.Vector2f(-(WIDTH/2-TAPER), -HEIGHT),
                       new slick.geom.Vector2f(WIDTH/2-TAPER, -HEIGHT),
                       new slick.geom.Vector2f(WIDTH/2, -BEVEL),
                       new slick.geom.Vector2f(-WIDTH/2, -BEVEL)
                     ).toArray
-  
-  val physShapePoints = shapePoints.map((point) => new phys2d.math.Vector2f(point.x, point.y))
-  val physShape = new phys2d.raw.shapes.Polygon(physShapePoints.toArray)
-  val baseShape = new phys2d.raw.shapes.Box(BASE_WIDTH, BASE_HEIGHT);
-  val wheelShape = new phys2d.raw.shapes.Circle(WHEEL_RADIUS)
+
+  override def shapes = {
+    val bodyShapePoints = shapePoints.map((point) => new Vec2(point.x, point.y))
+    val bodyShape = new PolygonDef
+    bodyShapePoints.foreach(bodyShape.addVertex(_))
+    bodyShape.density = 1f
+
+    val baseShape = new PolygonDef
+    baseShape.setAsBox(BASE_WIDTH, BASE_HEIGHT, new Vec2(BASE_OFFSET_X, BASE_OFFSET_Y), 0f)
+    baseShape.density = 1f
+    
+    val wheelShape1 = new CircleDef
+    wheelShape1.radius = WHEEL_RADIUS
+    wheelShape1.localPosition = new Vec2(WHEEL_OFFSET_X, WHEEL_OFFSET_Y)
+    wheelShape1.density = 1f
+    
+    val wheelShape2 = new CircleDef
+    wheelShape2.radius = WHEEL_RADIUS
+    wheelShape2.localPosition = new Vec2(-WHEEL_OFFSET_X, WHEEL_OFFSET_Y)
+    wheelShape2.density = 1f
+
+    List(bodyShape, baseShape, wheelShape1, wheelShape2)
+  }
   
   var player: Player = null
-
-  var body: phys2d.raw.Body = _
-  var wheel1: phys2d.raw.Body = _
-  var wheel2: phys2d.raw.Body = _
-  var base: phys2d.raw.Body = _
 
   var health = 100
 
@@ -65,21 +79,22 @@ abstract class Tank (val session: Session, var id: Byte) extends Collider {
   
   var corbomite = 0
   val maxCorbomite = Config("tank.maxCorbomite").toInt
+
+  addShapes
   
   def fuelPercent = (jumpFuel.toFloat/maxJumpFuel) * 100
 
   def grounded : Boolean = contactTime > 0; true
 
-  def angle = body.getRotation.toDegrees
-  def x = body.getPosition.getX
-  def y = body.getPosition.getY
-  def velocity = body.getVelocity
+  def angle = body.getAngle.toDegrees
+  def x = body.getPosition.x
+  def y = body.getPosition.y
+  def velocity = body.getLinearVelocity
 
   def isAlive = health > 0
   def isDead = !isAlive
 
   def create(x: Float) = {
-    session.addBody(this, body)
   }
 
   def update(delta: Int): Unit = {
@@ -91,9 +106,6 @@ abstract class Tank (val session: Session, var id: Byte) extends Collider {
   
   def remove = {
     if (null != body) session.removeBody(body)
-    if (null != wheel1) session.removeBody(wheel1)
-    if (null != wheel2) session.removeBody(wheel2)
-    if (null != base) session.removeBody(base)
   }
 }
 

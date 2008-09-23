@@ -1,9 +1,14 @@
 import org.newdawn.slick
-import net.phys2d
+
+import org.jbox2d.dynamics._
+import org.jbox2d.dynamics.contacts._
+import org.jbox2d.common._
+import org.jbox2d.collision._
+
 import scala.collection.mutable.HashMap
 import scala.collection.mutable.HashSet
 
-abstract class Session(container: slick.GameContainer) extends phys2d.raw.CollisionListener {
+abstract class Session(container: slick.GameContainer) extends ContactListener {
   val WIDTH = 800
   val HEIGHT = 600
 
@@ -12,10 +17,9 @@ abstract class Session(container: slick.GameContainer) extends phys2d.raw.Collis
   var ground: Ground = _
 
   var active = false
-  var bodies = new HashMap[phys2d.raw.Body, Collider]
+  var bodies = new HashMap[Body, GameObject]
   var projectiles = new HashMap[Int, Projectile]
   var explosions = new HashSet[Explosion]
-  val frags = new HashSet[Frag]
 
   var nextProjectileId = 0
 
@@ -51,27 +55,27 @@ abstract class Session(container: slick.GameContainer) extends phys2d.raw.Collis
   }
 
   def createWorld = {
-    val newWorld = new phys2d.raw.World(
-      new phys2d.math.Vector2f(0.0f, Config("physics.gravity").toFloat),
+    val gravity = new Vec2(0.0f, Config("physics.gravity").toFloat)
+    val bounds = new AABB(new Vec2(-Main.WIDTH, -Main.HEIGHT),
+                          new Vec2(2*Main.WIDTH, 2*Main.HEIGHT))
 
-      Config("physics.iterations").toInt,
+    val newWorld = new World(bounds, gravity, false)
 
-      new phys2d.raw.strategies.QuadSpaceStrategy(
-        Config("physics.quadSpace.maxInSpace").toInt,
-        Config("physics.quadSpace.maxLevels").toInt))
-
-    newWorld.enableRestingBodyDetection(0.01f, 0.01f, 0.01f)
-    newWorld.addListener(this)
+    newWorld.setContactListener(this)
     newWorld
   }
 
-  def addBody(obj: Collider, body: phys2d.raw.Body) {
-    world.add(body)
-    bodies.put(body, obj)
+  def createBody(obj: GameObject, bodyDef: BodyDef) = {
+    val body = world.createBody(bodyDef)
+    if (null != body) {
+      bodies.put(body, obj)
+      body.setUserData(obj)
+    }
+    body
   }
-  
-  def removeBody(body : phys2d.raw.Body) {
-    world.remove(body)
+
+  def removeBody(body: Body) {
+    world.destroyBody(body)
     bodies -= body
   }
 
@@ -83,24 +87,18 @@ abstract class Session(container: slick.GameContainer) extends phys2d.raw.Collis
     explosions -= e
   }
 
-  def addFrag(f: Frag) {
-    addBody(f, f.body)
-    frags += f
-  }
-
-  def removeFrag(f: Frag) {
-    removeBody(f.body)
-    frags -= f
-  }
-  
-  def addProjectile(tank : Tank, x : Double, y : Double, angle : Double, speed : Double, projectileType : ProjectileTypes.Value): Projectile = {
+  def addProjectile(tank: Tank, x: Float, y: Float, angle: Float, speed: Float, projectileType : ProjectileTypes.Value): Projectile = {
     val radians = Math.toRadians(angle-90)
-    val velocity = new phys2d.math.Vector2f((speed * Math.cos(radians)).toFloat, (speed * Math.sin(radians)).toFloat)
+    
+    val velocity = new Vec2((speed * Math.cos(radians)).toFloat, (speed * Math.sin(radians)).toFloat)
+    velocity.addLocal(tank.velocity)
+
+    val position = new Vec2(x.toFloat, y.toFloat)
+    
     var p: Projectile = ProjectileTypes.newProjectile(this, tank, projectileType)
 
-    p.body.setPosition(x.toFloat, y.toFloat)
-    p.body.adjustVelocity(new phys2d.math.Vector2f(tank.velocity))
-    p.body.adjustVelocity(velocity)
+    p.body.setXForm(position, 0f)
+    p.body.setLinearVelocity(tank.velocity.add(velocity))
 
     addProjectile(p)
   }
@@ -118,13 +116,25 @@ abstract class Session(container: slick.GameContainer) extends phys2d.raw.Collis
     projectiles -= p.id
   }
   
-  override def collisionOccured(event : phys2d.raw.CollisionEvent) {
-    val a = event.getBodyA()
-    val b = event.getBodyB()
+  def isActive = active
+
+  /**
+   * Contact listener callbacks:
+   */
+  override def add(contact: ContactPoint) {
+    val a = contact.shape1.getBody()
+    val b = contact.shape2.getBody()
     
-    bodies(a).collide(bodies(b), event)
-    bodies(b).collide(bodies(a), event)
+    bodies(a).collide(bodies(b), contact)
+    bodies(b).collide(bodies(a), contact)
   }
 
-  def isActive = active
+  override def persist(contact: ContactPoint) {
+  }
+  
+  override def remove(contact: ContactPoint) {
+  }
+
+  override def result(result: ContactResult) {
+  }
 }

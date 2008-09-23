@@ -1,16 +1,26 @@
 import org.newdawn.slick._
 import sbinary.Instances._
 import sbinary.Operations
-import net.phys2d
 
-class Explosion (var x: Float, var y: Float, var radius: Float, session: Session, projectile: Projectile) {
+import org.jbox2d.collision._
+
+class Explosion (var x: Float, var y: Float, var radius: Float, session: Session, projectile: Projectile) extends GameObject(session) {
   val LIFETIME = Config("explosion.lifetime").toFloat
   var timeToDie = LIFETIME
 
   val SOUND = "explosion1.wav"
+  
+  override def shapes = {
+    val expShape = new CircleDef
+    expShape.radius = radius
+    expShape.isSensor = true
+    List(expShape)
+  }
+  
   if (session.isInstanceOf[Client]) {
     SoundPlayer ! PlaySound(SOUND)
   }
+  /*
   else {
     val explodeBody = new phys2d.raw.StaticBody(new phys2d.raw.shapes.Circle(radius))
     val server = session.asInstanceOf[Server]
@@ -37,6 +47,7 @@ class Explosion (var x: Float, var y: Float, var radius: Float, session: Session
       }
     }
   }
+  */
     
   def update(delta: Int) {
     timeToDie -= delta/1000f

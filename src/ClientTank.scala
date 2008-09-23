@@ -5,7 +5,7 @@ import org.newdawn.slick.geom._
 import org.newdawn.slick.particles._
 import org.newdawn.slick._
 
-import net.phys2d
+import org.jbox2d.common._
 
 import SwitchableParticleEmitter._
   
@@ -25,11 +25,6 @@ class ClientTank(client: Client) extends Tank(client, 0) {
 
 
   override def create(x: Float) {
-    body = new phys2d.raw.StaticBody(physShape)
-    wheel1 = new phys2d.raw.StaticBody(wheelShape)
-    wheel2 = new phys2d.raw.StaticBody(wheelShape)
-    base = new phys2d.raw.StaticBody(baseShape)
-
     jetEmitter = ParticleIO.loadEmitter("media/particles/jet.xml")
     vapourEmitter = ParticleIO.loadEmitter("media/particles/vapour.xml")
     
@@ -86,23 +81,23 @@ class ClientTank(client: Client) extends Tank(client, 0) {
     
     gun.render(g)
     
-    drawWheel(g, -WHEEL_OFFSET_X, wheel1.getRotation)
-    drawWheel(g, WHEEL_OFFSET_X, wheel2.getRotation)
+    drawWheel(g, -WHEEL_OFFSET_X)
+    drawWheel(g, WHEEL_OFFSET_X)
     drawBase(g)
 
   }
 
   def drawBase(g: Graphics) {
     g.translate(x, y)
-    g.rotate(0, 0, body.getRotation.toDegrees)
+    g.rotate(0, 0, body.getAngle.toDegrees)
     g.translate(BASE_OFFSET_X, BASE_OFFSET_Y)
     g.fillRect(-BASE_WIDTH/2, -BASE_HEIGHT/2, BASE_WIDTH, BASE_HEIGHT)
     g.resetTransform
   }
 
-  def drawWheel(g : Graphics, offsetX : Float, rotation : Float) {
+  def drawWheel(g : Graphics, offsetX : Float) {
     g.translate(x, y)
-    g.rotate(0, 0, body.getRotation.toDegrees)
+    g.rotate(0, 0, body.getAngle.toDegrees)
     g.translate(offsetX, WHEEL_OFFSET_Y)
     
     g.setColor(wheelColor)
@@ -115,7 +110,7 @@ class ClientTank(client: Client) extends Tank(client, 0) {
     val values = Operations.fromByteArray[(
       Float, Float, Short,  //x, y, angle
       Short, Short, Short,  //gun angle, gun power, gun timer
-      Short, Boolean, //health, thrust, jumping
+      Short, Boolean,       //health, jumping
       Byte, Byte,           //gun angle change, gun power change
       Byte, Short, Short,   //selected weapon, selected ammo, jump fuel
       Byte)](data)          //id
@@ -127,8 +122,7 @@ class ClientTank(client: Client) extends Tank(client, 0) {
         newSelectedWeapon, newSelectedAmmo, newFuel,
         newID) = values
 
-    body.setPosition(newX, newY)
-    body.setRotation(newAngle.toFloat.toRadians)
+    body.setXForm(new Vec2(newX, newY), newAngle.toFloat.toRadians)
     gun.angle = newGunAngle
     gun.power = newGunPower
     gun.timer = newGunTimer

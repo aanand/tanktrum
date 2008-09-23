@@ -1,5 +1,4 @@
 import org.newdawn.slick
-import net.phys2d
 import sbinary.Instances._
 import sbinary.Operations
 

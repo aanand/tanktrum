@@ -1,7 +1,11 @@
 import org.newdawn.slick
-import net.phys2d
 import sbinary.Instances._
 import sbinary.Operations
+
+import org.jbox2d.dynamics._
+import org.jbox2d.dynamics.contacts._
+import org.jbox2d.common._
+import org.jbox2d.collision._
 
 object Projectile {
   def deserialise(data: Array[byte]) = Operations.fromByteArray[(Int, Float, Float, Float, Float, Float, Float, Byte)](data)
@@ -17,7 +21,7 @@ object Projectile {
   }
 }
 
-class Projectile(session: Session, val tank: Tank) extends Collider {
+class Projectile(session: Session, val tank: Tank) extends GameObject(session) {
   var id: Int = -1
 
   val color = new slick.Color(1.0f, 1.0f, 1.0f)
@@ -26,9 +30,19 @@ class Projectile(session: Session, val tank: Tank) extends Collider {
   val damage = 5
   val reloadTime = 4f
   val mass = 1f
-  def shape: phys2d.raw.shapes.DynamicShape = new phys2d.raw.shapes.Circle(radius)
   
-  var body: phys2d.raw.Body = _
+  override def shapes: List[ShapeDef] = {
+    val sDef = new CircleDef
+    sDef.radius = radius
+    sDef.density = 1f
+    List(sDef)
+  }
+
+  override def bodyDef = {
+    val bDef = new BodyDef
+    bDef.isBullet = true
+    bDef
+  }
   
   val trailLifetime = Config("projectile.trail.lifetime").toInt
 
@@ -36,25 +50,22 @@ class Projectile(session: Session, val tank: Tank) extends Collider {
   var stationaryTime = 0
   var dead = false
   
+  addShapes
+
   def trailDead = stationaryTime > trailLifetime
 
   if (session.isInstanceOf[Server]) {
-    body = new phys2d.raw.Body(shape, mass)
-  }
-  else {
-    body = new phys2d.raw.StaticBody(shape)
+    body.setMassFromShapes
   }
 
-  body.addExcludedBody(session.ground.body)
+  //body.addExcludedBody(session.ground.body)
 
   val projectileType = ProjectileTypes.PROJECTILE
 
   var destroy = false
 
-  session.addBody(this, body)
-  
-  def x = body.getPosition.getX
-  def y = body.getPosition.getY
+  def x = body.getPosition.x
+  def y = body.getPosition.y
   
   def update(delta : Int) {
     if (session.isInstanceOf[Client]) {
@@ -125,13 +136,13 @@ class Projectile(session: Session, val tank: Tank) extends Collider {
     }
   }
   
-  override def collide(obj : Collider, event : phys2d.raw.CollisionEvent) {
+  override def collide(obj: GameObject, contact: ContactPoint) {
     if (!obj.isInstanceOf[Projectile]) {
       explode(obj)
     }
   }
   
-  def explode(obj : Collider) {
+  def explode(obj: GameObject) {
     if (destroy) {
       return
     }
@@ -163,9 +174,9 @@ class Projectile(session: Session, val tank: Tank) extends Collider {
       id,
       x,
       y,
-      body.getVelocity.getX,
-      body.getVelocity.getY,
-      body.getRotation,
+      body.getLinearVelocity.x,
+      body.getLinearVelocity.y,
+      body.getAngle,
       body.getAngularVelocity,
       projectileType.id.toByte
     ))
@@ -174,13 +185,11 @@ class Projectile(session: Session, val tank: Tank) extends Collider {
   def updateFromTuple(tuple: (Int, Float, Float, Float, Float, Float, Float, Byte)) {
     val (id, x, y, xVel, yVel, rot, angVel, projectileType) = tuple
     
-    val velocityDelta = new phys2d.math.Vector2f(xVel, yVel)
-    velocityDelta.sub(body.getVelocity)
+    val velocityDelta = new Vec2(xVel, yVel)
 
-    body.setPosition(x, y)
-    body.adjustVelocity(velocityDelta)
-    body.setRotation(rot)
-    body.adjustAngularVelocity(angVel - body.getAngularVelocity)
+    body.setXForm(new Vec2(x, y), rot)
+    body.setLinearVelocity(new Vec2(xVel, yVel))
+    body.setAngularVelocity(angVel)
   }
 }
 

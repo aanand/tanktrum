@@ -1,5 +1,4 @@
 import org.newdawn.slick
-import net.phys2d
 import sbinary.Instances._
 import sbinary.Operations
 
@@ -9,7 +8,7 @@ object CorbomiteItem extends Item {
   override def units = 8
 }
 
-class Corbomite(session: Session, tank: Tank) extends Projectile(session, tank) {
+class Corbomite(session: Session, tank: Tank) extends Roller(session, tank) {
   override val radius = 2f
   override val mass = 0.4f
   override val explosionRadius = 10f

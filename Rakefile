@@ -10,7 +10,7 @@ def jar_files dir, names
   names.map{ |name| "#{dir}/#{name}.jar" }
 end
 
-LIB_JAR_NAMES = %w(scala-library slick phys2d lwjgl sbinary jogg vorbisspi jorbis tritonus_share natives-linux natives-mac natives-win32)
+LIB_JAR_NAMES = %w(scala-library slick jbox2d lwjgl sbinary jogg vorbisspi jorbis tritonus_share natives-linux natives-mac natives-win32)
 LIB_JAR_FILES = jar_files('lib', LIB_JAR_NAMES)
 
 GAME_JAR_NAME = 'tank'

@@ -137,7 +137,6 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
       
       projectiles.values.foreach(_.render(g))
       explosions.foreach        (_.render(g))
-      frags.foreach             (_.render(g))
       players.values.foreach    (_.render(g))
       players.values.foreach    ((player) => if (null != player.tank) {player.tank.render(g)})
     }
