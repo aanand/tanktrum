@@ -9,11 +9,14 @@ import java.util.Date
 
 import scala.collection.mutable.HashMap
 import scala.collection.mutable.HashSet
+import scala.actors.Actor
 
 import sbinary.Operations
 import sbinary.Instances._
 
-class Server(port: Int) extends Session(null) {
+class Server(port: Int) extends Session(null) with Actor {
+  val tick = Config("game.logicUpdateInterval").toInt
+  
   var nextTankColorIndex = 0
   
   var playerID: Byte = -1
@@ -34,8 +37,34 @@ class Server(port: Int) extends Session(null) {
   val projectileSequence = new Sequence
   val groundSequence = new Sequence
 
+  def act {
+    println("Server started.")
+    var time = new Date().getTime()
+
+    while (true) {
+      while (mailboxSize > 0) {
+        receive {
+          case 'enter => enter; reply(true)
+          case 'leave => leave; reply(true)
+          case _ => println("Server: Received unknown message"); reply(true)
+        }
+      }
+      
+      if (isActive) {
+        val newTime = new Date().getTime()
+        val delta = (newTime - time)
+        time = newTime
+        update(delta.toInt)
+        if (tick-delta > 0) {
+          Thread.sleep(tick-delta)
+        }
+      }
+    }
+  }
+
   /**
-   * Called to start the server.
+   * Notionally private, until we rearchitect and it's actually private.
+   * Use "server !? 'enter" instead.
    */
   override def enter() = {
     super.enter()
@@ -48,7 +77,8 @@ class Server(port: Int) extends Session(null) {
   }
   
   /**
-   * Called to stop the server.
+   * Notionally private, until we rearchitect and it's actually private.
+   * Use "server !? 'leave" instead.
    */
   override def leave() = {
     super.leave()

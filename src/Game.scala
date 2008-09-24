@@ -50,9 +50,6 @@ class Game(title: String) extends BasicGame(title) {
     if (client != null && client.isActive) {
       client.update(delta)
     }
-    if (server != null && server.isActive) {
-      server.update(delta)
-    }
   }
 
   def render(container: GameContainer, graphics: Graphics) {
@@ -68,13 +65,14 @@ class Game(title: String) extends BasicGame(title) {
   
   def startServer(port : Int, userName : String) {
     if (server != null) {
-      server.leave
+      server !? 'leave
       server = null
     }
    
     server = new Server(port)
+    server.start
     println("Starting server.")
-    server.enter
+    server !? 'enter
 
     startClient("localhost", port, userName)
   }
@@ -97,15 +95,16 @@ class Game(title: String) extends BasicGame(title) {
   
   def startPractice(userName: String) {
     if (server != null) {
-      server.leave
+      server !? 'leave
       server = null
     }
 
     val port = 10000
 
     server = new PracticeServer(port)
+    server.start
     println("Starting practice server.")
-    server.enter
+    server !? 'enter
 
     startClient("localhost", port, userName)
   }
@@ -133,7 +132,7 @@ class Game(title: String) extends BasicGame(title) {
       }
       
       if (null != server) {
-        server.leave
+        server !? 'leave
       }
       
       true
