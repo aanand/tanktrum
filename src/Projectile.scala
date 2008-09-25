@@ -26,7 +26,7 @@ class Projectile(session: Session, val tank: Tank) extends GameObject(session) {
 
   val color = new slick.Color(1.0f, 1.0f, 1.0f)
   val explosionRadius = 20f
-  val radius = 3f
+  def radius = 3f
   val damage = 5
   val reloadTime = 4f
   val mass = 1f
@@ -35,6 +35,7 @@ class Projectile(session: Session, val tank: Tank) extends GameObject(session) {
     val sDef = new CircleDef
     println("Creating projectile with radius: " + radius)
     sDef.radius = radius
+    sDef.restitution = 0f
     sDef.density = 1f
     List(sDef)
   }

@@ -11,7 +11,6 @@ abstract class Item {
   var itemType: Items.Value = null;
 }
 
-//Can't seem to get a handle on Item.Value from here.
 object Items extends Enumeration {
   val items = new HashMap[Value, Item]
   

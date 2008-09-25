@@ -12,7 +12,7 @@ object MirvItem extends Item {
 }
 
 class Mirv(session: Session, tank: Tank) extends Projectile(session, tank) {
-  override val radius = 4f
+  override def radius = 4f
   override val projectileType = ProjectileTypes.MIRV
   override val explosionRadius = 13f
   val DISTRIBUTION = 50
