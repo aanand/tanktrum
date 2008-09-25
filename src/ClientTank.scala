@@ -34,7 +34,7 @@ class ClientTank(client: Client) extends Tank(client, 0) {
     vapourEmitter = ParticleIO.loadEmitter("media/particles/vapour.xml")
     
     for (e <- particleEmitters) {
-      client.asInstanceOf[Client].particleSystem.addEmitter(e)
+      client.particleSystem.addEmitter(e)
       e.setEmitting(false)
     }
     super.create(x)
