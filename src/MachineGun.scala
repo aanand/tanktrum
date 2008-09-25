@@ -24,7 +24,7 @@ class MachineGun(session: Session, tank: Tank) extends Projectile(session, tank)
 
   override def shapes = {
     val polyDef = new PolygonDef
-    polyDef.setAsBox(radius, radius*2)
+    polyDef.setAsBox(radius/2, radius)
     polyDef.density = 1f
     List(polyDef)
   }

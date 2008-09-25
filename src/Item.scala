@@ -18,8 +18,8 @@ object Items extends Enumeration {
   NukeItem.itemType = Value
   items.put(NukeItem.itemType, NukeItem)
   
-  MIRVItem.itemType = Value
-  items.put(MIRVItem.itemType, MIRVItem)
+  MirvItem.itemType = Value
+  items.put(MirvItem.itemType, MirvItem)
   
   RollerItem.itemType = Value
   items.put(RollerItem.itemType, RollerItem)

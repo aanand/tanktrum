@@ -24,7 +24,8 @@ class Roller(session : Session, tank : Tank) extends Projectile(session, tank) {
   override def shapes = {
     val sDef = new CircleDef
     sDef.radius = radius
-    sDef.restitution = 1.0f
+    sDef.restitution = 1f
+    sDef.density = 1f
     List(sDef)
   }
 

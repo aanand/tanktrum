@@ -10,7 +10,7 @@ object DeathsHeadItem extends Item {
   override val projectileType = ProjectileTypes.DEATHS_HEAD
 }
 
-class DeathsHead(session: Session, tank: Tank) extends MIRV(session, tank) {
+class DeathsHead(session: Session, tank: Tank) extends Mirv(session, tank) {
   override val radius = 6f
   override val mass = 3f
   override val explosionRadius = 20f

@@ -13,6 +13,8 @@ object ServerTank {
 }
 
 class ServerTank(server: Server, id: Byte) extends Tank(server, id) {
+  val rand = new Random
+  
   val SPEED = Config("tank.speed").toFloat
 
   val STARTING_ALTITUDE = Config("tank.startingAltitude").toFloat
@@ -59,17 +61,19 @@ class ServerTank(server: Server, id: Byte) extends Tank(server, id) {
     println("Setting tank mass.")
     body.setMassFromShapes
 
-    /*body.setFriction(1f)
-    base.setFriction(0.8f)
-    wheel1.setFriction(0f)
-    wheel2.setFriction(0f)*/
     super.create(x)
   }
 
   override def update(delta: Int) {
     super.update(delta)
-    if (destroy) remove
+    if (destroy) {
+      for (i <- 0 until corbomite) {
+        server.addProjectile(this, gun.x, gun.y, -50f+rand.nextFloat()*100f, rand.nextFloat()*150f, ProjectileTypes.CORBOMITE)
+      }
+      remove
+    }
     if (isDead) return
+
     
     if (true) /*base.isTouchingStatic(new ArrayList[Body]) ||
         (wheel1.isTouchingStatic(new ArrayList[Body]) &&
@@ -97,7 +101,7 @@ class ServerTank(server: Server, id: Byte) extends Tank(server, id) {
     else {
       regenJumpFuel(delta)
       if (grounded) {
-        applyGroundForces(delta)
+        //applyGroundForces(delta)
       }
     }
   }
@@ -160,10 +164,6 @@ class ServerTank(server: Server, id: Byte) extends Tank(server, id) {
         server.broadcastChat(player.name + " went splat.")
       }
       
-      val rand = new Random
-      for (i <- 0 until corbomite) {
-        server.addProjectile(this, gun.x, gun.y, -50f+rand.nextFloat()*100f, rand.nextFloat()*150f, ProjectileTypes.CORBOMITE)
-      }
       destroy = true
     }
     if (isDead) {

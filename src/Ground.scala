@@ -31,7 +31,7 @@ class Ground(session : Session, width : Int, height : Int) extends GameObject(se
   var initialised = false
     
   val friction = 1f
-  val restitution = 0.8f
+  val restitution = 0.0f
 
   addShapes
 
@@ -69,18 +69,22 @@ class Ground(session : Session, width : Int, height : Int) extends GameObject(se
     
     for (i <- 0 until physShapePoints.length/2) {
       val polyDef = new PolygonDef
-      val vert1 = physShapePoints(i*2)
-      val vert2 = physShapePoints(i*2+1)
+      val vert1 = physShapePoints(i*2+1)
+      val vert2 = physShapePoints(i*2)
+      val vert3 = new Vec2(vert2.x, height)
+      val vert4 = new Vec2(vert1.x, height)
+      polyDef.addVertex(vert4)
+      polyDef.addVertex(vert3)
       polyDef.addVertex(vert2)
       polyDef.addVertex(vert1)
-      polyDef.addVertex(new Vec2(vert1.x, height))
-      polyDef.addVertex(new Vec2(vert2.x, height))
       polyDef.friction = friction
       polyDef.restitution = restitution
       physShapes += polyDef
     }
     
+    session.removeBody(body)
     removeShapes
+    body = createBody
     addShapes
 
     //body = new phys2d.raw.StaticBody(physShape)
@@ -96,7 +100,6 @@ class Ground(session : Session, width : Int, height : Int) extends GameObject(se
     while (!deformQueue.isEmpty) {
       val (x, y, radius) = deformQueue.dequeue
 
-      session.removeBody(body)
 
       for (i <- -radius/granularity until radius/granularity+1) {
         val pointInd = (x/granularity)+i

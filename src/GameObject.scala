@@ -4,7 +4,7 @@ import org.jbox2d.common._
 import org.jbox2d.collision._
 
 abstract class GameObject(session: Session) {
-  val body = createBody
+  var body = createBody
 
   def collide(other: GameObject, contact: ContactPoint) {}
   
@@ -12,12 +12,13 @@ abstract class GameObject(session: Session) {
   def bodyDef = new BodyDef
   
   def createBody = {
-    println("Creating a " + getClass())
     session.createBody(this, bodyDef)
   }
   
   def addShapes = {
-    shapes.foreach(body.createShape(_))
+    for (shape <- shapes) {
+      body.createShape(shape)
+    }
   }
   
   def removeShapes = {

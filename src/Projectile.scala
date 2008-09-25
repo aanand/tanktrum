@@ -76,7 +76,7 @@ class Projectile(session: Session, val tank: Tank) extends GameObject(session) {
         session.removeProjectile(this)
       }
       if (y + radius > session.ground.heightAt(x)) {
-        collide(session.ground, null)
+        //collide(session.ground, null)
       }
     }
   }
@@ -202,8 +202,8 @@ object ProjectileTypes extends Enumeration {
       case PROJECTILE          => new Projectile(session, tank) 
       case NUKE                => new Nuke(session, tank) 
       case ROLLER              => new Roller(session, tank) 
-      case MIRV                => new MIRV(session, tank) 
-      case MIRV_CLUSTER        => new MIRVCluster(session, tank)
+      case MIRV                => new Mirv(session, tank) 
+      case MIRV_CLUSTER        => new MirvCluster(session, tank)
       case CORBOMITE           => new Corbomite(session, tank)
       case MACHINE_GUN         => new MachineGun(session, tank) 
       case DEATHS_HEAD         => new DeathsHead(session, tank)
