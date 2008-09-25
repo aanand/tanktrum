@@ -44,7 +44,10 @@ class ClientTank(client: Client) extends Tank(client, 0) {
     super.update(delta)
     if (jumping && isAlive) {
       startEmitting
-      for (e <- particleEmitters) { e.setPosition(x, y) }
+      for (e <- particleEmitters) {
+        e.setPosition(x, y)
+        e.setRotation(body.getRotation.toDegrees)
+      }
     }
     else {
       stopEmitting
