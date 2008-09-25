@@ -68,7 +68,10 @@ class ServerTank(server: Server, id: Byte) extends Tank(server, id) {
     super.update(delta)
     if (destroy) {
       for (i <- 0 until corbomite) {
-        server.addProjectile(this, gun.x, gun.y, -50f+rand.nextFloat()*100f, rand.nextFloat()*150f, ProjectileTypes.CORBOMITE)
+        server.addProjectile(this, x+WIDTH/2, y-HEIGHT/2, 
+                              -50f+rand.nextFloat()*100f, 
+                                   rand.nextFloat()*150f+body.getLinearVelocity.y*2, 
+                              ProjectileTypes.CORBOMITE)
       }
       remove
     }
