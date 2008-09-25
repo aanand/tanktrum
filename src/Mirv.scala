@@ -12,13 +12,13 @@ object MirvItem extends Item {
 }
 
 class Mirv(session: Session, tank: Tank) extends Projectile(session, tank) {
-  val rand = new Random
+  override val radius = 4f
+  override val projectileType = ProjectileTypes.MIRV
+  override val explosionRadius = 13f
   val DISTRIBUTION = 50
   val clusterSize = 10
   var timeUntilSplit = 2000
-  override val projectileType = ProjectileTypes.MIRV
-  //override val radius = 4f
-  override val explosionRadius = 13f
+  val rand = new Random
 
   def clusterProjectile: Projectile = new MirvCluster(session, tank)
   

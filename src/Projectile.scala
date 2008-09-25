@@ -33,6 +33,7 @@ class Projectile(session: Session, val tank: Tank) extends GameObject(session) {
   
   override def shapes: List[ShapeDef] = {
     val sDef = new CircleDef
+    println("Creating projectile with radius: " + radius)
     sDef.radius = radius
     sDef.density = 1f
     List(sDef)
