@@ -67,10 +67,10 @@ class Ground(session : Session, width : Int, height : Int) extends GameObject(se
     
     physShapes = List[ShapeDef]()
     
-    for (i <- 0 until physShapePoints.length/2) {
+    for (i <- 0 until physShapePoints.length-1) {
       val polyDef = new PolygonDef
-      val vert1 = physShapePoints(i*2+1)
-      val vert2 = physShapePoints(i*2)
+      val vert1 = physShapePoints(i+1)
+      val vert2 = physShapePoints(i)
       val vert3 = new Vec2(vert2.x, height)
       val vert4 = new Vec2(vert1.x, height)
       polyDef.addVertex(vert4)
