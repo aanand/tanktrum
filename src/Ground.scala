@@ -51,9 +51,9 @@ class Ground(session : Session, width : Int, height : Int) extends GameObject(se
   }
   
   def initPoints() {
-    val shapePoints = (List(new Vector2f(-20, height), new Vector2f(0, -height)) ++ 
+    val shapePoints = (List(new Vector2f(0, height)) ++
                       points ++ 
-                      List(new Vector2f(width, -height), new Vector2f(width+20, height), new Vector2f(-20, height))).toArray
+                      List(new Vector2f(width, height))).toArray
     
     val drawShapePoints = new Array[float](shapePoints.length*2)
     for (i <- 0 until shapePoints.length) {
