@@ -80,6 +80,10 @@ class ServerTank(server: Server, id: Byte) extends Tank(server, id) {
     }
     if (isDead) return
 
+    if (x > Main.WIDTH || x < 0) {
+      val newX = rand.nextFloat() * Main.WIDTH-20f + 20f
+      body.setXForm(new Vec2(newX, server.ground.heightAt(newX) - 300f), 0f)
+    }
     
     if (contactTime > 0) {
       contactTime -= delta
@@ -118,8 +122,6 @@ class ServerTank(server: Server, id: Byte) extends Tank(server, id) {
 
     val targetRotation = airTilt * thrust
 
-    body.setAngularVelocity(0)
-  
     if (body.getAngle < targetRotation) {
       body.setAngularVelocity(airAngularSpeed)
     } 
