@@ -130,6 +130,11 @@ abstract class Session(container: slick.GameContainer) extends ContactListener {
   }
 
   override def persist(contact: ContactPoint) {
+    val a = contact.shape1.getBody()
+    val b = contact.shape2.getBody()
+    
+    bodies(a).persist(bodies(b), contact)
+    bodies(b).persist(bodies(a), contact)
   }
   
   override def remove(contact: ContactPoint) {

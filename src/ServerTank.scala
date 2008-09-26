@@ -40,6 +40,9 @@ class ServerTank(server: Server, id: Byte) extends Tank(server, id) {
   var lift = 0
   var destroy = false
 
+  var wheel1OnGround = false
+  var wheel2OnGround = false
+
   var previousValues: (Float, Float, Float, Float, Float, Int, Int, Int, Int, Boolean, Int, Int, Int) = _
   
   def currentValues = {
@@ -78,12 +81,7 @@ class ServerTank(server: Server, id: Byte) extends Tank(server, id) {
     if (isDead) return
 
     
-    if (true) /*base.isTouchingStatic(new ArrayList[Body]) ||
-        (wheel1.isTouchingStatic(new ArrayList[Body]) &&
-         wheel2.isTouchingStatic(new ArrayList[Body]))) */{
-      contactTime = contactGrace
-    }
-    else if (contactTime > 0) {
+    if (contactTime > 0) {
       contactTime -= delta
     }
     
@@ -104,9 +102,12 @@ class ServerTank(server: Server, id: Byte) extends Tank(server, id) {
     else {
       regenJumpFuel(delta)
       if (grounded) {
-        //applyGroundForces(delta)
+        applyGroundForces(delta)
       }
     }
+
+    wheel1OnGround = false
+    wheel2OnGround = false
   }
 
   def applyJumpForces(delta: Int) = {
@@ -186,6 +187,28 @@ class ServerTank(server: Server, id: Byte) extends Tank(server, id) {
         println(player + " hit the ground at velocity " + body.getLinearVelocity);
         damage((body.getLinearVelocity.length.toInt - fallThreshold)/fallDamageDivider, null)
         fallImmuneTimer = fallImmuneTime
+      }
+    }
+  }
+
+  override def persist(other: GameObject, contact: ContactPoint) {
+    if (other == server.ground) {
+      if (contact.shape1 == baseShape || 
+          contact.shape2 == baseShape) {
+        contactTime = contactGrace
+      }
+      
+      if (contact.shape1 == wheelShape1 ||
+          contact.shape2 == wheelShape1) {
+        wheel1OnGround = true
+      }
+      if (contact.shape1 == wheelShape2 ||
+          contact.shape2 == wheelShape2) {
+        wheel2OnGround = true
+      }
+
+      if (wheel1OnGround && wheel2OnGround) {
+        contactTime = contactGrace
       }
     }
   }

@@ -7,6 +7,7 @@ abstract class GameObject(session: Session) {
   var body = createBody
 
   def collide(other: GameObject, contact: ContactPoint) {}
+  def persist(other: GameObject, contact: ContactPoint) {}
   
   def shapes: List[ShapeDef]
   def bodyDef = new BodyDef

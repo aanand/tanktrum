@@ -11,6 +11,7 @@ import org.jbox2d.dynamics._
 import org.jbox2d.dynamics.contacts._
 import org.jbox2d.common._
 import org.jbox2d.collision._
+import org.jbox2d.collision
 
 import ClientTank._
 
@@ -32,40 +33,6 @@ abstract class Tank (val session: Session, var id: Byte) extends GameObject(sess
   def color = Colors(id)
  
   val gun = new Gun(session, this)
-
-  def shapePoints = List[slick.geom.Vector2f] (
-                      new slick.geom.Vector2f(-(WIDTH/2-TAPER), -HEIGHT),
-                      new slick.geom.Vector2f(WIDTH/2-TAPER, -HEIGHT),
-                      new slick.geom.Vector2f(WIDTH/2, -BEVEL),
-                      new slick.geom.Vector2f(-WIDTH/2, -BEVEL)
-                    ).toArray
-
-  override def shapes = {
-    val bodyShapePoints = shapePoints.map((point) => new Vec2(point.x, point.y))
-    val bodyShape = new PolygonDef
-    bodyShapePoints.foreach(bodyShape.addVertex(_))
-    bodyShape.density = 1f
-    bodyShape.restitution = 0f
-
-    val baseShape = new PolygonDef
-    baseShape.setAsBox(BASE_WIDTH/2, BASE_HEIGHT/2, new Vec2(BASE_OFFSET_X, BASE_OFFSET_Y), 0f)
-    baseShape.density = 1f
-    baseShape.restitution = 0f
-    
-    val wheelShape1 = new CircleDef
-    wheelShape1.radius = WHEEL_RADIUS
-    wheelShape1.localPosition = new Vec2(WHEEL_OFFSET_X, WHEEL_OFFSET_Y)
-    wheelShape1.density = 1f
-    wheelShape1.restitution = 0f
-    
-    val wheelShape2 = new CircleDef
-    wheelShape2.radius = WHEEL_RADIUS
-    wheelShape2.localPosition = new Vec2(-WHEEL_OFFSET_X, WHEEL_OFFSET_Y)
-    wheelShape2.density = 1f
-    wheelShape2.restitution = 0f
-
-    List(bodyShape, baseShape, wheelShape1, wheelShape2)
-  }
   
   var player: Player = null
 
@@ -83,6 +50,53 @@ abstract class Tank (val session: Session, var id: Byte) extends GameObject(sess
   
   var corbomite = 0
   val maxCorbomite = Config("tank.maxCorbomite").toInt
+
+  var topShape: collision.Shape = _
+  var baseShape: collision.Shape = _
+  var wheelShape1: collision.Shape = _
+  var wheelShape2: collision.Shape = _
+
+  def shapePoints = List[slick.geom.Vector2f] (
+                      new slick.geom.Vector2f(-(WIDTH/2-TAPER), -HEIGHT),
+                      new slick.geom.Vector2f(WIDTH/2-TAPER, -HEIGHT),
+                      new slick.geom.Vector2f(WIDTH/2, -BEVEL),
+                      new slick.geom.Vector2f(-WIDTH/2, -BEVEL)
+                    ).toArray
+
+  override def shapes = {
+    val bodyShapeDefPoints = shapePoints.map((point) => new Vec2(point.x, point.y))
+    val bodyShapeDef = new PolygonDef
+    bodyShapeDefPoints.foreach(bodyShapeDef.addVertex(_))
+    bodyShapeDef.density = 1f
+    bodyShapeDef.restitution = 0f
+
+    val baseShapeDef = new PolygonDef
+    baseShapeDef.setAsBox(BASE_WIDTH/2, BASE_HEIGHT/2, new Vec2(BASE_OFFSET_X, BASE_OFFSET_Y), 0f)
+    baseShapeDef.density = 1f
+    baseShapeDef.restitution = 0f
+    
+    val wheelShapeDef1 = new CircleDef
+    wheelShapeDef1.radius = WHEEL_RADIUS
+    wheelShapeDef1.localPosition = new Vec2(WHEEL_OFFSET_X, WHEEL_OFFSET_Y)
+    wheelShapeDef1.density = 1f
+    wheelShapeDef1.restitution = 0f
+    
+    val wheelShapeDef2 = new CircleDef
+    wheelShapeDef2.radius = WHEEL_RADIUS
+    wheelShapeDef2.localPosition = new Vec2(-WHEEL_OFFSET_X, WHEEL_OFFSET_Y)
+    wheelShapeDef2.density = 1f
+    wheelShapeDef2.restitution = 0f
+
+    List(bodyShapeDef, baseShapeDef, wheelShapeDef1, wheelShapeDef2)
+  }
+
+  override def addShapes = {
+    val shapesList = shapes
+    topShape = body.createShape(shapesList(0))
+    baseShape = body.createShape(shapesList(1))
+    wheelShape1 = body.createShape(shapesList(2))
+    wheelShape2 = body.createShape(shapesList(3))
+  }
 
   addShapes
   
