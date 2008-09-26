@@ -78,7 +78,7 @@ class Projectile(session: Session, val tank: Tank) extends GameObject(session) {
         session.removeProjectile(this)
       }
       if (y + radius > session.ground.heightAt(x)) {
-        //collide(session.ground, null)
+        collide(session.ground, null)
       }
     }
   }
