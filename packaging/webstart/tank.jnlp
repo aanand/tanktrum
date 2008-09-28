@@ -13,7 +13,7 @@
     
     <jar href="tank.jar"/>
     <jar href="scala-library.jar"/>
-    <jar href="phys2d.jar"/>
+    <jar href="jbox2d.jar"/>
     <jar href="sbinary.jar"/>
     <jar href="tritonus_share.jar"/>
     <jar href="jogg.jar"/>
