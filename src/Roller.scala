@@ -33,7 +33,7 @@ class Roller(session : Session, tank : Tank) extends Projectile(session, tank) {
     if (y - radius > session.ground.heightAt(x) || //It's below the ground.
         obj.isInstanceOf[Tank] || //Or it's hit a tank.
         (obj.isInstanceOf[Projectile] && !obj.isInstanceOf[Roller])) { //Or it's hit a projectile.)
-        explode(obj)
+        collidedWith = obj
     }
   }
 }

@@ -49,7 +49,7 @@ class ServerTank(server: Server, id: Byte) extends Tank(server, id) {
     (x, y, angle, 
      gun.angle, gun.power, 
      gun.angleChange, gun.powerChange, 
-     health, thrust, jumping, jumpFuel, 
+     health.toInt, thrust, jumping, jumpFuel, 
      gun.selectedWeapon.id, 
      gun.ammo(gun.selectedWeapon))
   }
@@ -149,7 +149,7 @@ class ServerTank(server: Server, id: Byte) extends Tank(server, id) {
     }
   }
   
-  override def damage(d: Int, source: Projectile) {
+  override def damage(d: Float, source: Projectile) {
     val oldHealth = health
     var damageDone = d
 
@@ -165,7 +165,7 @@ class ServerTank(server: Server, id: Byte) extends Tank(server, id) {
     health -= damageDone
     
     if (null != source) {
-      source.tank.player.awardHit(this, damageDone)
+      source.tank.player.awardHit(this, damageDone.toInt)
     }
     
     if (isDead && oldHealth > 0) {

@@ -2,13 +2,22 @@ import org.newdawn.slick._
 import sbinary.Instances._
 import sbinary.Operations
 
+import scala.collection.mutable.HashMap
+
+import org.jbox2d.dynamics._
+import org.jbox2d.dynamics.contacts._
+import org.jbox2d.common._
 import org.jbox2d.collision._
 
 class Explosion (var x: Float, var y: Float, var radius: Float, session: Session, projectile: Projectile) extends GameObject(session) {
-  val LIFETIME = Config("explosion.lifetime").toFloat
-  var timeToDie = LIFETIME
+  val lifetime = Config("explosion.lifetime").toFloat
+  var timeToDie = lifetime
 
-  val SOUND = "explosion1.wav"
+  val sound = "explosion1.wav"
+  
+  var tanksHit = new HashMap[Tank, float]
+
+  body.setXForm(new Vec2(x, y), 0f)
   
   override def shapes = {
     val expShape = new CircleDef
@@ -16,38 +25,12 @@ class Explosion (var x: Float, var y: Float, var radius: Float, session: Session
     expShape.isSensor = true
     List(expShape)
   }
+
+  addShapes
   
   if (session.isInstanceOf[Client]) {
-    SoundPlayer ! PlaySound(SOUND)
+    SoundPlayer ! PlaySound(sound)
   }
-  /*
-  else {
-    val explodeBody = new phys2d.raw.StaticBody(new phys2d.raw.shapes.Circle(radius))
-    val server = session.asInstanceOf[Server]
-    explodeBody.setPosition(x, y)
-    for (tank <- session.tanks) {
-      if (tank.isAlive) {
-        val contacts = new Array[phys2d.raw.Contact](10)
-        for (i <- 0 until contacts.length) contacts(i) = new phys2d.raw.Contact
-        val numContacts = phys2d.raw.Collide.collide(contacts, explodeBody, tank.body, 0f) 
-        
-        if (numContacts > 0) {
-          var maxOverlap = 0f
-          for (i <- 0 until numContacts) {
-            if (-contacts(i).getSeparation > maxOverlap) {
-              maxOverlap = -contacts(i).getSeparation
-            }
-          }
-          val damage = maxOverlap.toInt
-          tank.damage(damage, projectile)
-          if (null != projectile) {
-            println(projectile.tank.player.name + " hit " + tank.player.name + " with splash damage from a " + projectile.getClass.getName + " for " + damage + " damage.")
-          }
-        }
-      }
-    }
-  }
-  */
     
   def update(delta: Int) {
     timeToDie -= delta/1000f
@@ -57,7 +40,7 @@ class Explosion (var x: Float, var y: Float, var radius: Float, session: Session
   }
 
   def render(g: Graphics) {
-    g.setColor(new Color(0.5f, 0.5f, 0.8f, timeToDie/LIFETIME))
+    g.setColor(new Color(0.5f, 0.5f, 0.8f, timeToDie/lifetime))
     g.fillOval(x - radius, y - radius, radius*2, radius*2)
   }
 
@@ -74,5 +57,27 @@ class Explosion (var x: Float, var y: Float, var radius: Float, session: Session
     x = newX
     y = newY
     radius = newRadius
+  }
+
+  override def collide(other: GameObject, contact: ContactPoint) {
+    if (other.isInstanceOf[Tank]) {
+      val tank = other.asInstanceOf[Tank]
+      var damage = -contact.separation
+      damage *= (timeToDie/lifetime)
+
+      if (!tanksHit.contains(tank)) {
+        println(tank.player.name + " in explosion for " + damage + " damage.")
+        tanksHit(tank) = damage
+        tank.damage(damage, this.projectile)
+      }
+      else {
+        val oldDamage = tanksHit(tank)
+        if (damage > oldDamage) {
+          println(tank.player.name + " in explosion for a further " + (damage-oldDamage) + " damage.")
+          tanksHit(tank) = damage
+          tank.damage(damage-oldDamage, this.projectile)
+        }
+      }
+    }
   }
 }

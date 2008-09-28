@@ -31,9 +31,10 @@ class Projectile(session: Session, val tank: Tank) extends GameObject(session) {
   val reloadTime = 4f
   val mass = 1f
   
+  var collidedWith: GameObject = _
+  
   override def shapes: List[ShapeDef] = {
     val sDef = new CircleDef
-    println("Creating projectile with radius: " + radius)
     sDef.radius = radius
     sDef.restitution = 0f
     sDef.density = 1f
@@ -70,6 +71,9 @@ class Projectile(session: Session, val tank: Tank) extends GameObject(session) {
   def y = body.getPosition.y
   
   def update(delta : Int) {
+    if (null != collidedWith) {
+      explode(collidedWith)
+    }
     if (session.isInstanceOf[Client]) {
       updateTrail(delta)
     }
@@ -145,8 +149,8 @@ class Projectile(session: Session, val tank: Tank) extends GameObject(session) {
   }
   
   override def collide(obj: GameObject, contact: ContactPoint) {
-    if (!obj.isInstanceOf[Projectile]) {
-      explode(obj)
+    if (!obj.isInstanceOf[Projectile] && !obj.isInstanceOf[Explosion]) {
+      collidedWith = obj
     }
   }
   

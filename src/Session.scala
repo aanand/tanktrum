@@ -84,6 +84,7 @@ abstract class Session(container: slick.GameContainer) extends ContactListener {
   }
 
   def removeExplosion(e: Explosion) {
+    removeBody(e.body)
     explosions -= e
   }
 

@@ -37,7 +37,7 @@ abstract class Tank (val session: Session, var id: Byte) extends GameObject(sess
   
   var player: Player = null
 
-  var health = 100
+  var health = 100f
 
   val contactGrace = 50
   var contactTime = 0
@@ -124,7 +124,7 @@ abstract class Tank (val session: Session, var id: Byte) extends GameObject(sess
     gun.update(delta)
   }
 
-  def damage(d: Int, source: Projectile) {
+  def damage(d: Float, source: Projectile) {
   }
   
   def remove = {
