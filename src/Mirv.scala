@@ -17,7 +17,8 @@ class Mirv(session: Session, tank: Tank) extends Projectile(session, tank) {
   override val explosionRadius = 13f
   val DISTRIBUTION = 50
   val clusterSize = 10
-  var timeUntilSplit = 2000
+  val lifetime = 2000
+  var timeUntilSplit = lifetime
   val rand = new Random
 
   def clusterProjectile: Projectile = new MirvCluster(session, tank)
@@ -37,6 +38,11 @@ class Mirv(session: Session, tank: Tank) extends Projectile(session, tank) {
         session.removeProjectile(this)
       }
     }
+  }
+
+  override def color = {
+    val lifeRatio = timeUntilSplit.toFloat/lifetime
+    new slick.Color(1f, lifeRatio, lifeRatio)
   }
 }
 

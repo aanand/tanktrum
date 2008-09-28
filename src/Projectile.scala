@@ -24,7 +24,7 @@ object Projectile {
 class Projectile(session: Session, val tank: Tank) extends GameObject(session) {
   var id: Int = -1
 
-  val color = new slick.Color(1.0f, 1.0f, 1.0f)
+  def color = new slick.Color(1.0f, 1.0f, 1.0f)
   val explosionRadius = 20f
   val explosionDamageFactor = 1f
   lazy val radius = 3f
