@@ -25,8 +25,9 @@ abstract class GameObject(session: Session) {
   def removeShapes = {
     var currentShape = body.getShapeList
     while (null != currentShape) {
+      val nextShape = currentShape.getNext
       body.destroyShape(currentShape)
-      currentShape = currentShape.getNext
+      currentShape = nextShape
     }
   }
 }

@@ -82,13 +82,9 @@ class Ground(session : Session, width : Int, height : Int) extends GameObject(se
       physShapes += polyDef
     }
     
-    session.removeBody(body)
     removeShapes
-    body = createBody
     addShapes
 
-    //body = new phys2d.raw.StaticBody(physShape)
-    
     initialised = true
   }
 
