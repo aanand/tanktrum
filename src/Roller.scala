@@ -17,6 +17,7 @@ object RollerItem extends Item {
 class Roller(session : Session, tank : Tank) extends Projectile(session, tank) {
   override val projectileType = ProjectileTypes.ROLLER
   override val color = new slick.Color(0.4f, 0.6f, 0f)
+  override lazy val radius = 4f
   override val damage = 10
   override val explosionRadius = 25f
   override val explosionDamageFactor = 1.2f
@@ -25,7 +26,7 @@ class Roller(session : Session, tank : Tank) extends Projectile(session, tank) {
   override def shapes = {
     val sDef = new CircleDef
     sDef.radius = radius
-    sDef.restitution = 1f
+    sDef.restitution = 0.8f
     sDef.density = 1f
     List(sDef)
   }
