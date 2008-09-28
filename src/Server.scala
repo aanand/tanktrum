@@ -198,17 +198,11 @@ class Server(port: Int) extends Session(null) with Actor {
     super.endRound()
     
     world = createWorld
-    for (projectile <- projectiles.values) {
-      removeProjectile(projectile)
-    }
+    
     projectiles = new HashMap[Int, Projectile]
-
-    for (explosion <- explosions) {
-      removeExplosion(explosion)
-    }
     explosions = new HashSet[Explosion]
-
     bodies = new HashMap[Body, GameObject]
+
     for (player <- players.values) {
       player.money += 10
       player.ready = false
@@ -218,7 +212,7 @@ class Server(port: Int) extends Session(null) with Actor {
     ground.buildPoints
     for (player <- players.values) {
       val oldTank = player.tank
-      player.tank.remove
+      //player.tank.remove
       player.tank = createTank(player.id)
       player.tank.player = player //Oh no.
       if (oldTank.isAlive) { 
