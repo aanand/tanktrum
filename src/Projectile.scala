@@ -54,8 +54,6 @@ class Projectile(session: Session, val tank: Tank) extends GameObject(session) {
   var stationaryTime = 0
   var dead = false
   
-  addShapes
-
   def trailDead = stationaryTime > trailLifetime
 
   if (session.isInstanceOf[Server]) {

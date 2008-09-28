@@ -26,8 +26,6 @@ class Explosion (var x: Float, var y: Float, var radius: Float, session: Session
     List(expShape)
   }
 
-  addShapes
-  
   if (session.isInstanceOf[Client]) {
     SoundPlayer ! PlaySound(sound)
   }

@@ -16,20 +16,20 @@ import org.jbox2d.collision
 import ClientTank._
 
 abstract class Tank (val session: Session, var id: Byte) extends GameObject(session) {
-  val WIDTH  = Config("tank.width").toFloat
-  val HEIGHT = Config("tank.height").toFloat
-  val TAPER  = Config("tank.taper").toFloat
-  val BEVEL  = Config("tank.bevel").toFloat
+  lazy val WIDTH  = Config("tank.width").toFloat
+  lazy val HEIGHT = Config("tank.height").toFloat
+  lazy val TAPER  = Config("tank.taper").toFloat
+  lazy val BEVEL  = Config("tank.bevel").toFloat
   
-  val WHEEL_RADIUS = BEVEL
-  val WHEEL_OFFSET_X = WIDTH/2-BEVEL
-  val WHEEL_OFFSET_Y = -BEVEL
+  lazy val WHEEL_RADIUS = BEVEL
+  lazy val WHEEL_OFFSET_X = WIDTH/2-BEVEL
+  lazy val WHEEL_OFFSET_Y = -BEVEL
 
-  val BASE_WIDTH = WIDTH - 2*WHEEL_RADIUS
-  val BASE_HEIGHT = BEVEL
-  val BASE_OFFSET_X = 0
-  val BASE_OFFSET_Y = -BASE_HEIGHT/2
-  val friction = Config("tank.friction").toFloat
+  lazy val BASE_WIDTH = WIDTH - 2*WHEEL_RADIUS
+  lazy val BASE_HEIGHT = BEVEL
+  lazy val BASE_OFFSET_X = 0
+  lazy val BASE_OFFSET_Y = -BASE_HEIGHT/2
+  lazy val friction = Config("tank.friction").toFloat
   
   def color = Colors(id)
  
@@ -57,7 +57,7 @@ abstract class Tank (val session: Session, var id: Byte) extends GameObject(sess
   var wheelShape1: collision.Shape = _
   var wheelShape2: collision.Shape = _
 
-  def shapePoints = List[slick.geom.Vector2f] (
+  lazy val shapePoints = List[slick.geom.Vector2f] (
                       new slick.geom.Vector2f(-(WIDTH/2-TAPER), -HEIGHT),
                       new slick.geom.Vector2f(WIDTH/2-TAPER, -HEIGHT),
                       new slick.geom.Vector2f(WIDTH/2, -BEVEL),
@@ -95,16 +95,15 @@ abstract class Tank (val session: Session, var id: Byte) extends GameObject(sess
     List(bodyShapeDef, baseShapeDef, wheelShapeDef1, wheelShapeDef2)
   }
 
-  override def addShapes = {
+  override def loadShapes = {
     val shapesList = shapes
     topShape = body.createShape(shapesList(0))
     baseShape = body.createShape(shapesList(1))
     wheelShape1 = body.createShape(shapesList(2))
     wheelShape2 = body.createShape(shapesList(3))
+    body.setMassFromShapes
   }
 
-  addShapes
-  
   def fuelPercent = (jumpFuel.toFloat/maxJumpFuel) * 100
 
   def grounded : Boolean = contactTime > 0; true

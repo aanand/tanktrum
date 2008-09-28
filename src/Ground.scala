@@ -23,8 +23,15 @@ class Ground(session : Session, width : Int, height : Int) extends GameObject(se
   var points : Array[Vector2f] = _
   var drawShape : Shape = _
   
-  var physShapes: List[ShapeDef] = List()
-  override def shapes = physShapes
+  var physShapes: List[ShapeDef] = _
+  override def shapes = {
+    if (null == physShapes) {
+      List()
+    }
+    else {
+      physShapes
+    }
+  }
 
   var deformQueue = new Queue[(Int, Int, Int)]
 
@@ -32,8 +39,6 @@ class Ground(session : Session, width : Int, height : Int) extends GameObject(se
     
   val friction = 1f
   val restitution = 0.0f
-
-  addShapes
 
   def buildPoints() {
     val rand = new Random()
@@ -82,8 +87,7 @@ class Ground(session : Session, width : Int, height : Int) extends GameObject(se
       physShapes += polyDef
     }
     
-    removeShapes
-    addShapes
+    loadShapes
 
     initialised = true
   }

@@ -61,9 +61,6 @@ class ServerTank(server: Server, id: Byte) extends Tank(server, id) {
   override def create(x: Float) {
     val y = server.ground.heightAt(x).toFloat - STARTING_ALTITUDE
     body.setXForm(new Vec2(x, y), 0)
-    println("Setting tank mass.")
-    body.setMassFromShapes
-
     super.create(x)
   }
 
