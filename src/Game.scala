@@ -1,6 +1,7 @@
 import org.newdawn.slick._
 import java.io._
 import java.util.prefs._
+import java.util.Date
 
 class Game(title: String) extends BasicGame(title) {
   var client: Client = _
@@ -49,9 +50,6 @@ class Game(title: String) extends BasicGame(title) {
     if (client != null && client.isActive) {
       client.update(delta)
     }
-    if (server != null && server.isActive) {
-      server.update(delta)
-    }
   }
 
   def render(container: GameContainer, graphics: Graphics) {
@@ -67,13 +65,14 @@ class Game(title: String) extends BasicGame(title) {
   
   def startServer(port : Int, userName : String) {
     if (server != null) {
-      server.leave
+      server !? 'leave
       server = null
     }
    
     server = new Server(port)
+    server.start
     println("Starting server.")
-    server.enter
+    server !? 'enter
 
     startClient("localhost", port, userName)
   }
@@ -96,15 +95,16 @@ class Game(title: String) extends BasicGame(title) {
   
   def startPractice(userName: String) {
     if (server != null) {
-      server.leave
+      server !? 'leave
       server = null
     }
 
     val port = 10000
 
     server = new PracticeServer(port)
+    server.start
     println("Starting practice server.")
-    server.enter
+    server !? 'enter
 
     startClient("localhost", port, userName)
   }
@@ -134,6 +134,22 @@ class Game(title: String) extends BasicGame(title) {
     }
     if (container != null) {
       container.exit
+    }
+  }
+
+  override def closeRequested = {
+    if (super.closeRequested) {
+      if (null != client) {
+        client.leave
+      }
+      
+      if (null != server) {
+        server !? 'leave
+      }
+      
+      true
+    } else {
+      false
     }
   }
 }

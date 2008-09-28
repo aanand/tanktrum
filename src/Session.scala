@@ -7,10 +7,17 @@ import org.jbox2d.collision._
 
 import scala.collection.mutable.HashMap
 import scala.collection.mutable.HashSet
+import java.util.Date
 
 abstract class Session(container: slick.GameContainer) extends ContactListener {
-  val WIDTH = 800
-  val HEIGHT = 600
+  val TANK_BROADCAST_INTERVAL       = Config("server.tankBroadcastInterval").toInt
+  val PROJECTILE_BROADCAST_INTERVAL = Config("server.projectileBroadcastInterval").toInt
+  val PLAYER_BROADCAST_INTERVAL     = Config("server.playerBroadcastInterval").toInt
+  val READY_ROOM_BROADCAST_INTERVAL = Config("server.readyRoomBroadcastInterval").toInt
+  val MAX_PLAYERS                   = Config("server.maxPlayers").toInt
+  
+  val WIDTH = Main.WIDTH
+  val HEIGHT = Main.HEIGHT
 
   var world = createWorld
 
@@ -25,6 +32,10 @@ abstract class Session(container: slick.GameContainer) extends ContactListener {
 
   def tanks: Iterator[Tank]
 
+  var supposedRunTime = 0
+  var numTankUpdates = 0
+  var startTime: Long = 0
+
   def enter() {
     ground = new Ground(this, WIDTH, HEIGHT)
     active = true
@@ -35,6 +46,8 @@ abstract class Session(container: slick.GameContainer) extends ContactListener {
   }
   
   def update(delta: Int) {
+    supposedRunTime += delta
+    
     ground.update(delta)
     for (tank <- tanks) {
       if (null != tank) { tank.update(delta) }
@@ -117,8 +130,6 @@ abstract class Session(container: slick.GameContainer) extends ContactListener {
     projectiles -= p.id
   }
   
-  def isActive = active
-
   /**
    * Contact listener callbacks:
    */
@@ -142,5 +153,32 @@ abstract class Session(container: slick.GameContainer) extends ContactListener {
   }
 
   override def result(result: ContactResult) {
+  }
+
+  def isActive = active
+  
+  def endRound() {
+    val runTime = (new Date().getTime - startTime).toFloat
+    
+    val prefix = if (this.isInstanceOf[Server]) "Server: " else "Client: "
+    
+    println(prefix + "runTime = " + runTime/1000)
+    println(prefix + "numTankUpdates = " + numTankUpdates)
+    
+    if (numTankUpdates > 0) {
+      val targetTankUpdateRate = 1000f / TANK_BROADCAST_INTERVAL
+      val actualTankUpdateRate = numTankUpdates.toFloat/runTime * 1000
+      val error = (actualTankUpdateRate - targetTankUpdateRate) / targetTankUpdateRate * 100
+      
+      println(prefix + "avg tank update interval = " + runTime/numTankUpdates)
+      println(prefix + "target tank update = " + targetTankUpdateRate + " updates/sec")
+      println(prefix + "actual tank update rate = " + actualTankUpdateRate + " updates/sec")
+      println(prefix + "update rate error = " + error + "%")
+    }
+    
+    val error = (supposedRunTime - runTime).toFloat / runTime * 100
+    
+    println(prefix + "supposedRunTime = " + supposedRunTime.toFloat/1000)
+    println(prefix + "delta error = " + error + "%")
   }
 }

@@ -4,9 +4,11 @@ import java.nio.channels._
 import java.nio._
 import java.net._
 import java.util.Random
+import java.util.Date
 
 import scala.collection.mutable.HashMap
 import scala.collection.mutable.HashSet
+import scala.actors.Actor
 
 import sbinary.Operations
 import sbinary.Instances._
@@ -18,13 +20,9 @@ import org.jbox2d.collision._
 
 import ServerTank._
 
-class Server(port: Int) extends Session(null) {
-  val TANK_BROADCAST_INTERVAL       = Config("server.tankBroadcastInterval").toInt
-  val PROJECTILE_BROADCAST_INTERVAL = Config("server.projectileBroadcastInterval").toInt
-  val PLAYER_BROADCAST_INTERVAL     = Config("server.playerBroadcastInterval").toInt
-  val READY_ROOM_BROADCAST_INTERVAL = Config("server.readyRoomBroadcastInterval").toInt
-  val MAX_PLAYERS                   = Config("server.maxPlayers").toInt
-
+class Server(port: Int) extends Session(null) with Actor {
+  val tick = Config("game.logicUpdateInterval").toInt
+  
   var nextTankColorIndex = 0
   
   var playerID: Byte = -1
@@ -47,9 +45,35 @@ class Server(port: Int) extends Session(null) {
   val tankSequence = new Sequence
   val projectileSequence = new Sequence
   val groundSequence = new Sequence
-  
+
+  def act {
+    println("Server started.")
+    var time = new Date().getTime()
+
+    while (true) {
+      while (mailboxSize > 0) {
+        receive {
+          case 'enter => enter; reply(true)
+          case 'leave => leave; reply(true)
+          case _ => println("Server: Received unknown message"); reply(true)
+        }
+      }
+      
+      if (isActive) {
+        val newTime = new Date().getTime()
+        val delta = (newTime - time)
+        time = newTime
+        update(delta.toInt)
+        if (tick-delta > 0) {
+          Thread.sleep(tick-delta)
+        }
+      }
+    }
+  }
+
   /**
-   * Called to start the server.
+   * Notionally private, until we rearchitect and it's actually private.
+   * Use "server !? 'enter" instead.
    */
   override def enter() = {
     super.enter()
@@ -62,7 +86,8 @@ class Server(port: Int) extends Session(null) {
   }
   
   /**
-   * Called to stop the server.
+   * Notionally private, until we rearchitect and it's actually private.
+   * Use "server !? 'leave" instead.
    */
   override def leave() = {
     super.leave()
@@ -169,7 +194,9 @@ class Server(port: Int) extends Session(null) {
     broadcastExplosion(e)
   }
 
-  def endRound {
+  override def endRound {
+    super.endRound()
+    
     world = createWorld
     for (projectile <- projectiles.values) {
       removeProjectile(projectile)
@@ -203,6 +230,10 @@ class Server(port: Int) extends Session(null) {
   }
   
   def startRound {
+    startTime = new Date().getTime
+    supposedRunTime = 0
+    numTankUpdates = 0
+    
     println("Starting game.")
     inReadyRoom = false
     broadcastGround
@@ -379,6 +410,7 @@ class Server(port: Int) extends Session(null) {
    */
   def broadcastTanks {
     broadcast(tankPositionData)
+    numTankUpdates += 1
   }
 
   def broadcastProjectiles {

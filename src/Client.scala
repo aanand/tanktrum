@@ -179,7 +179,12 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
       case Commands.PROJECTILES  => loadProjectiles
       case Commands.EXPLOSION    => loadExplosion
       case Commands.PLAYERS      => loadPlayers
-      case Commands.READY_ROOM   => inReadyRoom = true
+      case Commands.READY_ROOM   => {
+        if (!inReadyRoom) {
+          inReadyRoom = true
+          endRound()
+        }
+      }
       case Commands.CHAT_MESSAGE => addChatMessage
       case _                     => println("Warning: Client got unknown command: " + command.toByte)
     }
@@ -243,7 +248,7 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
       }
     }
   }
-
+  
   /*
    * Everything below here is basically networking stuff.
    */
@@ -266,7 +271,7 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
   def checkTimeout = {
     if (new Date().getTime - lastMessageReceived.getTime > SERVER_TIMEOUT) {
       println("Connection timed out.")
-      super.leave()
+      leave()
     }
   }
 
@@ -371,7 +376,15 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
   }
   
   def processUpdate {
-    inReadyRoom = false
+    numTankUpdates += 1
+    
+    if (inReadyRoom) {
+      inReadyRoom = false
+      startTime = new Date().getTime
+      supposedRunTime = 0
+      numTankUpdates = 0
+    }
+    
     val byteArray = new Array[byte](data.remaining)
     data.get(byteArray)
     
