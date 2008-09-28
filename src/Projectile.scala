@@ -133,7 +133,7 @@ class Projectile(session: Session, val tank: Tank) extends GameObject(session) {
         return
       }
       
-      if (prevX > 0) {
+      if (prevX > 0 && Math.abs(x-prevX) < Main.WIDTH/2) {
         g.setColor(new slick.Color(color.r, color.g, color.b, 0.5f - (t.toFloat / trailLifetime)*0.5f))
         g.drawLine(x, y, prevX, prevY)
       }
