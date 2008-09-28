@@ -41,7 +41,7 @@ class ClientTank(client: Client) extends Tank(client, 0) {
       startEmitting
       for (e <- particleEmitters) {
         e.setPosition(x, y)
-        e.setRotation(body.getRotation.toDegrees)
+        e.setRotation(body.getAngle.toDegrees)
       }
     }
     else {
