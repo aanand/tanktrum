@@ -163,8 +163,8 @@ class Server(port: Int) extends Session(null) {
     p
   }
 
-  override def addExplosion(x: Float, y: Float, radius: Float, projectile: Projectile) {
-    val e = new Explosion(x, y, radius, this, projectile)
+  override def addExplosion(x: Float, y: Float, radius: Float, projectile: Projectile, damageFactor: Float) {
+    val e = new Explosion(x, y, radius, this, projectile, damageFactor)
     explosions += e
     broadcastExplosion(e)
   }

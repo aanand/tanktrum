@@ -26,6 +26,7 @@ class Projectile(session: Session, val tank: Tank) extends GameObject(session) {
 
   val color = new slick.Color(1.0f, 1.0f, 1.0f)
   val explosionRadius = 20f
+  val explosionDamageFactor = 1f
   def radius = 3f
   val damage = 5
   val reloadTime = 4f
@@ -162,7 +163,7 @@ class Projectile(session: Session, val tank: Tank) extends GameObject(session) {
     destroy = true
 
     if (session.isInstanceOf[Server]) {
-      session.addExplosion(x, y, explosionRadius, this)
+      session.addExplosion(x, y, explosionRadius, this, explosionDamageFactor)
       session.ground.deform(x.toInt, y.toInt, explosionRadius.toInt)
     }
     

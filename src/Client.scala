@@ -334,7 +334,7 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
   def loadExplosion = {
     val explosionArray = new Array[byte](data.remaining)
     data.get(explosionArray)
-    val e = new Explosion(0, 0, 0, this, null)
+    val e = new Explosion(0, 0, 0, this, null, 0)
     e.loadFrom(explosionArray)
     explosions += e
   }

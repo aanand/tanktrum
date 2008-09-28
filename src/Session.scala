@@ -79,8 +79,8 @@ abstract class Session(container: slick.GameContainer) extends ContactListener {
     bodies -= body
   }
 
-  def addExplosion(x: Float, y: Float, radius: Float, projectile: Projectile) {
-    explosions += new Explosion(x, y, radius, this, projectile)
+  def addExplosion(x: Float, y: Float, radius: Float, projectile: Projectile, damageFactor: Float) {
+    explosions += new Explosion(x, y, radius, this, projectile, damageFactor)
   }
 
   def removeExplosion(e: Explosion) {

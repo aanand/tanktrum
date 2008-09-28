@@ -13,7 +13,7 @@ object DeathsHeadItem extends Item {
 class DeathsHead(session: Session, tank: Tank) extends Mirv(session, tank) {
   override val radius = 6f
   override val mass = 3f
-  override val explosionRadius = 20f
+  override val explosionRadius = 30f
   override val projectileType = ProjectileTypes.DEATHS_HEAD
   override val clusterSize = 8
 
@@ -24,5 +24,6 @@ class DeathsHeadCluster(session: Session, tank: Tank) extends Projectile(session
   override val radius = 4f
   override val damage = 5
   override val explosionRadius = 30f
+  override val explosionDamageFactor = 1.2f
   override val projectileType = ProjectileTypes.DEATHS_HEAD_CLUSTER
 }

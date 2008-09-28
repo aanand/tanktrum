@@ -9,7 +9,7 @@ import org.jbox2d.dynamics.contacts._
 import org.jbox2d.common._
 import org.jbox2d.collision._
 
-class Explosion (var x: Float, var y: Float, var radius: Float, session: Session, projectile: Projectile) extends GameObject(session) {
+class Explosion (var x: Float, var y: Float, var radius: Float, session: Session, projectile: Projectile, damageFactor: Float) extends GameObject(session) {
   val lifetime = Config("explosion.lifetime").toFloat
   var timeToDie = lifetime
 
@@ -64,6 +64,7 @@ class Explosion (var x: Float, var y: Float, var radius: Float, session: Session
       val tank = other.asInstanceOf[Tank]
       var damage = -contact.separation
       damage *= (timeToDie/lifetime)
+      damage *= damageFactor
 
       if (!tanksHit.contains(tank)) {
         println(tank.player.name + " in explosion for " + damage + " damage.")
