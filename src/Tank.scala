@@ -29,6 +29,7 @@ abstract class Tank (val session: Session, var id: Byte) extends GameObject(sess
   val BASE_HEIGHT = BEVEL
   val BASE_OFFSET_X = 0
   val BASE_OFFSET_Y = -BASE_HEIGHT/2
+  val friction = Config("tank.friction").toFloat
   
   def color = Colors(id)
  
@@ -69,27 +70,27 @@ abstract class Tank (val session: Session, var id: Byte) extends GameObject(sess
     bodyShapeDefPoints.foreach(bodyShapeDef.addVertex(_))
     bodyShapeDef.density = 1f
     bodyShapeDef.restitution = 0f
-    bodyShapeDef.friction = 0f
+    bodyShapeDef.friction = friction
 
     val baseShapeDef = new PolygonDef
     baseShapeDef.setAsBox(BASE_WIDTH/2, BASE_HEIGHT/2, new Vec2(BASE_OFFSET_X, BASE_OFFSET_Y), 0f)
     baseShapeDef.density = 1f
     baseShapeDef.restitution = 0f
-    baseShapeDef.friction = 0f
+    baseShapeDef.friction = friction
     
     val wheelShapeDef1 = new CircleDef
     wheelShapeDef1.radius = WHEEL_RADIUS
     wheelShapeDef1.localPosition = new Vec2(WHEEL_OFFSET_X, WHEEL_OFFSET_Y)
     wheelShapeDef1.density = 1f
     wheelShapeDef1.restitution = 0f
-    wheelShapeDef1.friction = 0f
+    wheelShapeDef1.friction = friction
     
     val wheelShapeDef2 = new CircleDef
     wheelShapeDef2.radius = WHEEL_RADIUS
     wheelShapeDef2.localPosition = new Vec2(-WHEEL_OFFSET_X, WHEEL_OFFSET_Y)
     wheelShapeDef2.density = 1f
     wheelShapeDef2.restitution = 0f
-    wheelShapeDef2.friction = 0f
+    wheelShapeDef2.friction = friction
 
     List(bodyShapeDef, baseShapeDef, wheelShapeDef1, wheelShapeDef2)
   }
