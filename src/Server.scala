@@ -1,5 +1,4 @@
 import org.newdawn.slick._
-import net.phys2d
 
 import java.nio.channels._
 import java.nio._
@@ -11,6 +10,11 @@ import scala.collection.mutable.HashSet
 
 import sbinary.Operations
 import sbinary.Instances._
+
+import org.jbox2d.dynamics._
+import org.jbox2d.dynamics.contacts._
+import org.jbox2d.common._
+import org.jbox2d.collision._
 
 import ServerTank._
 
@@ -75,7 +79,16 @@ class Server(port: Int) extends Session(null) {
    */
   override def update(delta: Int) = {
     if (!inReadyRoom) {
-      world.step(delta/1000f)
+      world.step(delta/1000f, 10)
+    }
+
+    var body = world.getBodyList
+
+    while (null != body) {
+      if (null != body.getUserData) { 
+        body.wakeUp
+      }
+      body = body.getNext
     }
 
     super.update(delta)
@@ -144,14 +157,14 @@ class Server(port: Int) extends Session(null) {
   /***
    * Add methods.  These all add create an instance of a game object and add it to a collection to be tracked by the server.
    */
-  override def addProjectile(tank : Tank, x : Double, y : Double, angle : Double, speed : Double, projectileType: ProjectileTypes.Value) = {
+  override def addProjectile(tank: Tank, x: Float, y: Float, angle: Float, speed: Float, projectileType: ProjectileTypes.Value) = {
     val p = super.addProjectile(tank, x, y, angle, speed, projectileType)
     broadcast(projectileData(p))
     p
   }
 
-  override def addExplosion(x: Float, y: Float, radius: Float, projectile: Projectile) {
-    val e = new Explosion(x, y, radius, this, projectile)
+  override def addExplosion(x: Float, y: Float, radius: Float, projectile: Projectile, damageFactor: Float) {
+    val e = new Explosion(x, y, radius, this, projectile, damageFactor)
     explosions += e
     broadcastExplosion(e)
   }
@@ -168,7 +181,7 @@ class Server(port: Int) extends Session(null) {
     }
     explosions = new HashSet[Explosion]
 
-    bodies = new HashMap[phys2d.raw.Body, Collider]
+    bodies = new HashMap[Body, GameObject]
     for (player <- players.values) {
       player.money += 10
       player.ready = false

@@ -2,12 +2,16 @@ import org.newdawn.slick
 import org.newdawn.slick._
 import org.newdawn.slick.geom._
 
-import net.phys2d
+import scala.collection.mutable.Queue
 
 import sbinary.Instances._
 import sbinary.Operations
 
-class Ground(session : Session, width : Int, height : Int) extends Collider {
+import org.jbox2d.collision.ShapeDef
+import org.jbox2d.collision.PolygonDef
+import org.jbox2d.common._
+
+class Ground(session : Session, width : Int, height : Int) extends GameObject(session) {
   val MIN_HEIGHT = Config("ground.minHeight").toFloat
   val granularity = Config("ground.granularity").toInt
 
@@ -18,12 +22,23 @@ class Ground(session : Session, width : Int, height : Int) extends Collider {
   
   var points : Array[Vector2f] = _
   var drawShape : Shape = _
-  var physShape : phys2d.raw.shapes.Shape = _
-  var body : phys2d.raw.Body = _
+  
+  var physShapes: List[ShapeDef] = _
+  override def shapes = {
+    if (null == physShapes) {
+      List()
+    }
+    else {
+      physShapes
+    }
+  }
 
-  var doDeform: (Int, Int, Int) = _
+  var deformQueue = new Queue[(Int, Int, Int)]
 
   var initialised = false
+    
+  val friction = 1f
+  val restitution = 0.0f
 
   def buildPoints() {
     val rand = new Random()
@@ -41,9 +56,9 @@ class Ground(session : Session, width : Int, height : Int) extends Collider {
   }
   
   def initPoints() {
-    val shapePoints = (List(new Vector2f(-20, height), new Vector2f(0, -height)) ++ 
+    val shapePoints = (List(new Vector2f(0, height)) ++
                       points ++ 
-                      List(new Vector2f(width, -height), new Vector2f(width+20, height), new Vector2f(-20, height))).toArray
+                      List(new Vector2f(width, height))).toArray
     
     val drawShapePoints = new Array[float](shapePoints.length*2)
     for (i <- 0 until shapePoints.length) {
@@ -53,27 +68,38 @@ class Ground(session : Session, width : Int, height : Int) extends Collider {
     
     drawShape = new Polygon(drawShapePoints.toArray)
     
-    val physShapePoints = shapePoints.map(p => new phys2d.math.Vector2f(p.x, p.y))
+    val physShapePoints = shapePoints.map(p => new Vec2(p.x, p.y))
     
-    physShape = new phys2d.raw.shapes.Polygon(physShapePoints.toArray)
+    physShapes = List[ShapeDef]()
     
-    body = new phys2d.raw.StaticBody(physShape)
-    body.setFriction(1f)
-    body.setRestitution(0.8f)
-    session.addBody(this, body)
+    for (i <- 0 until physShapePoints.length-1) {
+      val polyDef = new PolygonDef
+      val vert1 = physShapePoints(i+1)
+      val vert2 = physShapePoints(i)
+      val vert3 = new Vec2(vert2.x, height)
+      val vert4 = new Vec2(vert1.x, height)
+      polyDef.addVertex(vert4)
+      polyDef.addVertex(vert3)
+      polyDef.addVertex(vert2)
+      polyDef.addVertex(vert1)
+      polyDef.friction = friction
+      polyDef.restitution = restitution
+      physShapes += polyDef
+    }
     
+    loadShapes
+
     initialised = true
   }
 
   def deform(x: Int, y : Int, radius: Int) {
-    doDeform = (x, y, radius)
+    deformQueue += (x, y, radius)
   }
 
   def update(delta: Int) {
-    if (doDeform != null) {
-      val (x, y, radius) = doDeform
+    while (!deformQueue.isEmpty) {
+      val (x, y, radius) = deformQueue.dequeue
 
-      session.removeBody(body)
 
       for (i <- -radius/granularity until radius/granularity+1) {
         val pointInd = (x/granularity)+i
@@ -97,7 +123,6 @@ class Ground(session : Session, width : Int, height : Int) extends Collider {
         }
       }
       initPoints()
-      doDeform = null
       if (session.isInstanceOf[Server]) {
         session.asInstanceOf[Server].broadcastGround()
       }

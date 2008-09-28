@@ -1,7 +1,11 @@
 import org.newdawn.slick
-import net.phys2d
 import sbinary.Instances._
 import sbinary.Operations
+
+import org.jbox2d.dynamics._
+import org.jbox2d.dynamics.contacts._
+import org.jbox2d.common._
+import org.jbox2d.collision._
 
 object MachineGunItem extends Item {
   override def name = "Machine Gun"
@@ -18,19 +22,25 @@ class MachineGun(session: Session, tank: Tank) extends Projectile(session, tank)
   override val reloadTime = 0.4f
   override val projectileType = ProjectileTypes.MACHINE_GUN
 
-  override def shape = new phys2d.raw.shapes.Box(radius, radius*2)
+  override def shapes = {
+    val polyDef = new PolygonDef
+    polyDef.setAsBox(radius/2, radius)
+    polyDef.restitution = 0f
+    polyDef.density = 1f
+    List(polyDef)
+  }
   
   override def update(delta : Int) {
     super.update(delta)
     if (session.isInstanceOf[Server]) {
-      body.setRotation((Math.atan2(body.getVelocity.getX, -body.getVelocity.getY)).toFloat)
+      body.setXForm(body.getPosition, (Math.atan2(body.getLinearVelocity.x, -body.getLinearVelocity.y)).toFloat)
     }
   }
 
   override def renderBody(g: slick.Graphics) {
     g.setColor(color)
     g.translate(x, y)
-    g.rotate(0, 0, body.getRotation.toDegrees)
+    g.rotate(0, 0, body.getAngle.toDegrees)
     g.fillRect(-radius/2, -radius, radius, radius*2)
     g.fillOval(-radius/2, -3*radius/2, radius, radius)
     g.resetTransform

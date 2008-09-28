@@ -38,8 +38,8 @@ class Gun(session: Session, tank: Tank) {
 
   def ready = timer <= 0
   
-  def x = tank.x - OFFSET_X * Math.cos(tank.angle.toRadians) - OFFSET_Y * Math.sin(tank.angle.toRadians)
-  def y = tank.y - OFFSET_X * Math.sin(tank.angle.toRadians) + OFFSET_Y * Math.cos(tank.angle.toRadians)
+  def x = (tank.x - OFFSET_X * Math.cos(tank.angle.toRadians) - OFFSET_Y * Math.sin(tank.angle.toRadians)).toFloat
+  def y = (tank.y - OFFSET_X * Math.sin(tank.angle.toRadians) + OFFSET_Y * Math.cos(tank.angle.toRadians)).toFloat
 
   def cycleWeapon() {
     var id = (selectedWeapon.id + 1) % ProjectileTypes.maxId

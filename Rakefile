@@ -10,7 +10,7 @@ def jar_files dir, names
   names.map{ |name| "#{dir}/#{name}.jar" }
 end
 
-LIB_JAR_NAMES = %w(scala-library slick phys2d lwjgl sbinary jogg vorbisspi jorbis tritonus_share natives-linux natives-mac natives-win32)
+LIB_JAR_NAMES = %w(scala-library slick jbox2d lwjgl sbinary jogg vorbisspi jorbis tritonus_share natives-linux natives-mac natives-win32)
 LIB_JAR_FILES = jar_files('lib', LIB_JAR_NAMES)
 
 GAME_JAR_NAME = 'tank'
@@ -96,8 +96,18 @@ namespace :install do
     system "zip -q -d lib/slick.jar *.SF *.RSA *.DSA"
   end
   
-  file 'lib/phys2d.jar' => :lib do
-    download_file 'lib/phys2d.jar', 'http://www.cokeandcode.com/phys2d/source/builds/phys2d-060408.jar'
+  file 'lib/jbox2d.jar' => [:lib, 'tmp/jbox2d'] do
+    raise "couldn't find appropriate jar file in Jbox2d distribution" unless jar = Dir['tmp/jbox2d/*/jbox2d-*-library-only.jar'].first
+    
+    cp jar, 'lib/jbox2d.jar'
+  end
+
+  file 'tmp/jbox2d' => 'tmp/jbox2d.zip' do
+    raise "extraction of jbox2d.zip failed" unless sh "unzip tmp/jbox2d.zip -d tmp/jbox2d"
+  end
+
+  file 'tmp/jbox2d.zip' do
+    download_file 'tmp/jbox2d.zip', 'http://garr.dl.sourceforge.net/sourceforge/jbox2d/JBox2d-2.0.1.zip'
   end
 
   file 'lib/sbinary.jar' => :lib do

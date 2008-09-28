@@ -11,15 +11,14 @@ abstract class Item {
   var itemType: Items.Value = null;
 }
 
-//Can't seem to get a handle on Item.Value from here.
 object Items extends Enumeration {
   val items = new HashMap[Value, Item]
   
   NukeItem.itemType = Value
   items.put(NukeItem.itemType, NukeItem)
   
-  MIRVItem.itemType = Value
-  items.put(MIRVItem.itemType, MIRVItem)
+  MirvItem.itemType = Value
+  items.put(MirvItem.itemType, MirvItem)
   
   RollerItem.itemType = Value
   items.put(RollerItem.itemType, RollerItem)
