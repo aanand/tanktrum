@@ -47,7 +47,7 @@ class Server(port: Int) extends Session(null) with Actor {
   val groundSequence = new Sequence
 
   def act {
-    println("Server started.")
+    println("Server started on port " + port + ".")
     var time = new Date().getTime()
 
     while (true) {

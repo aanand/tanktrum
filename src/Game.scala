@@ -23,10 +23,10 @@ class Game(title: String) extends BasicGame(title) {
     this.container = container
 
     val storedUserName = prefs.get("username", "Player")
-    val storedPort = prefs.get("port", "10000")
-    val storedHostname = prefs.get("hostname", "boomtrapezoid.com")
+    val storedPort = prefs.get("port", Config("default.port"))
+    val storedHostname = prefs.get("hostname", Config("default.hostname"))
 
-    val serverPort = MenuEditable(storedPort, 5);
+    val serverPort = MenuEditable(storedPort, 5)
     val serverHostname = MenuEditable(storedHostname, 255)
     val userName = MenuEditable(storedUserName, Player.MAX_NAME_LENGTH)
 
@@ -99,7 +99,7 @@ class Game(title: String) extends BasicGame(title) {
       server = null
     }
 
-    val port = 10000
+    val port = Config("default.port").toInt
 
     server = new PracticeServer(port)
     server.start
