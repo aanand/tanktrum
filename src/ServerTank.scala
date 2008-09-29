@@ -49,7 +49,7 @@ class ServerTank(server: Server, id: Byte) extends Tank(server, id) {
     (x, y, angle, 
      gun.angle, gun.power, 
      gun.angleChange, gun.powerChange, 
-     health.toInt, thrust, jumping, jumpFuel, 
+     health.toInt, thrust, jumping, jumpFuel.toInt, 
      gun.selectedWeapon.id, 
      gun.ammo(gun.selectedWeapon))
   }
@@ -118,9 +118,9 @@ class ServerTank(server: Server, id: Byte) extends Tank(server, id) {
   }
 
   def applyJumpForces(delta: Int) = {
-    jumpFuel -= delta*3
+    jumpFuel -= delta*jumpFuelBurn
 
-    body.applyForce(new Vec2(airSpeedX * thrust, (airSpeedY * lift) + session.ground.heightAt(x) - y), 
+    body.applyForce(new Vec2(airSpeedX * thrust, (airSpeedY * lift)), 
                     body.getPosition)
 
     val targetRotation = airTilt * thrust
@@ -140,7 +140,7 @@ class ServerTank(server: Server, id: Byte) extends Tank(server, id) {
   }
 
   def regenJumpFuel(delta: Int) {
-    jumpFuel += delta
+    jumpFuel += delta * jumpFuelRegen
     if (jumpFuel > purchasedJumpFuel) {
       jumpFuel = purchasedJumpFuel
     }

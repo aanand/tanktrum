@@ -45,9 +45,11 @@ abstract class Tank (val session: Session, var id: Byte) extends GameObject(sess
   var jumping = false
   var airborne = false
 
-  var maxJumpFuel = 20000
-  var purchasedJumpFuel = 2000
-  var jumpFuel = 0
+  var maxJumpFuel = Config("tank.jumpjet.maxFuel").toInt
+  var purchasedJumpFuel = Config("tank.jumpjet.startingFuel").toInt
+  var jumpFuel = 0f
+  var jumpFuelBurn = Config("tank.jumpjet.burn").toFloat
+  var jumpFuelRegen = Config("tank.jumpjet.regen").toFloat
   
   var corbomite = 0
   val maxCorbomite = Config("tank.maxCorbomite").toInt
