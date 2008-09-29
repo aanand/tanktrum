@@ -120,7 +120,7 @@ class ServerTank(server: Server, id: Byte) extends Tank(server, id) {
   def applyJumpForces(delta: Int) = {
     jumpFuel -= delta*jumpFuelBurn
 
-    body.applyForce(new Vec2(airSpeedX * thrust, (airSpeedY * lift)), 
+    body.applyForce(new Vec2((airSpeedX*delta) * thrust, (airSpeedY*delta) * lift), 
                     body.getPosition)
 
     val targetRotation = airTilt * thrust
