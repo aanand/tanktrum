@@ -8,6 +8,7 @@ require 'open-uri'
 
 class Feed
   def initialize url
+    @olditems = []
     @url = url
   end
 
@@ -21,7 +22,7 @@ class Feed
       return []
     end
 
-    if @olditems.nil?
+    if @olditems.empty?
       item = rss.items.first
       new_items_list << item
     else
@@ -32,7 +33,9 @@ class Feed
       end
     end
 
-    @olditems = rss.items
+    if rss.items and rss.items.size >= @olditems.size
+      @olditems = rss.items
+    end
     new_items_list
   end
 end
@@ -97,7 +100,10 @@ class RssBot
     if title_words.length >= 3 && title_words[1] == "Changeset" && title_words[2].length == 42
       return
     end
-    item_str = date + author + " | " + title + ' | ' + link
+    if date and author and title and link
+      item_str = date + author + " | " + title + ' | ' + link
+    end
+
 
     send item_str
   end
@@ -110,7 +116,9 @@ class RssBot
     title = "Git commit: " +  item.title
     title_words = title.split(" ")
     
-    item_str = date + author + " | " + title + ' | ' + link
+    if date and author and title and link
+      item_str = date + author + " | " + title + ' | ' + link
+    end
 
     send item_str
   end
