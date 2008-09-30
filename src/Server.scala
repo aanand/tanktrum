@@ -62,11 +62,14 @@ class Server(port: Int) extends Session(null) with Actor {
       if (isActive) {
         val newTime = new Date().getTime()
         val delta = (newTime - time)
-        time = newTime
-        update(delta.toInt)
         if (tick-delta > 0) {
           Thread.sleep(tick-delta)
+          update(tick)
         }
+        else {
+          update(delta.toInt)
+        }
+        time = newTime
       }
     }
   }
