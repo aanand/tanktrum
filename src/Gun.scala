@@ -33,7 +33,7 @@ class Gun(session: Session, tank: Tank) {
   var powerChange = 0
 
   var angle = 0f
-  var power = 200f
+  var power = POWER_RANGE.end/2f
   var timer = 0f
 
   def ready = timer <= 0
