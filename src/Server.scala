@@ -4,7 +4,6 @@ import java.nio.channels._
 import java.nio._
 import java.net._
 import java.util.Random
-import java.util.Date
 
 import scala.collection.mutable.HashMap
 import scala.collection.mutable.HashSet
@@ -48,7 +47,7 @@ class Server(port: Int) extends Session(null) with Actor {
 
   def act {
     println("Server started on port " + port + ".")
-    var time = new Date().getTime()
+    var time = System.currentTimeMillis
 
     while (true) {
       while (mailboxSize > 0) {
@@ -60,16 +59,16 @@ class Server(port: Int) extends Session(null) with Actor {
       }
       
       if (isActive) {
-        val newTime = new Date().getTime()
+        val newTime = System.currentTimeMillis
         val delta = (newTime - time)
-        if (tick-delta > 0) {
-          Thread.sleep(tick-delta)
-          update(tick)
-        }
-        else {
-          update(delta.toInt)
-        }
         time = newTime
+
+        update(delta.toInt)
+        
+        val updateTime = time - System.currentTimeMillis
+        if (tick-updateTime > 0) {
+          Thread.sleep(tick-updateTime)
+        }
       }
     }
   }
@@ -227,7 +226,7 @@ class Server(port: Int) extends Session(null) with Actor {
   }
   
   def startRound {
-    startTime = new Date().getTime
+    startTime = System.currentTimeMillis
     supposedRunTime = 0
     numTankUpdates = 0
     
