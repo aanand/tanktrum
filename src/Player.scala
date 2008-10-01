@@ -77,6 +77,7 @@ class Player (var tank: Tank, var name: String, var id: Byte) {
       }
       if (item == JumpjetItem) {
         tank.purchasedJumpFuel += item.units
+        tank.jumpFuel = tank.purchasedJumpFuel
         if (tank.purchasedJumpFuel > tank.maxJumpFuel) {
           tank.purchasedJumpFuel = tank.maxJumpFuel
         }
