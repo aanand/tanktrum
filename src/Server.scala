@@ -210,7 +210,7 @@ class Server(port: Int) extends Session(null) with Actor {
       player.ready = false
     }
     inReadyRoom = true;
-    ground = new Ground(this, WIDTH, HEIGHT)
+    ground = new Ground(this, Main.GAME_WIDTH.toInt, Main.GAME_HEIGHT.toInt)
     ground.buildPoints
     for (player <- players.values) {
       val oldTank = player.tank
@@ -265,9 +265,9 @@ class Server(port: Int) extends Session(null) with Actor {
 
   def createTank(id: Byte) = {
     val tank = new ServerTank(this, id)
-    var x = rand.nextFloat * (Main.WIDTH - tank.WIDTH * 2) + tank.WIDTH
+    var x = rand.nextFloat * (Main.GAME_WIDTH - tank.WIDTH * 2) + tank.WIDTH
     while (tanks.exists(tank => {x > tank.x - tank.WIDTH && x < tank.x + tank.WIDTH})) {
-      x = rand.nextFloat * (Main.WIDTH - tank.WIDTH * 2) + tank.WIDTH
+      x = rand.nextFloat * (Main.GAME_WIDTH - tank.WIDTH * 2) + tank.WIDTH
     }
     tank.create(x)
     tank

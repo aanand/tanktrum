@@ -41,6 +41,7 @@ class Player (var tank: Tank, var name: String, var id: Byte) {
   }
 
   def render(g: Graphics) {
+    g.resetTransform
     if (null == tank) {
       return
     }
@@ -65,6 +66,7 @@ class Player (var tank: Tank, var name: String, var id: Byte) {
     }
 
     g.resetTransform
+    g.scale(Main.GAME_WINDOW_RATIO, Main.GAME_WINDOW_RATIO)
   }
 
   def buy(item: Item) = {

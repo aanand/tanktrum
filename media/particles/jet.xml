@@ -3,15 +3,15 @@
   <spawnInterval enabled="false" max="50.0" min="50.0"/>
   <spawnCount enabled="true" max="5.0" min="1.0"/>
   <initialLife enabled="true" max="100.0" min="50.0"/>
-  <initialSize enabled="true" max="28.0" min="28.0"/>
+  <initialSize enabled="true" max="6.0" min="6.0"/>
   <xOffset enabled="false" max="0.0" min="0.0"/>
   <yOffset enabled="true" max="0.0" min="0.0"/>
   <initialDistance enabled="false" max="0.0" min="0.0"/>
-  <speed enabled="true" max="300.0" min="150.0"/>
+  <speed enabled="true" max="60.0" min="30.0"/>
   <length enabled="false" max="1000.0" min="1000.0"/>
-  <spread value="45.0"/>
+  <spread value="9.0"/>
   <angularOffset value="180.0"/>
-  <growthFactor value="200.0"/>
+  <growthFactor value="40.0"/>
   <gravityFactor value="0.0"/>
   <startAlpha value="255.0"/>
   <endAlpha value="0.0"/>

@@ -63,6 +63,7 @@ class Explosion (var x: Float, var y: Float, var radius: Float, session: Session
       var damage = -contact.separation
       damage *= (timeToDie/lifetime)
       damage *= damageFactor
+      damage *= Main.GAME_WINDOW_RATIO
 
       if (!tanksHit.contains(tank)) {
         println(tank.player.name + " in explosion for " + damage + " damage.")

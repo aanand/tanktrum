@@ -96,6 +96,7 @@ class ClientTank(client: Client) extends Tank(client, 0) {
     g.translate(BASE_OFFSET_X, BASE_OFFSET_Y)
     g.fillRect(-BASE_WIDTH/2, -BASE_HEIGHT/2, BASE_WIDTH, BASE_HEIGHT)
     g.resetTransform
+    g.scale(Main.GAME_WINDOW_RATIO, Main.GAME_WINDOW_RATIO)
   }
 
   def drawWheel(g : Graphics, offsetX : Float) {
@@ -107,6 +108,7 @@ class ClientTank(client: Client) extends Tank(client, 0) {
     g.fillOval(-WHEEL_RADIUS, -WHEEL_RADIUS, WHEEL_RADIUS*2, WHEEL_RADIUS*2)
     
     g.resetTransform
+    g.scale(Main.GAME_WINDOW_RATIO, Main.GAME_WINDOW_RATIO)
   }
 
   def serialise = {

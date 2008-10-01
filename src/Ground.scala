@@ -33,7 +33,7 @@ class Ground(session : Session, width : Int, height : Int) extends GameObject(se
     }
   }
 
-  var deformQueue = new Queue[(Int, Int, Int)]
+  var deformQueue = new Queue[(Float, Float, Float)]
 
   var initialised = false
     
@@ -92,17 +92,19 @@ class Ground(session : Session, width : Int, height : Int) extends GameObject(se
     initialised = true
   }
 
-  def deform(x: Int, y : Int, radius: Int) {
+  def deform(x: Float, y: Float, radius: Float) {
     deformQueue += (x, y, radius)
   }
 
   def update(delta: Int) {
     while (!deformQueue.isEmpty) {
       val (x, y, radius) = deformQueue.dequeue
+      
+      var i = -radius/granularity
+      while (i < radius/granularity+1) {
+        
+        val pointInd = (x/granularity+i).toInt
 
-
-      for (i <- -radius/granularity until radius/granularity+1) {
-        val pointInd = (x/granularity)+i
         if (pointInd >= 0 && pointInd < points.length) {
           val groundHeight = points(pointInd).y
 
@@ -117,10 +119,11 @@ class Ground(session : Session, width : Int, height : Int) extends GameObject(se
               points(pointInd).y += (yBottom - yTop).toFloat
             }
           }
-          if (points(pointInd).y > Main.HEIGHT-MIN_HEIGHT) {
-            points(pointInd).y = Main.HEIGHT-MIN_HEIGHT
+          if (points(pointInd).y > Main.GAME_HEIGHT-MIN_HEIGHT) {
+            points(pointInd).y = Main.GAME_HEIGHT-MIN_HEIGHT
           }
         }
+        i += granularity
       }
       initPoints()
       if (session.isInstanceOf[Server]) {
@@ -146,11 +149,11 @@ class Ground(session : Session, width : Int, height : Int) extends GameObject(se
     }
 
     g.setColor(earthColor)
-    g.fillRect(0, Main.HEIGHT-MIN_HEIGHT, Main.WIDTH, MIN_HEIGHT)
+    g.fillRect(0, (Main.GAME_HEIGHT-MIN_HEIGHT), (Main.GAME_WIDTH), MIN_HEIGHT)
   }
   
   def serialise(seq: Short) = {
-    Operations.toByteArray((seq, points.map((p) => p.getY.toShort).toArray))
+    Operations.toByteArray((seq, points.map((p) => (p.getY/Main.GAME_WIDTH*Math.MAX_SHORT).toShort).toArray))
   }
   
   def loadFrom(shortPoints: Array[Short]) = {
@@ -159,7 +162,7 @@ class Ground(session : Session, width : Int, height : Int) extends GameObject(se
     }
     var i = 0f
     points = shortPoints.map((s) => {
-        val v = new Vector2f(i, s)
+        val v = new Vector2f(i, s.toFloat/Math.MAX_SHORT*Main.GAME_WIDTH)
         i += granularity
         v
       }

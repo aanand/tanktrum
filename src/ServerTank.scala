@@ -31,11 +31,6 @@ class ServerTank(server: Server, id: Byte) extends Tank(server, id) {
   val fallImmuneTime    = Config("tank.fall.immuneTime").toInt
   var fallImmuneTimer = fallImmuneTime
 
-
-  val BODY_MASS = Config("tank.bodyMass").toFloat
-  val WHEEL_MASS = Config("tank.wheelMass").toFloat
-  val BASE_MASS = Config("tank.baseMass").toFloat
-
   var thrust = 0
   var lift = 0
   var destroy = false
@@ -70,20 +65,20 @@ class ServerTank(server: Server, id: Byte) extends Tank(server, id) {
       health = 0
       for (i <- 0 until corbomite) {
         server.addProjectile(this, x+Math.sin(body.getAngle).toFloat*HEIGHT/2, y-Math.cos(body.getAngle).toFloat*HEIGHT/2, 
-                              -50f+rand.nextFloat()*100f, 
-                                   rand.nextFloat()*150f+body.getLinearVelocity.y*2, 
+                              -40f+rand.nextFloat*80f, 
+                                   rand.nextFloat*50f+body.getLinearVelocity.y*2, 
                               ProjectileTypes.CORBOMITE)
       }
       remove
     }
     if (isDead) return
 
-    if (y < -Main.HEIGHT+HEIGHT) {
+    if (y < -Main.GAME_HEIGHT+HEIGHT) {
       server.broadcastChat(player.name + " went into orbit.")
       destroy = true
     }
 
-    if (y > Main.HEIGHT || x < 0 || x > Main.WIDTH) {
+    if (y > Main.GAME_HEIGHT || x < 0 || x > Main.GAME_WIDTH) {
       server.broadcastChat(player.name + " left the world.")
       destroy = true
     }

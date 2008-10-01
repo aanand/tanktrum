@@ -25,12 +25,11 @@ class Projectile(session: Session, val tank: Tank) extends GameObject(session) {
   var id: Int = -1
 
   def color = new slick.Color(1.0f, 1.0f, 1.0f)
-  val explosionRadius = 20f
+  val explosionRadius = 4f
   val explosionDamageFactor = 1f
-  lazy val radius = 3f
+  lazy val radius = 0.6f
   val damage = 5
   val reloadTime = 4f
-  val mass = 1f
   
   var collidedWith: GameObject = _
   
@@ -77,12 +76,12 @@ class Projectile(session: Session, val tank: Tank) extends GameObject(session) {
       updateTrail(delta)
     }
     else {
-      if (y > Main.HEIGHT || destroy) {
+      if (y > Main.GAME_HEIGHT || destroy) {
         session.removeProjectile(this)
       }
       else if (y + radius > session.ground.heightAt(x) || 
                x < 0 || 
-               x > Main.WIDTH) {
+               x > Main.GAME_WIDTH) {
         collide(session.ground, null)
       }
     }
@@ -132,7 +131,7 @@ class Projectile(session: Session, val tank: Tank) extends GameObject(session) {
         return
       }
       
-      if (prevX > 0 && Math.abs(x-prevX) < Main.WIDTH/2) {
+      if (prevX > 0 && Math.abs(x-prevX) < Main.GAME_WIDTH/2) {
         g.setColor(new slick.Color(color.r, color.g, color.b, 0.5f - (t.toFloat / trailLifetime)*0.5f))
         g.drawLine(x, y, prevX, prevY)
       }
@@ -158,7 +157,7 @@ class Projectile(session: Session, val tank: Tank) extends GameObject(session) {
 
     if (session.isInstanceOf[Server]) {
       session.addExplosion(x, y, explosionRadius, this, explosionDamageFactor)
-      session.ground.deform(x.toInt, y.toInt, explosionRadius.toInt)
+      session.ground.deform(x, y, explosionRadius)
     }
     
     if (obj.isInstanceOf[Tank] && session.isInstanceOf[Server]) {

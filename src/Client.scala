@@ -138,6 +138,7 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
       readyRoom.render(g)
     }
     else { 
+      g.scale(Main.GAME_WINDOW_RATIO, Main.GAME_WINDOW_RATIO)
       if (ground.initialised) {
         renderSky(g)
         particleSystem.render()
@@ -151,6 +152,7 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
     }
 
     g.resetTransform
+    g.scale(Main.GAME_WINDOW_RATIO, Main.GAME_WINDOW_RATIO)
     g.setColor(new Color(1f, 1f, 1f))
     g.drawString("Ping: " + latency, 735, 575)
 

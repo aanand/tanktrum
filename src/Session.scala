@@ -16,9 +16,6 @@ abstract class Session(container: slick.GameContainer) extends ContactListener {
   val READY_ROOM_BROADCAST_INTERVAL = Config("server.readyRoomBroadcastInterval").toInt
   val MAX_PLAYERS                   = Config("server.maxPlayers").toInt
   
-  val WIDTH = Main.WIDTH
-  val HEIGHT = Main.HEIGHT
-
   var world = createWorld
 
   var ground: Ground = _
@@ -37,7 +34,7 @@ abstract class Session(container: slick.GameContainer) extends ContactListener {
   var startTime: Long = 0
 
   def enter() {
-    ground = new Ground(this, WIDTH, HEIGHT)
+    ground = new Ground(this, Main.GAME_WIDTH.toInt, Main.GAME_HEIGHT.toInt)
     active = true
   }
   
@@ -69,8 +66,8 @@ abstract class Session(container: slick.GameContainer) extends ContactListener {
 
   def createWorld = {
     val gravity = new Vec2(0.0f, Config("physics.gravity").toFloat)
-    val bounds = new AABB(new Vec2(-Main.WIDTH, -Main.HEIGHT),
-                          new Vec2(2*Main.WIDTH, 2*Main.HEIGHT))
+    val bounds = new AABB(new Vec2(-Main.GAME_WIDTH, -Main.GAME_HEIGHT),
+                          new Vec2(2*Main.GAME_WIDTH, 2*Main.GAME_HEIGHT))
 
     val newWorld = new World(bounds, gravity, false)
 

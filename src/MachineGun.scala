@@ -15,9 +15,8 @@ object MachineGunItem extends Item {
 }
 
 class MachineGun(session: Session, tank: Tank) extends Projectile(session, tank) {
-  override val radius = 2f
-  override val mass = 0.2f
-  override val explosionRadius = 4f
+  override val radius = 0.4f
+  override val explosionRadius = 0.8f
   override val damage = 3
   override val reloadTime = 0.4f
   override val projectileType = ProjectileTypes.MACHINE_GUN
@@ -44,5 +43,6 @@ class MachineGun(session: Session, tank: Tank) extends Projectile(session, tank)
     g.fillRect(-radius/2, -radius, radius, radius*2)
     g.fillOval(-radius/2, -3*radius/2, radius, radius)
     g.resetTransform
+    g.scale(Main.GAME_WINDOW_RATIO, Main.GAME_WINDOW_RATIO)
   }
 }

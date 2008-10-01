@@ -52,14 +52,14 @@ class Game(title: String) extends BasicGame(title) {
     }
   }
 
-  def render(container: GameContainer, graphics: Graphics) {
+  def render(container: GameContainer, g: Graphics) {
     if (menu != null && menu.showing) {
-      graphics.drawImage(titleImage, 0, 0)
-      menu.render(graphics)
+      g.drawImage(titleImage, 0, 0)
+      menu.render(g)
       return
     }
     if (client != null && client.isActive) {
-      client.render(graphics)
+      client.render(g)
     }
   }
   

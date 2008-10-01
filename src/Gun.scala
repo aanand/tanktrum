@@ -17,7 +17,7 @@ class Gun(session: Session, tank: Tank) {
   val READY_COLOR   = new Color(0.0f, 1.0f, 0.0f, 0.5f)
   val LOADING_COLOR = new Color(1.0f, 0.0f, 0.0f, 0.5f)
   
-  val arrowShape = new Polygon(List[Float](-5, 0, -5, -50, -10, -50, 0, -60, 10, -50, 5, -50, 5, 0).toArray)
+  val arrowShape = new Polygon(List[Float](-1, 0, -1, -10, -2, -10, 0, -12, 2, -10, 1, -10, 1, 0).toArray)
   
   var selectedWeapon = ProjectileTypes.PROJECTILE
   
@@ -99,5 +99,6 @@ class Gun(session: Session, tank: Tank) {
     g.fill(arrowShape)
     
     g.resetTransform
+    g.scale(Main.GAME_WINDOW_RATIO, Main.GAME_WINDOW_RATIO)
   }
 }

@@ -12,10 +12,10 @@ object MirvItem extends Item {
 }
 
 class Mirv(session: Session, tank: Tank) extends Projectile(session, tank) {
-  override lazy val radius = 4f
+  override lazy val radius = 0.8f
   override val projectileType = ProjectileTypes.MIRV
-  override val explosionRadius = 13f
-  val DISTRIBUTION = 50
+  override val explosionRadius = 2.6f
+  val distribution = 10
   val clusterSize = 10
   val lifetime = 2000
   var timeUntilSplit = lifetime
@@ -31,8 +31,8 @@ class Mirv(session: Session, tank: Tank) extends Projectile(session, tank) {
         for (val i <- 0 until clusterSize) {
           val p = clusterProjectile
           p.body.setXForm(new Vec2(x, y), 0)
-          p.body.setLinearVelocity(new Vec2(body.getLinearVelocity.x + (rand.nextFloat*2f - 1f) * DISTRIBUTION, 
-                                            body.getLinearVelocity.y + (rand.nextFloat*2f - 1f) * DISTRIBUTION))
+          p.body.setLinearVelocity(new Vec2(body.getLinearVelocity.x + (rand.nextFloat*2f - 1f) * distribution, 
+                                            body.getLinearVelocity.y + (rand.nextFloat*2f - 1f) * distribution))
           session.addProjectile(p)
         }
         session.removeProjectile(this)
@@ -47,8 +47,8 @@ class Mirv(session: Session, tank: Tank) extends Projectile(session, tank) {
 }
 
 class MirvCluster(session: Session, tank: Tank) extends Projectile(session, tank) {
-  override val radius = 2f
+  override lazy val radius = 0.4f
   override val damage = 3
-  override val explosionRadius = 13f
+  override val explosionRadius = 2.6f
   override val projectileType = ProjectileTypes.MIRV_CLUSTER
 }

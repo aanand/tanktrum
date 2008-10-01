@@ -29,7 +29,8 @@ class Menu(tree : List[(String, MenuItem)]) {
       g.translate(0, 20)
     }
     
-    g.resetTransform()
+    g.resetTransform
+    g.scale(Main.GAME_WINDOW_RATIO, Main.GAME_WINDOW_RATIO)
   }
   
   def keyPressed(key : Int, char : Char) {
