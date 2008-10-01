@@ -24,8 +24,6 @@ object Main {
       container.setTargetFrameRate(targetFrameRate)
     }
     
-    container.setSmoothDeltas(smoothDeltas)
-
     container.setShowFPS(showFPS)
 
     //it's useful if the server still sends updates when the player is alt-tabbed
