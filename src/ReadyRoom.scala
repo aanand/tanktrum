@@ -11,6 +11,8 @@ class ReadyRoom (client: Client) {
     List(("Ready", MenuCommand(Unit => ready))))
 
   def render(g: Graphics) {
+    g.resetTransform
+
     menu.showing = true
 
     g.translate(20, 20)
@@ -37,6 +39,8 @@ class ReadyRoom (client: Client) {
       g.drawString(player.score.toString, 400, 20 + offset * 20)
       offset += 1
     }
+    g.resetTransform
+    g.scale(Main.GAME_WINDOW_RATIO, Main.GAME_WINDOW_RATIO)
   }
 
   def buy(item: Item) {
