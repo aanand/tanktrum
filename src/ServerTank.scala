@@ -78,7 +78,7 @@ class ServerTank(server: Server, id: Byte) extends Tank(server, id) {
       destroy = true
     }
 
-    if (y > Main.GAME_HEIGHT || x < 0 || x > Main.GAME_WIDTH) {
+    if (y > Main.GAME_HEIGHT || x < -WIDTH || x > Main.GAME_WIDTH+WIDTH) {
       server.broadcastChat(player.name + " left the world.")
       destroy = true
     }
