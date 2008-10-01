@@ -148,7 +148,6 @@ class ClientTank(client: Client) extends Tank(client, 0) {
     id = newID
     
     if (null != client.me && id != client.me.id) {
-      println("Updating gun things.")
       gun.angle = newGunAngle
       gun.power = newGunPower
       gun.angleChange = newGunAngleChange
