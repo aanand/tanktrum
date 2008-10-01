@@ -322,15 +322,7 @@ class Server(port: Int) extends Session(null) with Actor {
       case Commands.JUMP                   => player.tank.lift = -1 
       case Commands.STOP_JUMP              => player.tank.lift = 0 
                                            
-      case Commands.AIM_CLOCKWISE          => player.gun.angleChange = 1 
-      case Commands.STOP_AIM_CLOCKWISE     => player.gun.angleChange = 0 
-      case Commands.AIM_ANTICLOCKWISE      => player.gun.angleChange = -1 
-      case Commands.STOP_AIM_ANTICLOCKWISE => player.gun.angleChange = 0 
-                                           
-      case Commands.POWER_UP               => player.gun.powerChange = 1 
-      case Commands.STOP_POWER_UP          => player.gun.powerChange = 0 
-      case Commands.POWER_DOWN             => player.gun.powerChange = -1 
-      case Commands.STOP_POWER_DOWN        => player.gun.powerChange = 0 
+      case Commands.TANK_UPDATE            => handleTankUpdate(player)
                                            
       case Commands.START_FIRE             => player.gun.firing = true 
       case Commands.STOP_FIRE              => player.gun.firing = false 
@@ -343,6 +335,12 @@ class Server(port: Int) extends Session(null) with Actor {
       
       case Commands.GOODBYE                => handleGoodbye(addr)
       case _                               => println("Warning: Server got unknown command: " + command.toByte)}
+  }
+
+  def handleTankUpdate(player: Player) = {
+    val tankArray = new Array[byte](data.remaining)
+    data.get(tankArray)
+    player.tank.loadFrom(tankArray)
   }
 
   def handleChat(player: Player) = {

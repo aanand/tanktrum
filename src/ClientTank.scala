@@ -108,6 +108,16 @@ class ClientTank(client: Client) extends Tank(client, 0) {
     
     g.resetTransform
   }
+
+  def serialise = {
+    Operations.toByteArray((
+      gun.angle.toShort,
+      gun.angleChange.toByte,
+      gun.power.toShort,
+      gun.powerChange.toByte
+    ))
+  }
+
   
   def loadFrom(data: Array[Byte]) = {
     val values = Operations.fromByteArray[(
@@ -126,17 +136,21 @@ class ClientTank(client: Client) extends Tank(client, 0) {
         newID) = values
 
     body.setXForm(new Vec2(newX, newY), newAngle.toFloat.toRadians)
-    gun.angle = newGunAngle
-    gun.power = newGunPower
     gun.timer = newGunTimer
     health = newHealth
     jumping = newJumping
-    gun.angleChange = newGunAngleChange
-    gun.powerChange = newGunPowerChange
     gun.selectedWeapon = ProjectileTypes.apply(newSelectedWeapon)
     gun.ammo(gun.selectedWeapon) = newSelectedAmmo
     jumpFuel = newFuel
     
     id = newID
+    
+    if (null != client.me && id != client.me.id) {
+      println("Updating gun things.")
+      gun.angle = newGunAngle
+      gun.power = newGunPower
+      gun.angleChange = newGunAngleChange
+      gun.powerChange = newGunPowerChange
+    }
   }
 }

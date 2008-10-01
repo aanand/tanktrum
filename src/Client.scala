@@ -3,7 +3,6 @@ import org.newdawn.slick._
 import java.nio.channels._
 import java.nio._
 import java.net._
-import java.util.Date
 
 import scala.collection.mutable.HashMap
 
@@ -14,6 +13,7 @@ import ClientTank._
 
 class Client (hostname: String, port: Int, name: String, container: GameContainer) extends Session(container) {
   val PING_PERIOD = Config("client.pingPeriod").toInt
+  val TANK_UPDATE_INTERVAL = Config("client.tankUpdateInterval").toInt
   val SERVER_TIMEOUT = Config("client.serverTimeout").toInt
 
   val CHAT_KEY              = Input.KEY_T
@@ -30,8 +30,9 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
   var channel: DatagramChannel = _
   val data = ByteBuffer.allocate(10000)
   
-  var lastPing = new Date()
-  var lastMessageReceived = new Date()
+  var lastPing = System.currentTimeMillis
+  var lastMessageReceived = System.currentTimeMillis
+  var timeToTankUpdate = 0
   var latency: Long = 0
 
   val skyTopColor    = new Color(0f, 0f, 0.25f)
@@ -98,6 +99,14 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
         data.rewind
         val command = data.get.toChar
         processCommand(command)
+      }
+
+      timeToTankUpdate -= delta
+      if (timeToTankUpdate < 0) {
+        if (null != me && null != me.tank) {
+          timeToTankUpdate = TANK_UPDATE_INTERVAL
+          sendTankUpdate
+        }
       }
       
       for (p <- projectiles.values) {
@@ -173,7 +182,7 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
     command match {
       case Commands.SERVER_FULL  => error("Server full.")
       case Commands.GROUND       => loadGround
-      case Commands.PING         => latency = new Date().getTime - lastPing.getTime
+      case Commands.PING         => latency = System.currentTimeMillis - lastPing
       case Commands.TANKS        => processUpdate
       case Commands.PROJECTILE   => loadProjectile
       case Commands.PROJECTILES  => loadProjectiles
@@ -207,10 +216,10 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
           case MOVE_LEFT_KEY         => sendCommand(Commands.MOVE_LEFT) 
           case MOVE_RIGHT_KEY        => sendCommand(Commands.MOVE_RIGHT) 
           case JUMP_KEY              => sendCommand(Commands.JUMP) 
-          case AIM_ANTICLOCKWISE_KEY => sendCommand(Commands.AIM_ANTICLOCKWISE) 
-          case AIM_CLOCKWISE_KEY     => sendCommand(Commands.AIM_CLOCKWISE) 
-          case POWER_UP_KEY          => sendCommand(Commands.POWER_UP) 
-          case POWER_DOWN_KEY        => sendCommand(Commands.POWER_DOWN) 
+          case AIM_ANTICLOCKWISE_KEY => me.tank.gun.angleChange = -1
+          case AIM_CLOCKWISE_KEY     => me.tank.gun.angleChange = 1
+          case POWER_UP_KEY          => me.tank.gun.powerChange = 1
+          case POWER_DOWN_KEY        => me.tank.gun.powerChange = -1
           case FIRE_KEY              => sendCommand(Commands.START_FIRE) 
           case CYCLE_WEAPON_KEY      => sendCommand(Commands.CYCLE_WEAPON) 
           case _                     => 
@@ -232,12 +241,12 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
           case MOVE_LEFT_KEY         => sendCommand(Commands.STOP_MOVE_LEFT) 
           case MOVE_RIGHT_KEY        => sendCommand(Commands.STOP_MOVE_RIGHT) 
           case JUMP_KEY              => sendCommand(Commands.STOP_JUMP) 
-          case AIM_ANTICLOCKWISE_KEY => sendCommand(Commands.STOP_AIM_ANTICLOCKWISE) 
-          case AIM_CLOCKWISE_KEY     => sendCommand(Commands.STOP_AIM_CLOCKWISE) 
-          case POWER_UP_KEY          => sendCommand(Commands.STOP_POWER_UP) 
-          case POWER_DOWN_KEY        => sendCommand(Commands.STOP_POWER_DOWN) 
+          case AIM_ANTICLOCKWISE_KEY => if (me.tank.gun.angleChange == -1) {me.tank.gun.angleChange = 0}
+          case AIM_CLOCKWISE_KEY     => if (me.tank.gun.angleChange ==  1) {me.tank.gun.angleChange = 0}
+          case POWER_UP_KEY          => if (me.tank.gun.powerChange ==  1) {me.tank.gun.powerChange = 0}
+          case POWER_DOWN_KEY        => if (me.tank.gun.powerChange == -1) {me.tank.gun.powerChange = 0}
           case FIRE_KEY              => sendCommand(Commands.STOP_FIRE) 
-          case _ => 
+          case _                     => 
         }
       }
     }
@@ -262,21 +271,21 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
   }
   
   def ping = {
-    if (new Date().getTime - lastPing.getTime > PING_PERIOD) {
+    if (System.currentTimeMillis - lastPing> PING_PERIOD) {
       sendPing
-      lastPing = new Date()
+      lastPing = System.currentTimeMillis
     }
   }
   
   def checkTimeout = {
-    if (new Date().getTime - lastMessageReceived.getTime > SERVER_TIMEOUT) {
+    if (System.currentTimeMillis - lastMessageReceived > SERVER_TIMEOUT) {
       println("Connection timed out.")
       leave()
     }
   }
 
   def resetTimeout = {
-    lastMessageReceived = new Date
+    lastMessageReceived = System.currentTimeMillis
   }
 
   def loadGround {
@@ -361,16 +370,15 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
         players.put(p.id, p)
       }
       players(p.id).updated = true
-      //This is poetry:
-      if (p.me) {
-        me = p
-      }
     }
 
     //prune players who no longer exist.
     for (player <- players.values) {
       if (player.updated == false && !player.me) {
         players -= player.id
+      }
+      if (player.updated == true && player.me) {
+        me = player
       }
     }
   }
@@ -380,7 +388,7 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
     
     if (inReadyRoom) {
       inReadyRoom = false
-      startTime = new Date().getTime
+      startTime = System.currentTimeMillis
       supposedRunTime = 0
       numTankUpdates = 0
     }
@@ -407,6 +415,10 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
         }
       }
     }
+  }
+
+  def sendTankUpdate {
+    send(byteToArray(Commands.TANK_UPDATE) ++ me.tank.serialise)
   }
 
   def sendPurchase(item: byte) {

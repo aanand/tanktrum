@@ -67,6 +67,7 @@ class ServerTank(server: Server, id: Byte) extends Tank(server, id) {
   override def update(delta: Int) {
     super.update(delta)
     if (destroy) {
+      health = 0
       for (i <- 0 until corbomite) {
         server.addProjectile(this, x+Math.sin(body.getAngle).toFloat*HEIGHT/2, y-Math.cos(body.getAngle).toFloat*HEIGHT/2, 
                               -50f+rand.nextFloat()*100f, 
@@ -76,6 +77,16 @@ class ServerTank(server: Server, id: Byte) extends Tank(server, id) {
       remove
     }
     if (isDead) return
+
+    if (y < -Main.HEIGHT+HEIGHT) {
+      server.broadcastChat(player.name + " went into orbit.")
+      destroy = true
+    }
+
+    if (y > Main.HEIGHT || x < 0 || x > Main.WIDTH) {
+      server.broadcastChat(player.name + " left the world.")
+      destroy = true
+    }
 
     if (contactTime > 0) {
       contactTime -= delta
@@ -224,6 +235,19 @@ class ServerTank(server: Server, id: Byte) extends Tank(server, id) {
       jumpFuel.toShort,
       id
     ))
+  }
+
+  def loadFrom(data: Array[Byte]) = {
+    val values = Operations.fromByteArray[(
+      Short, Byte,         //gun angle, gun angle change
+      Short, Byte)](data)  //gun power, gun power change
+    
+    val (newGunAngle, newGunAngleChange, newGunPower, newGunPowerChange) = values
+
+    gun.angle = newGunAngle
+    gun.power = newGunPower
+    gun.angleChange = newGunAngleChange
+    gun.powerChange = newGunPowerChange
   }
  
 }

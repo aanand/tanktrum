@@ -25,15 +25,7 @@ object Commands {
   val JUMP = nextI
   val STOP_JUMP = nextI
 
-  val AIM_CLOCKWISE = nextI
-  val STOP_AIM_CLOCKWISE = nextI
-  val AIM_ANTICLOCKWISE = nextI
-  val STOP_AIM_ANTICLOCKWISE = nextI
-
-  val POWER_UP = nextI
-  val STOP_POWER_UP = nextI
-  val POWER_DOWN = nextI
-  val STOP_POWER_DOWN = nextI
+  val TANK_UPDATE = nextI
 
   val START_FIRE = nextI
   val STOP_FIRE = nextI
