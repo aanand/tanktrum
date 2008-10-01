@@ -8,6 +8,8 @@ import org.jbox2d.common._
 import org.jbox2d.collision._
 
 object Projectile {
+  val antiGravity = Config("physics.projectileGravity").toFloat - Config("physics.gravity").toFloat
+
   def deserialise(data: Array[byte]) = Operations.fromByteArray[(Int, Float, Float, Float, Float, Float, Float, Byte)](data)
   
   def newFromTuple(session: Session, tuple: (Int, Float, Float, Float, Float, Float, Float, Byte)) = {
@@ -72,6 +74,7 @@ class Projectile(session: Session, val tank: Tank) extends GameObject(session) {
     if (null != collidedWith) {
       explode(collidedWith)
     }
+    body.applyForce(new Vec2(0, Projectile.antiGravity * body.getMass), body.getPosition)
     if (session.isInstanceOf[Client]) {
       updateTrail(delta)
     }
