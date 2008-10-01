@@ -221,7 +221,7 @@ class ServerTank(server: Server, id: Byte) extends Tank(server, id) {
       gun.angle.toShort, 
       gun.power.toShort,
       Math.ceil(gun.timer).toShort, 
-      health.toShort, 
+      health,
       jumping,
       gun.angleChange.toByte, 
       gun.powerChange.toByte,

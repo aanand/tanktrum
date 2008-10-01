@@ -125,7 +125,7 @@ class ClientTank(client: Client) extends Tank(client, 0) {
     val values = Operations.fromByteArray[(
       Float, Float, Short,  //x, y, angle
       Short, Short, Short,  //gun angle, gun power, gun timer
-      Short, Boolean,       //health, jumping
+      Float, Boolean,       //health, jumping
       Byte, Byte,           //gun angle change, gun power change
       Byte, Short, Short,   //selected weapon, selected ammo, jump fuel
       Byte)](data)          //id
