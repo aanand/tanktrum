@@ -77,16 +77,12 @@ class Projectile(session: Session, val tank: Tank) extends GameObject(session) {
       updateTrail(delta)
     }
     else {
-      if (x < 0) {
-        body.setXForm(new Vec2(Main.WIDTH-1f, y), body.getAngle)
-      }
-      if (x > Main.WIDTH) {
-        body.setXForm(new Vec2(1f, y), body.getAngle)
-      }
       if (y > Main.HEIGHT || destroy) {
         session.removeProjectile(this)
       }
-      if (y + radius > session.ground.heightAt(x)) {
+      else if (y + radius > session.ground.heightAt(x) || 
+               x < 0 || 
+               x > Main.WIDTH) {
         collide(session.ground, null)
       }
     }

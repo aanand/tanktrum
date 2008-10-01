@@ -77,17 +77,6 @@ class ServerTank(server: Server, id: Byte) extends Tank(server, id) {
     }
     if (isDead) return
 
-    if (x > Main.WIDTH) {
-      var newY = server.ground.heightAt(1f) - 3f
-      if (y < newY) newY = y
-      body.setXForm(new Vec2(1f, newY), angle.toRadians)
-    }
-    if (x < 0) {
-      var newY = server.ground.heightAt(Main.WIDTH-1f) - 3f
-      if (y < newY) newY = y
-      body.setXForm(new Vec2(Main.WIDTH-1f, newY), angle.toRadians)
-    }
-    
     if (contactTime > 0) {
       contactTime -= delta
     }
