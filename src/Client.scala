@@ -33,6 +33,7 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
   var lastPing = System.currentTimeMillis
   var lastMessageReceived = System.currentTimeMillis
   var timeToTankUpdate = 0
+  var lastTankUpdate = new Array[Byte](6)
   var latency: Long = 0
 
   val skyTopColor    = new Color(0f, 0f, 0.25f)
@@ -152,7 +153,6 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
     }
 
     g.resetTransform
-    g.scale(Main.GAME_WINDOW_RATIO, Main.GAME_WINDOW_RATIO)
     g.setColor(new Color(1f, 1f, 1f))
     g.drawString("Ping: " + latency, 735, 575)
 
@@ -420,7 +420,11 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
   }
 
   def sendTankUpdate {
-    send(byteToArray(Commands.TANK_UPDATE) ++ me.tank.serialise)
+    val tankUpdate = me.tank.serialise
+    if (!tankUpdate.toArray.deepEquals(lastTankUpdate.toArray)) {
+      send(byteToArray(Commands.TANK_UPDATE) ++ tankUpdate)
+      lastTankUpdate = tankUpdate
+    }
   }
 
   def sendPurchase(item: byte) {
