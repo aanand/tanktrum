@@ -32,8 +32,7 @@ class Roller(session : Session, tank : Tank) extends Projectile(session, tank) {
   }
 
   override def collide(obj: GameObject, contact: ContactPoint) {
-    if (y - radius > session.ground.heightAt(x) || //It's below the ground.
-        obj.isInstanceOf[Tank] || //Or it's hit a tank.
+    if (obj.isInstanceOf[Tank] || //Or it's hit a tank.
         (obj.isInstanceOf[Projectile] && !obj.isInstanceOf[Roller])) { //Or it's hit a projectile.)
         collidedWith = obj
     }

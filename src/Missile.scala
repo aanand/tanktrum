@@ -25,6 +25,10 @@ class Missile(session: Session, tank: Tank) extends MachineGun(session, tank) {
     tank.missile = this
   }
 
+  override def collide(obj: GameObject, contact: ContactPoint) {
+    collidedWith = obj
+  }
+
   override def explode(obj: GameObject) {
     super.explode(obj)
     if (tank != null) {
