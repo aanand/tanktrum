@@ -34,4 +34,7 @@ object Items extends Enumeration {
   
   CorbomiteItem.itemType = Value
   items.put(CorbomiteItem.itemType, CorbomiteItem)
+  
+  MissileItem.itemType = Value
+  items.put(MissileItem.itemType, MissileItem)
 }

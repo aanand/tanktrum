@@ -204,7 +204,7 @@ class Projectile(session: Session, val tank: Tank) extends GameObject(session) {
 
 object ProjectileTypes extends Enumeration {
   val PROJECTILE, NUKE, ROLLER, MIRV, MIRV_CLUSTER, CORBOMITE, 
-      MACHINE_GUN, DEATHS_HEAD, DEATHS_HEAD_CLUSTER = Value
+      MACHINE_GUN, DEATHS_HEAD, DEATHS_HEAD_CLUSTER, MISSILE = Value
 
   def newProjectile(session: Session, tank: Tank, projectileType: Value) : Projectile = {
     projectileType match {
@@ -217,6 +217,7 @@ object ProjectileTypes extends Enumeration {
       case MACHINE_GUN         => new MachineGun(session, tank) 
       case DEATHS_HEAD         => new DeathsHead(session, tank)
       case DEATHS_HEAD_CLUSTER => new DeathsHeadCluster(session, tank)
+      case MISSILE             => new Missile(session, tank)
     }
   }
 
@@ -252,6 +253,11 @@ object ProjectileTypes extends Enumeration {
         g.fillOval(0, 0, 8, 8)
         g.fillOval(-8, 0, 8, 8)
         g.fillOval(0, -8, 8, 8)
+      }
+
+      case MISSILE => {
+        g.fillRect(-3, -6, 6, 12)
+        g.fillOval(-3, -9, 6, 6)
       }
     }
   }

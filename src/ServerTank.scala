@@ -24,6 +24,8 @@ class ServerTank(server: Server, id: Byte) extends Tank(server, id) {
   val airTilt         = Math.toRadians(Config("tank.air.tilt").toFloat).toFloat
   val airAngularSpeed = Math.toRadians(Config("tank.air.angularSpeed").toFloat).toFloat
 
+  val missileThrust   = Config("missile.thrust").toFloat
+
   var altitudeDamageFactor = Config("tank.air.altitudeDamageFactor").toFloat
   
   val fallThreshold     = Config("tank.fall.threshold").toInt
@@ -98,7 +100,10 @@ class ServerTank(server: Server, id: Byte) extends Tank(server, id) {
     }
     jumping = jumpFuel > 0 && (lift != 0 || (thrust != 0 && airborne))
 
-    if (jumping) {
+    if (null != missile) {
+      applyMissleDirection(delta)
+    }
+    else if (jumping) {
       applyJumpForces(delta)
     }
     else {
@@ -110,6 +115,12 @@ class ServerTank(server: Server, id: Byte) extends Tank(server, id) {
 
     wheel1OnGround = false
     wheel2OnGround = false
+  }
+
+  def applyMissleDirection(delta: Int) = {
+    missile.body.applyForce(new Vec2(missileThrust * thrust * Math.cos(missile.body.getAngle).toFloat, 
+                                     missileThrust * thrust * Math.sin(missile.body.getAngle).toFloat), 
+                            missile.body.getPosition)
   }
 
   def applyJumpForces(delta: Int) = {

@@ -59,6 +59,8 @@ abstract class Tank (val session: Session, var id: Byte) extends GameObject(sess
   var wheelShape1: collision.Shape = _
   var wheelShape2: collision.Shape = _
 
+  var missile: Missile = _
+  
   lazy val shapePoints = List[slick.geom.Vector2f] (
                       new slick.geom.Vector2f(-(WIDTH/2-TAPER), -HEIGHT),
                       new slick.geom.Vector2f(WIDTH/2-TAPER, -HEIGHT),
