@@ -12,7 +12,6 @@ class Game(title: String) extends BasicGame(title) {
 
   var menu : Menu = _
   
-  val INTRO_SOUND = "explosion.ogg"
   SoundPlayer.start
   
   val prefs = Preferences.userRoot.node("boomtrapezoid")
@@ -82,7 +81,6 @@ class Game(title: String) extends BasicGame(title) {
     prefs.put("hostname", address)
     prefs.put("port", port.toString)
 
-    SoundPlayer ! PlaySound(INTRO_SOUND)
     if (client != null) {
       client.leave()
       client = null

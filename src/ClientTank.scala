@@ -23,6 +23,7 @@ class ClientTank(client: Client) extends Tank(client, 0) {
   def particleEmitters = List(jetEmitter, vapourEmitter)
   var emitting = false
 
+  var wasAlive = false
 
   override def create(x: Float) {
     jetEmitter = ParticleIO.loadEmitter("media/particles/jet.xml")
@@ -37,6 +38,7 @@ class ClientTank(client: Client) extends Tank(client, 0) {
 
   override def update(delta: Int) {
     super.update(delta)
+
     if (jumping && isAlive) {
       startEmitting
       for (e <- particleEmitters) {
@@ -47,6 +49,12 @@ class ClientTank(client: Client) extends Tank(client, 0) {
     else {
       stopEmitting
     }
+    
+    if (wasAlive && !isAlive) {
+      SoundPlayer ! PlaySound("explosion.ogg")
+    }
+    
+    wasAlive = isAlive
   }
 
   def startEmitting {
