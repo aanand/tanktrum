@@ -23,8 +23,8 @@ class ServerTank(server: Server, id: Byte) extends Tank(server, id) {
 
   val airSpeedX       = Config("tank.air.speedX").toFloat
   val airSpeedY       = Config("tank.air.speedY").toFloat
-  val airTilt         = Math.toRadians(Config("tank.air.tilt").toFloat).toFloat
-  val airAngularSpeed = Math.toRadians(Config("tank.air.angularSpeed").toFloat).toFloat
+  val airTilt         = toRadians(Config("tank.air.tilt").toFloat).toFloat
+  val airAngularSpeed = toRadians(Config("tank.air.angularSpeed").toFloat).toFloat
 
   val missileThrust   = Config("missile.thrust").toFloat
 
@@ -53,7 +53,7 @@ class ServerTank(server: Server, id: Byte) extends Tank(server, id) {
      gun.ammo(gun.selectedWeapon))
   }
 
-  def direction = new Vec2(Math.cos(body.getAngle).toFloat, Math.sin(body.getAngle).toFloat)
+  def direction = new Vec2(cos(body.getAngle).toFloat, sin(body.getAngle).toFloat)
   def targetSpeed = SPEED * thrust * (if (direction.y * thrust < 0) direction.x else (2-direction.x))
   def targetVelocity = new Vec2(direction.x*targetSpeed, direction.y*targetSpeed)
 
@@ -77,7 +77,7 @@ class ServerTank(server: Server, id: Byte) extends Tank(server, id) {
     if (destroy) {
       health = 0
       for (i <- 0 until corbomite) {
-        server.addProjectile(this, x+Math.sin(body.getAngle).toFloat*HEIGHT/2, y-Math.cos(body.getAngle).toFloat*HEIGHT/2, 
+        server.addProjectile(this, x+sin(body.getAngle).toFloat*HEIGHT/2, y-cos(body.getAngle).toFloat*HEIGHT/2, 
                               -40f+rand.nextFloat*80f, 
                                    rand.nextFloat*50f+body.getLinearVelocity.y*2, 
                               ProjectileTypes.CORBOMITE)
@@ -247,7 +247,7 @@ class ServerTank(server: Server, id: Byte) extends Tank(server, id) {
       angle.toShort, 
       gun.angle.toShort, 
       gun.power.toShort,
-      Math.ceil(gun.timer).toShort, 
+      ceil(gun.timer).toShort, 
       health,
       jumping,
       gun.angleChange.toByte, 
