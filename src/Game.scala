@@ -21,6 +21,8 @@ class Game(title: String) extends BasicGame(title) {
   def init(container: GameContainer) {
     this.container = container
 
+    container.getInput.enableKeyRepeat(Config("game.keyRepeatWait").toInt, Config("game.keyRepeatInterval").toInt)
+
     val storedUserName = prefs.get("username", "Player")
     val storedPort = prefs.get("port", Config("default.port"))
     val storedHostname = prefs.get("hostname", Config("default.hostname"))
