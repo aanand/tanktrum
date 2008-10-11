@@ -1,35 +1,67 @@
 import org.newdawn.slick._
 import scala.collection.mutable.Stack
 
-class Menu(tree : List[(String, MenuItem)]) {
+object Menu {
+  val defaultPositionX = Config("menu.defaultPositionX").toInt
+  val defaultPositionY = Config("menu.defaultPositionY").toInt
+
+  val clickableItemWidth = Config("menu.clickableItemWidth").toInt
+  val clickableItemHeight = Config("menu.clickableItemHeight").toInt
+  val clickableItemOffsetX = Config("menu.clickableItemOffsetX").toInt
+  val clickableItemOffsetY = Config("menu.clickableItemOffsetY").toInt
+}
+
+class Menu(initTree: List[(String, MenuItem)], offsetX: Int, offsetY: Int) {
   val SELECTED_COLOR = new Color(1.0f, 1.0f, 1.0f, 1.0f)
   val UNSELECTED_COLOR = new Color(1.0f, 1.0f, 1.0f, 0.5f)
   
   var showing = true
   var editing = false
   
-  val path = new Stack[Submenu]
+  val path = new Stack[SubmenuWithPositions]
   var selection = 0
 
+  val tree = buildTree(initTree)
+
+  def this(initTree: List[(String, MenuItem)]) = this(initTree, Menu.defaultPositionX, Menu.defaultPositionY)
+  
+  def buildTree(tree: List[(String, MenuItem)]): List[(Int, Int, String, MenuItem)] = {
+    var (x, y) = (offsetX, offsetY)
+    
+    tree.map { item =>
+      val (key, command) = item
+      
+      val tuple = (x, y, key, command match {
+        case Submenu(subTree) => SubmenuWithPositions(buildTree(subTree))
+        case _ => command
+      })
+
+      y += 20
+      
+      tuple
+    }
+  }
+  
   def render(g: Graphics) {
     if (!showing) return;
     
-    g.translate(20, 20)
-    
     for (i <- 0 until subTree.length) {
-      val (key, command) = subTree(i)
+      val (x, y, key, command) = subTree(i)
       val current = (i == selection)
       
       val color = if (current) SELECTED_COLOR else UNSELECTED_COLOR
 
+      g.translate(x, y)
       g.setColor(color)
+
       g.drawString(key, 0, 0)
       command.render(g, this, current)
       
-      g.translate(0, 20)
+      // g.drawRect(Menu.clickableItemOffsetX, Menu.clickableItemOffsetY, Menu.clickableItemWidth, Menu.clickableItemHeight)
+
+      g.resetTransform
     }
     
-    g.resetTransform
     g.scale(Main.GAME_WINDOW_RATIO, Main.GAME_WINDOW_RATIO)
   }
   
@@ -56,13 +88,44 @@ class Menu(tree : List[(String, MenuItem)]) {
           }
           else {
             val subMenu = path.pop()
-            selection = subTree.indexOf(subTree.find((item) => {item._2 == subMenu}).get)
+            selection = subTree.indexOf(subTree.find((item) => {item._4 == subMenu}).get)
           }
         }
 
         case _ => 
       }
     }
+  }
+  
+  def mouseMoved(oldx: Int, oldy: Int, newx: Int, newy: Int) {
+    itemAt(newx, newy) match {
+      case Some((i, _)) => selection = i
+      case None =>
+    }
+  }
+  
+  def mouseClicked(button: Int, x: Int, y: Int, clickCount: Int) {
+    itemAt(x, y) match {
+      case Some((i, item)) => {
+        selection = i
+        currentItem.perform(this)
+      }
+
+      case None =>
+    }
+  }
+  
+  def itemAt(x: Int, y: Int): Option[(Int, MenuItem)] = {
+    for (i <- 0 until subTree.length) {
+      val (itemX, itemY, _, item) = subTree(i)
+      
+      if (x > itemX + Menu.clickableItemOffsetX && x < itemX + Menu.clickableItemOffsetX + Menu.clickableItemWidth &&
+          y > itemY + Menu.clickableItemOffsetY && y < itemY + Menu.clickableItemOffsetY + Menu.clickableItemHeight) {
+        return Some(i, item)
+      }
+    }
+    
+    None
   }
   
   def show() {
@@ -85,10 +148,7 @@ class Menu(tree : List[(String, MenuItem)]) {
     }
   }
   
-  def currentItem = {
-    val (key, item) = subTree(selection)
-    item
-  }
+  def currentItem = subTree(selection)._4
 }
 
 abstract class MenuItem {
@@ -149,6 +209,13 @@ case class MenuCommandWithLabel(override val callback : Unit => Unit, label: Str
 }
 
 case class Submenu(tree : List[(String, MenuItem)]) extends MenuItem {
+  // This is probably bad.
+  override def perform(menu : Menu) {
+    throw new RuntimeException("Submenu#perform() should never be called")
+  }
+}
+
+case class SubmenuWithPositions(tree: List[(Int, Int, String, MenuItem)]) extends MenuItem {
   override def perform(menu : Menu) {
     menu.path.push(this)
     menu.selection = 0

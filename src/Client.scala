@@ -260,6 +260,18 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
     }
   }
   
+  def mouseMoved(oldx: Int, oldy: Int, newx: Int, newy: Int) {
+    if (inReadyRoom) {
+      readyRoom.mouseMoved(oldx, oldy, newx, newy)
+    }
+  }
+  
+  def mouseClicked(button: Int, x: Int, y: Int, clickCount: Int) {
+    if (inReadyRoom) {
+      readyRoom.mouseClicked(button, x, y, clickCount)
+    }
+  }
+  
   /*
    * Everything below here is basically networking stuff.
    */
