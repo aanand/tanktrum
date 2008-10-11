@@ -3,6 +3,8 @@ import sbinary.Operations
 
 import java.util.ArrayList
 
+import Math._
+
 import org.jbox2d.dynamics._
 import org.jbox2d.dynamics.contacts._
 import org.jbox2d.common._
@@ -62,6 +64,15 @@ class ServerTank(server: Server, id: Byte) extends Tank(server, id) {
   }
 
   override def update(delta: Int) {
+
+    //Keep the body angle between -Pi and Pi:
+    if (body.getAngle > Pi) {
+      body.setXForm(body.getPosition, body.getAngle - 2*Pi.toFloat)
+    }
+    else if (body.getAngle < Pi) {
+      body.setXForm(body.getPosition, body.getAngle + 2*Pi.toFloat)
+    }
+
     super.update(delta)
     if (destroy) {
       health = 0
@@ -118,8 +129,8 @@ class ServerTank(server: Server, id: Byte) extends Tank(server, id) {
   }
 
   def applyMissleDirection(delta: Int) = {
-    missile.body.applyForce(new Vec2(missileThrust * thrust * Math.cos(missile.body.getAngle).toFloat, 
-                                     missileThrust * thrust * Math.sin(missile.body.getAngle).toFloat), 
+    missile.body.applyForce(new Vec2(missileThrust * thrust * cos(missile.body.getAngle).toFloat, 
+                                     missileThrust * thrust * sin(missile.body.getAngle).toFloat), 
                             missile.body.getPosition)
   }
 
@@ -127,15 +138,20 @@ class ServerTank(server: Server, id: Byte) extends Tank(server, id) {
     jumpFuel -= delta*jumpFuelBurn
     val force = new Vec2(airSpeedX * thrust, airSpeedY * lift)
 
-    body.applyForce(force, body.getPosition)
+    body.applyForce(force, body.getWorldPoint(body.getLocalCenter.add(new Vec2(0f, -HEIGHT/2))))
 
     val targetRotation = airTilt * thrust
-
-    if (body.getAngle < targetRotation) {
-      body.setAngularVelocity(airAngularSpeed)
-    } 
-    else if (body.getAngle > targetRotation) {
-      body.setAngularVelocity(-airAngularSpeed)
+    
+    if (abs(body.getAngle - targetRotation) < Pi/2) {
+      if (abs(body.getAngle - targetRotation) < 0.01) {
+        body.setAngularVelocity(0f)
+      }
+      else if (body.getAngle < targetRotation) {
+        body.setAngularVelocity(airAngularSpeed)
+      } 
+      else if (body.getAngle > targetRotation) {
+        body.setAngularVelocity(-airAngularSpeed)
+      }
     }
   }
 
