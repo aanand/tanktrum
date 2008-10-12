@@ -8,7 +8,7 @@ import org.newdawn.slick._
 import org.jbox2d.common._
 
 import SwitchableParticleEmitter._
-  
+
 object ClientTank {
   implicit def tankToClientTank(tank: Tank) = tank.asInstanceOf[ClientTank]
 }
@@ -77,6 +77,8 @@ class ClientTank(client: Client) extends Tank(client, 0) {
     }
   }
 
+  import GL._
+
   def render(g: Graphics) {
     if (isDead) {
       return
@@ -84,39 +86,36 @@ class ClientTank(client: Client) extends Tank(client, 0) {
     
     g.setColor(color)
     
-    g.translate(x, y)
-    g.rotate(0, 0, angle)
+    translate(x, y) {
+      rotate(0, 0, angle) {
     
-    //Tank body
-    g.fill(tankShape)
-    
-    gun.render(g)
-    
-    drawWheel(g, -WHEEL_OFFSET_X)
-    drawWheel(g, WHEEL_OFFSET_X)
-    drawBase(g)
+        //Tank body
+        g.fill(tankShape)
 
+        gun.render(g)
+
+        drawWheel(g, -WHEEL_OFFSET_X)
+        drawWheel(g, WHEEL_OFFSET_X)
+        drawBase(g)
+      }
+    }
+    
+    g.resetTransform
+    g.scale(Main.GAME_WINDOW_RATIO, Main.GAME_WINDOW_RATIO)
+    
   }
 
   def drawBase(g: Graphics) {
-    g.translate(x, y)
-    g.rotate(0, 0, body.getAngle.toDegrees)
-    g.translate(BASE_OFFSET_X, BASE_OFFSET_Y)
-    g.fillRect(-BASE_WIDTH/2, -BASE_HEIGHT/2, BASE_WIDTH, BASE_HEIGHT)
-    g.resetTransform
-    g.scale(Main.GAME_WINDOW_RATIO, Main.GAME_WINDOW_RATIO)
+    translate(BASE_OFFSET_X, BASE_OFFSET_Y) {
+      g.fillRect(-BASE_WIDTH/2, -BASE_HEIGHT/2, BASE_WIDTH, BASE_HEIGHT)
+    }
   }
 
   def drawWheel(g : Graphics, offsetX : Float) {
-    g.translate(x, y)
-    g.rotate(0, 0, body.getAngle.toDegrees)
-    g.translate(offsetX, WHEEL_OFFSET_Y)
-    
-    g.setColor(wheelColor)
-    g.fillOval(-WHEEL_RADIUS, -WHEEL_RADIUS, WHEEL_RADIUS*2, WHEEL_RADIUS*2)
-    
-    g.resetTransform
-    g.scale(Main.GAME_WINDOW_RATIO, Main.GAME_WINDOW_RATIO)
+    translate(offsetX, WHEEL_OFFSET_Y) {
+      g.setColor(wheelColor)
+      g.fillOval(-WHEEL_RADIUS, -WHEEL_RADIUS, WHEEL_RADIUS*2, WHEEL_RADIUS*2)
+    }
   }
 
   def serialise = {
