@@ -40,34 +40,41 @@ name: homepage
     <hr>
     
     <h2>Okay, so.</h2>
-
-    <p>
-        We started work on this a few weeks before <a href="http://www.deathtank.com/">discovering</a>
-        that a game called Death Tank appears to be coming to Xbox Live Arcade. While that's great
-        (the whole reason we started this thing is so we could play Death Tank online) it's admittedly
-        somewhat dispiriting - damn it, <em>we</em> were doing that!
-    </p>
-
-    <p>
-        However, we can think of several reasons this is still worth people's time:
-    </p>
+    This here is a game about trapezoids that go boom.  A complicated concept,
+    I know, but we're sure you'll grasp it with time.  It has been inspired by
+    some things.  A rich history of explosions, parabolas, primitive shapes and
+    the deep, deep stories of the conflicts between them.  Here are some in a
+    list:
 
     <ul>
         <li>
-            We're not charging money for it!
+            It all started in BASIC in 1979.  With a game called Artillery.  No
+            advanced graphics here, just code and numbers and command lines.
+            You even had to type in the code for the thing from a magazine.
+            The <a href="http://github.com/aanand/boomtrapezoid">code</a> for
+            Boom Trapezoid would take quite a while to type out from a
+            magazine, it's about 10,000 words so far.
         </li>
 
         <li>
-            Their version might turn out to be rubbish!
+            A bit later, after some revisions of the BASIC game, someone made a
+            game with some graphics, imaginatively named it Artillery, and put
+            it on an Apple II in 1981.
         </li>
 
         <li>
-            You can play this on any PC or Mac or Linux machine, not just an Xbox 360!
+            Scorched Earth first happened in 1991, providing players with a
+            choice of weapons and other tools for the first time.
         </li>
 
         <li>
-            We're staggeringly cool people, and you definitely want to be seen playing
-            our game.
+            Worms happened in 1995.  It added some cute and sold lots.
+        </li>
+
+        <li>
+            Death Tank happened in 1996.  It added real time.  7 people would
+            sit, squeezed round a TV, pressing buttons and shouting at each
+            other.
         </li>
     </ul>
 </div>
