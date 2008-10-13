@@ -21,6 +21,8 @@ class Game(title: String) extends BasicGame(title) {
   def init(container: GameContainer) {
     this.container = container
 
+    container.getInput.enableKeyRepeat(Config("game.keyRepeatWait").toInt, Config("game.keyRepeatInterval").toInt)
+
     val storedUserName = prefs.get("username", "Player")
     val storedPort = prefs.get("port", Config("default.port"))
     val storedHostname = prefs.get("hostname", Config("default.hostname"))
@@ -120,6 +122,22 @@ class Game(title: String) extends BasicGame(title) {
   override def keyReleased(key : Int, char : Char) {
     if (client != null) {
       client.keyReleased(key, char)
+    }
+  }
+  
+  override def mouseMoved(oldx: Int, oldy: Int, newx: Int, newy: Int) {
+    if (menu.showing) {
+      menu.mouseMoved(oldx, oldy, newx, newy)
+    } else if (client != null) {
+      client.mouseMoved(oldx, oldy, newx, newy)
+    }
+  }
+  
+  override def mouseClicked(button: Int, x: Int, y: Int, clickCount: Int) {
+    if (menu.showing) {
+      menu.mouseClicked(button, x, y, clickCount)
+    } else if (client != null) {
+      client.mouseClicked(button, x, y, clickCount)
     }
   }
 

@@ -8,25 +8,26 @@ class ReadyRoom (client: Client) {
 
   val menu = new Menu(
     itemList ++
-    List(("Ready", MenuCommand(Unit => ready))))
+    List(("Ready", MenuCommand(Unit => ready))), 40, 40)
 
   def render(g: Graphics) {
     g.resetTransform
 
     menu.showing = true
 
-    g.translate(20, 20)
-
     if (null != client.me) {
+      g.translate(20, 20)
+
       g.setColor(new Color(0f, 1f, 0f))
       g.drawString("Funds:", 20, 0)
       g.drawString(client.me.money.toString, 120, 0)
+
+      g.resetTransform
     }
 
     menu.render(g)
-    
     g.resetTransform
-
+    
     var offset = 0
     for (player <- client.players.values.toList.sort((p1, p2) => {p1.score > p2.score})) {
       val col = (player.color)
@@ -43,6 +44,14 @@ class ReadyRoom (client: Client) {
     }
     g.resetTransform
     g.scale(Main.GAME_WINDOW_RATIO, Main.GAME_WINDOW_RATIO)
+  }
+  
+  def mouseMoved(oldx: Int, oldy: Int, newx: Int, newy: Int) {
+    menu.mouseMoved(oldx, oldy, newx, newy)
+  }
+  
+  def mouseClicked(button: Int, x: Int, y: Int, clickCount: Int) {
+    menu.mouseClicked(button, x, y, clickCount)
   }
 
   def buy(item: Item) {

@@ -92,13 +92,15 @@ class Gun(session: Session, tank: Tank) {
   }
 
   def render(g: Graphics) {
-    g.translate(OFFSET_X, OFFSET_Y)
-    g.rotate(0, 0, angle)
-    g.scale(1, power/POWER_SCALE)
-    g.setColor(if (ready) READY_COLOR else LOADING_COLOR)
-    g.fill(arrowShape)
+    import GL._
     
-    g.resetTransform
-    g.scale(Main.GAME_WINDOW_RATIO, Main.GAME_WINDOW_RATIO)
+    translate(OFFSET_X, OFFSET_Y) {
+      rotate(0, 0, angle) {
+        scale(1, power/POWER_SCALE) {
+          g.setColor(if (ready) READY_COLOR else LOADING_COLOR)
+          g.fill(arrowShape)
+        }
+      }
+    }
   }
 }

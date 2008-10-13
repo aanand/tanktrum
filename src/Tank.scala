@@ -78,21 +78,21 @@ abstract class Tank (val session: Session, var id: Byte) extends GameObject(sess
 
     val baseShapeDef = new PolygonDef
     baseShapeDef.setAsBox(BASE_WIDTH/2, BASE_HEIGHT/2, new Vec2(BASE_OFFSET_X, BASE_OFFSET_Y), 0f)
-    baseShapeDef.density = 1f
+    baseShapeDef.density = 5f
     baseShapeDef.restitution = 0f
     baseShapeDef.friction = friction
     
     val wheelShapeDef1 = new CircleDef
     wheelShapeDef1.radius = WHEEL_RADIUS
     wheelShapeDef1.localPosition = new Vec2(WHEEL_OFFSET_X, WHEEL_OFFSET_Y)
-    wheelShapeDef1.density = 1f
+    wheelShapeDef1.density = 5f
     wheelShapeDef1.restitution = 0f
     wheelShapeDef1.friction = friction
     
     val wheelShapeDef2 = new CircleDef
     wheelShapeDef2.radius = WHEEL_RADIUS
     wheelShapeDef2.localPosition = new Vec2(-WHEEL_OFFSET_X, WHEEL_OFFSET_Y)
-    wheelShapeDef2.density = 1f
+    wheelShapeDef2.density = 5f
     wheelShapeDef2.restitution = 0f
     wheelShapeDef2.friction = friction
 
