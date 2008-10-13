@@ -22,7 +22,7 @@
                 <a href="{relocatable: index.html}">Boom Trapezoid</a>
             </h1>
 
-            <p class="subtitle">(an exploration of the complex interactions between booms and trapezoids.)</p>
+            <p class="subtitle">(a stupid game where you blow things up.)</p>
 
             <p class="nav">
                 <a href="{relocatable: index.html}">Home</a> |
