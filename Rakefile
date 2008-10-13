@@ -242,6 +242,6 @@ namespace :upload do
   
   def upload files
     files = [files].flatten
-    sh "scp -r #{files.join(" ")} deathtank@norgg.org:/var/www/boomtrapezoid.com/htdocs/"
+    sh "scp -r #{files.join(" ")} boomtrapezoid@norgg.org:/var/www/boomtrapezoid.com/htdocs/"
   end
 end
