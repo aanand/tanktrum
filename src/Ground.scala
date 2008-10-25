@@ -15,9 +15,6 @@ class Ground(session : Session, width : Int, height : Int) extends GameObject(se
   val MIN_HEIGHT = Config("ground.minHeight").toFloat
   val granularity = Config("ground.granularity").toInt
 
-  val topsoilColor = new Color(0.5f, 0.5f, 0f)
-  val earthColor = new Color(0.8f, 0.8f, 0f)
-  
   val topsoilDepth = Config("ground.topsoilDepth").toFloat
   
   var points : Array[Vector2f] = _
@@ -59,7 +56,7 @@ class Ground(session : Session, width : Int, height : Int) extends GameObject(se
     val shapePoints = (List(new Vector2f(-5, height), new Vector2f(-1, -height)) ++
                       points ++ 
                       List(new Vector2f(width+1, -height), new Vector2f(width+5, height))).toArray
-    
+
     val drawShapePoints = new Array[float](shapePoints.length*2)
     for (i <- 0 until shapePoints.length) {
       drawShapePoints(i*2) = shapePoints(i).getX
@@ -132,24 +129,9 @@ class Ground(session : Session, width : Int, height : Int) extends GameObject(se
     }
   }
   
-  def render(g: Graphics) {
-    g.setColor(earthColor)
-    g.fill(drawShape)
-    
-    new GL {
-      quadStrip {
-        for (p <- points) {
-          color(topsoilColor.r, topsoilColor.g, topsoilColor.b, 1f)
-          vertex(p.x, p.y)
-          
-          color(earthColor.r, earthColor.g, earthColor.b, 1f)
-          vertex(p.x, p.y + topsoilDepth)
-        }
-      }
-    }
-
-    g.setColor(earthColor)
-    g.fillRect(0, (Main.GAME_HEIGHT-MIN_HEIGHT), (Main.GAME_WIDTH), MIN_HEIGHT)
+  def render(g: Graphics, image: Image) {
+    g.setColor(new Color(1f, 1f, 1f))
+    g.texture(drawShape, image, image.getTextureWidth/Main.GAME_WIDTH, image.getTextureHeight/Main.GAME_HEIGHT)
   }
   
   def serialise(seq: Short) = {

@@ -36,9 +36,6 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
   var lastTankUpdate = new Array[Byte](6)
   var latency: Long = 0
 
-  val skyTopColor    = new Color(0f, 0f, 0.25f)
-  val skyBottomColor = new Color(0.3f, 0.125f, 0.125f)
-
   val players = new HashMap[Short, Player]
   var me: Player = null
 
@@ -54,10 +51,15 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
   val projectileSequence = new Sequence
   val groundSequence = new Sequence
 
-  val dot = new ImageBuffer(3, 3)
-  dot.setRGBA(1, 1, 255, 255, 255, 100)
-  
-  val particleSystem = new slick.particles.ParticleSystem(new Image(dot))
+  val particleSystem = new slick.particles.ParticleSystem(makeParticleImage)
+
+  val imageFilename = (new java.util.Random().nextInt(7) + 1).toString + ".jpg"
+
+  val skyImage = new Image("media/sky/" + imageFilename)
+  val groundImage = new Image("media/ground/" + imageFilename)
+
+  // force groundImage.init() (which is private) to be called. I know, wtf.
+  groundImage.toString
 
   override def enter {
     super.enter()
@@ -139,11 +141,15 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
       readyRoom.render(g)
     }
     else { 
-      g.scale(Main.GAME_WINDOW_RATIO, Main.GAME_WINDOW_RATIO)
       if (ground.initialised) {
         renderSky(g)
+      }
+
+      g.scale(Main.GAME_WINDOW_RATIO, Main.GAME_WINDOW_RATIO)
+
+      if (ground.initialised) {
         particleSystem.render()
-        ground.render(g)
+        ground.render(g, groundImage)
       }
       
       projectiles.values.foreach(_.render(g))
@@ -160,17 +166,21 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
   }
   
   def renderSky(g : Graphics) {
-    new GL {
-      polygon {
-        color(skyTopColor.r, skyTopColor.g, skyTopColor.b, 1f)
-        vertex(0, 0)
-        vertex(container.getWidth, 0)
-      
-        color(skyBottomColor.r, skyBottomColor.g, skyBottomColor.b, 1f)
-        vertex(container.getWidth, container.getHeight)
-        vertex(0, container.getHeight)
+    g.drawImage(skyImage, 0, 0)
+  }
+  
+  def makeParticleImage = {
+    val dot = new ImageBuffer(3, 3)
+
+    for (x <- 0 until 3) {
+      for (y <- 0 until 3) {
+        dot.setRGBA(x, y, 255, 255, 255, 0)
       }
     }
+
+    dot.setRGBA(1, 1, 255, 255, 255, 100)
+    
+    new Image(dot)
   }
 
   def error(message: String) {
