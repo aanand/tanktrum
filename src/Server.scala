@@ -52,9 +52,16 @@ class Server(port: Int) extends Session(null) with Actor {
     while (true) {
       while (mailboxSize > 0) {
         receive {
-          case 'enter => enter; reply(true)
-          case 'leave => leave; reply(true)
-          case _ => println("Server: Received unknown message"); reply(true)
+          case 'enter =>
+            enter
+            reply(true)
+          case 'leave =>
+            leave
+            reply(true)
+            exit()
+          case _ =>
+            println("Server: Received unknown message")
+            reply(true)
         }
       }
       
