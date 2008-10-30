@@ -12,7 +12,10 @@ class ReadyRoom (client: Client) {
 
   def render(g: Graphics) {
     g.resetTransform
-
+    
+    g.setColor(new Color(0f, 0f, 0f, 0.5f))
+    g.fillRect(0, 0, Main.WINDOW_WIDTH, Main.WINDOW_HEIGHT)
+    
     menu.showing = true
 
     if (null != client.me) {

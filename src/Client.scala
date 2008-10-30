@@ -138,6 +138,7 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
     }
 
     if (inReadyRoom) {
+      renderSky(g)
       readyRoom.render(g)
     }
     else { 
