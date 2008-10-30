@@ -38,6 +38,9 @@ class Server(port: Int) extends Session(null) with Actor {
 
   var inReadyRoom = true
   
+  val imageSetCount = 7
+  var imageSetIndex = rand.nextInt(imageSetCount) + 1
+  
   var endRoundTimer = 0
   val endRoundRunnoffTime = Config("server.roundRunoffTime").toInt
 
@@ -216,7 +219,17 @@ class Server(port: Int) extends Session(null) with Actor {
       player.money += 10
       player.ready = false
     }
-    inReadyRoom = true;
+    
+    inReadyRoom = true
+    
+    imageSetIndex += 1
+    
+    if (imageSetIndex > imageSetCount) {
+      imageSetIndex -= imageSetCount
+    }
+    
+    broadcast(imageSetData)
+    
     ground = new Ground(this, Main.GAME_WIDTH.toInt, Main.GAME_HEIGHT.toInt)
     ground.buildPoints
     for (player <- players.values) {
@@ -263,6 +276,9 @@ class Server(port: Int) extends Session(null) with Actor {
       players.put(addr, player)
 
       broadcastPlayers
+
+      send(imageSetData, addr)
+
       if (!inReadyRoom) {
         sendGround(addr)
         tank.health = 0
@@ -405,6 +421,7 @@ class Server(port: Int) extends Session(null) with Actor {
     byteToArray(Commands.PROJECTILES) ++ Operations.toByteArray((projectileSequence.next, projectileDataArray))
   }
 
+  def imageSetData = byteToArray(Commands.IMAGE_SET) ++ Operations.toByteArray(imageSetIndex)
 
   /***
    * Broadcast methods.  These send an update to all clients.
@@ -459,8 +476,7 @@ class Server(port: Int) extends Session(null) with Actor {
 
   def sendGround(addr: SocketAddress) = {
     send(byteToArray(Commands.GROUND) ++ ground.serialise(groundSequence.seq), addr)
-  }
-  
+  }  
 
   /**
    * Sends the provided byte array to all clients.

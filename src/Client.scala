@@ -53,13 +53,9 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
 
   val particleSystem = new slick.particles.ParticleSystem(makeParticleImage)
 
-  val imageFilename = (new java.util.Random().nextInt(7) + 1).toString + ".jpg"
-
-  val skyImage = new Image("media/sky/" + imageFilename)
-  val groundImage = new Image("media/ground/" + imageFilename)
-
-  // force groundImage.init() (which is private) to be called. I know, wtf.
-  groundImage.toString
+  var imageSetIndex = 0
+  var skyImage: Image = _
+  var groundImage: Image = _
 
   override def enter {
     super.enter()
@@ -88,7 +84,7 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
     if (!channel.isConnected) return
     sendCommand(Commands.GOODBYE)
   }
-
+  
   override def update(delta: Int) {
     if (!channel.isConnected) return
     try {
@@ -127,7 +123,7 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
       }
     }
   }
-
+  
   override def tanks = players.values.map(player => player.tank)
   
   def render(g: Graphics) {
@@ -148,7 +144,7 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
 
       g.scale(Main.GAME_WINDOW_RATIO, Main.GAME_WINDOW_RATIO)
 
-      if (ground.initialised) {
+      if (ground.initialised && null != groundImage) {
         particleSystem.render()
         ground.render(g, groundImage)
       }
@@ -167,7 +163,9 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
   }
   
   def renderSky(g : Graphics) {
-    g.drawImage(skyImage, 0, 0)
+    if (null != skyImage) {
+      g.drawImage(skyImage, 0, 0)
+    }
   }
   
   def makeParticleImage = {
@@ -201,12 +199,8 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
       case Commands.PROJECTILES  => loadProjectiles
       case Commands.EXPLOSION    => loadExplosion
       case Commands.PLAYERS      => loadPlayers
-      case Commands.READY_ROOM   => {
-        if (!inReadyRoom) {
-          inReadyRoom = true
-          endRound()
-        }
-      }
+      case Commands.READY_ROOM   => processReadyRoomUpdate
+      case Commands.IMAGE_SET    => processImageSetUpdate
       case Commands.CHAT_MESSAGE => addChatMessage
       case _                     => println("Warning: Client got unknown command: " + command.toByte)
     }
@@ -440,6 +434,26 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
         }
       }
     }
+  }
+  
+  def processReadyRoomUpdate {
+    if (!inReadyRoom) {
+      inReadyRoom = true
+      endRound()
+    }
+  }
+  
+  def processImageSetUpdate {
+    val byteArray = new Array[byte](data.remaining)
+    data.get(byteArray)
+
+    imageSetIndex = Operations.fromByteArray[Int](byteArray)
+    
+    groundImage = new Image("media/ground/" + imageSetIndex.toString + ".jpg")
+    skyImage = new Image("media/sky/" + imageSetIndex.toString + ".jpg")
+
+    // force groundImage.init() (which is private) to be called. I know, wtf.
+    groundImage.toString
   }
 
   def sendTankUpdate {
