@@ -132,6 +132,14 @@ class Ground(session : Session, width : Int, height : Int) extends GameObject(se
   def render(g: Graphics, image: Image) {
     g.setColor(new Color(1f, 1f, 1f))
     g.texture(drawShape, image, image.getTextureWidth/Main.GAME_WIDTH, image.getTextureHeight/Main.GAME_HEIGHT)
+    g.setColor(new Color(0f, 0f, 0f));
+    g.setLineWidth(2);
+    g.setAntiAlias(true);
+    for (i <- 1 until points.length-1) {
+      g.drawLine(points(i).x, points(i).y, points(i+1).x, points(i+1).y);
+    }
+    g.setAntiAlias(false);
+
   }
   
   def serialise(seq: Short) = {
