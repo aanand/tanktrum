@@ -69,7 +69,7 @@ class ServerTank(server: Server, id: Byte) extends Tank(server, id) {
     if (body.getAngle > Pi) {
       body.setXForm(body.getPosition, body.getAngle - 2*Pi.toFloat)
     }
-    else if (body.getAngle < Pi) {
+    else if (body.getAngle < -Pi) {
       body.setXForm(body.getPosition, body.getAngle + 2*Pi.toFloat)
     }
 
