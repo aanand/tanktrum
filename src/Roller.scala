@@ -16,7 +16,7 @@ object RollerItem extends Item {
 
 class Roller(session : Session, tank : Tank) extends Projectile(session, tank) {
   override val projectileType = ProjectileTypes.ROLLER
-  override val color = new slick.Color(0.4f, 0.6f, 0f)
+  //override val color = new slick.Color(0f, 0.3f, 0f)
   override lazy val radius = 0.8f
   override val damage = 10
   override val explosionRadius = 5f
@@ -29,6 +29,12 @@ class Roller(session : Session, tank : Tank) extends Projectile(session, tank) {
     sDef.restitution = 0.8f
     sDef.density = 1f
     List(sDef)
+  }
+
+  override def renderBody(g: slick.Graphics) {
+    super.renderBody(g)
+    g.setColor(new slick.Color(0f, 1f, 0f))
+    g.fillOval(x - radius/4, y-radius/4, radius/2, radius/2)
   }
 
   override def collide(obj: GameObject, contact: ContactPoint) {

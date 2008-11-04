@@ -1,7 +1,7 @@
 import org.newdawn.slick
 import sbinary.Instances._
 import sbinary.Operations
-import java.util.Random;
+import java.util.Random
 import org.jbox2d.common._
 
 object MirvItem extends Item {
@@ -42,7 +42,7 @@ class Mirv(session: Session, tank: Tank) extends Projectile(session, tank) {
 
   override def color = {
     val lifeRatio = timeUntilSplit.toFloat/lifetime
-    new slick.Color(1f, lifeRatio, lifeRatio)
+    new slick.Color(1-lifeRatio, 0f, 0f)
   }
 }
 

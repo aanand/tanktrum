@@ -26,7 +26,17 @@ object Projectile {
 class Projectile(session: Session, val tank: Tank) extends GameObject(session) {
   var id: Int = -1
 
-  def color = new slick.Color(1.0f, 1.0f, 1.0f)
+  def color = {
+    try {
+      val skyCol = session.asInstanceOf[Client].skyImage.getColor((x * Main.GAME_WINDOW_RATIO).toInt, 
+                                                                  (y * Main.GAME_WINDOW_RATIO).toInt)
+      new slick.Color(1f-skyCol.r, 1f-skyCol.g, 1f-skyCol.b)
+    }
+    catch {
+      case e: ArrayIndexOutOfBoundsException => new slick.Color(1f, 1f, 1f)
+    }
+  }
+
   val explosionRadius = 4f
   val explosionDamageFactor = 1f
   lazy val radius = 0.6f
@@ -112,11 +122,10 @@ class Projectile(session: Session, val tank: Tank) extends GameObject(session) {
   }
   
   def render(g : slick.Graphics) {
+    renderTrail(g)
     if (!dead) {
       renderBody(g)
     }
-    
-    renderTrail(g)
   }
 
   def renderBody(g: slick.Graphics) {
@@ -135,8 +144,11 @@ class Projectile(session: Session, val tank: Tank) extends GameObject(session) {
       }
       
       if (prevX > 0 && Math.abs(x-prevX) < Main.GAME_WIDTH/2) {
-        g.setColor(new slick.Color(color.r, color.g, color.b, 0.5f - (t.toFloat / trailLifetime)*0.5f))
+        g.setColor(new slick.Color(1f, 1f, 1f, 0.5f - (t.toFloat / trailLifetime)*0.5f))
+        g.setLineWidth(2f)
+        g.setAntiAlias(true)
         g.drawLine(x, y, prevX, prevY)
+        g.setAntiAlias(false)
       }
       
       prevX = x
