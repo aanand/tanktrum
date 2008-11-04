@@ -101,10 +101,10 @@ class ClientTank(client: Client) extends Tank(client, 0) {
         g.setAntiAlias(true);
         g.setColor(new Color(0f, 0f, 0f, 0.5f))
         g.setLineWidth(1.3f)
-        g.drawLine(-(WIDTH/2-TAPER), -HEIGHT, WIDTH/2-TAPER, -HEIGHT-0.01f)
-        g.drawLine(-WIDTH/2, 0f, WIDTH/2, 0.01f)
-        g.drawLine(-(WIDTH/2-TAPER), -HEIGHT, -WIDTH/2, 0f)
-        g.drawLine(WIDTH/2-TAPER, -HEIGHT, WIDTH/2, 0f)
+        GL.line(-(WIDTH/2-TAPER), -HEIGHT, WIDTH/2-TAPER, -HEIGHT)
+        GL.line(-WIDTH/2, 0f, WIDTH/2, 0f)
+        GL.line(-(WIDTH/2-TAPER), -HEIGHT, -WIDTH/2, 0f)
+        GL.line(WIDTH/2-TAPER, -HEIGHT, WIDTH/2, 0f)
         g.setAntiAlias(false);
       }
     }

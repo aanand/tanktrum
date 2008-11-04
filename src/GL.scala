@@ -47,6 +47,15 @@ class GL {
     SlickCallable.leaveSafeBlock
   }
   
+  def line(x1: Float, y1: Float, x2: Float, y2: Float) = {
+    safe {
+      glBegin(SGL.GL_LINES);
+      glVertex2f(x1, y1);
+      glVertex2f(x2, y2);
+      glEnd();
+    }
+  }
+
   def polygon(block: => Unit) = shape(GL11.GL_POLYGON)(block)
   def quadStrip(block: => Unit) = shape(GL11.GL_QUAD_STRIP)(block)
 

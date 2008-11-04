@@ -136,7 +136,7 @@ class Ground(session : Session, width : Int, height : Int) extends GameObject(se
     g.setLineWidth(2)
     g.setAntiAlias(true)
     for (i <- 1 until points.length-1) {
-      g.drawLine(points(i).x, points(i).y, points(i+1).x, points(i+1).y)
+      GL.line(points(i).x, points(i).y, points(i+1).x, points(i+1).y)
     }
     g.setAntiAlias(false)
 
