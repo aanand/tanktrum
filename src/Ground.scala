@@ -135,7 +135,7 @@ class Ground(session : Session, width : Int, height : Int) extends GameObject(se
     g.setColor(new Color(0f, 0f, 0f))
     g.setLineWidth(2)
     g.setAntiAlias(true)
-    for (i <- 1 until points.length-1) {
+    for (i <- 0 until points.length-1) {
       GL.line(points(i).x, points(i).y, points(i+1).x, points(i+1).y)
     }
     g.setAntiAlias(false)
