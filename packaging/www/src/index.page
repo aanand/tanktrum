@@ -125,7 +125,11 @@ name: homepage
 
     <ul>
         <li>
-            We're <a href="http://norgg.org">this person</a> and <a href="http://www.aanandprasad.com">this person</a>.
+            Science is <a href="http://norgg.org">this person</a> and <a href="http://www.aanandprasad.com">this person</a>.
+        </li>
+
+        <li>
+            Arts is <a href="http://www.marknicoll.com/">this person</a> and <a href="http://www.someplacewherellamaslive.com">this person</a>.
         </li>
     
         <li>
