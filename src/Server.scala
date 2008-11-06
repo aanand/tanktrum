@@ -91,7 +91,7 @@ class Server(port: Int) extends Session(null) with Actor {
     super.enter()
 
     ground.buildPoints()
-    
+
     channel = DatagramChannel.open()
     channel.socket.bind(new InetSocketAddress(port))
     channel.configureBlocking(false)
@@ -246,6 +246,8 @@ class Server(port: Int) extends Session(null) with Actor {
   }
   
   def startRound {
+    new ChatBox(this)
+    
     startTime = System.currentTimeMillis
     supposedRunTime = 0
     numTankUpdates = 0

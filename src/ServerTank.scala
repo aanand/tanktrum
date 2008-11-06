@@ -219,7 +219,7 @@ class ServerTank(server: Server, id: Byte) extends Tank(server, id) {
   }
 
   override def persist(other: GameObject, contact: ContactPoint) {
-    if (other == server.ground) {
+    if (other == server.ground || other.isInstanceOf[ChatBox]) {
       if (contact.shape1 == baseShape || 
           contact.shape2 == baseShape) {
         contactTime = contactGrace
