@@ -15,6 +15,11 @@ class Mirv(session: Session, tank: Tank) extends Projectile(session, tank) {
   override lazy val radius = 0.8f
   override val projectileType = ProjectileTypes.MIRV
   override val explosionRadius = 2.6f
+
+  override def imagePath = Config("projectile.mirv.imagePath")
+  override def imageWidth = Config("projectile.mirv.imageWidth").toInt
+  override def round = Config("projectile.mirv.round").toBoolean
+
   val distribution = 10
   val clusterSize = 10
   val lifetime = 2000

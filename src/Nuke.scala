@@ -16,4 +16,8 @@ class Nuke(session: Session, tank: Tank) extends Projectile(session, tank) {
   override val damage = 10
   override val reloadTime = 5f
   override val projectileType = ProjectileTypes.NUKE
+
+  override def imagePath = Config("projectile.nuke.imagePath")
+  override def imageWidth = Config("projectile.nuke.imageWidth").toInt
+  override def round = Config("projectile.nuke.round").toBoolean
 }

@@ -22,6 +22,10 @@ class Roller(session : Session, tank : Tank) extends Projectile(session, tank) {
   override val explosionRadius = 5f
   override val explosionDamageFactor = 1.2f
 
+  override def imagePath = Config("projectile.roller.imagePath")
+  override def imageWidth = Config("projectile.roller.imageWidth").toInt
+  override def round = Config("projectile.roller.round").toBoolean
+
   //body.removeExcludedBody(session.ground.body)
   override def shapes = {
     val sDef = new CircleDef

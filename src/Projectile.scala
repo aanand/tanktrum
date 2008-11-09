@@ -26,23 +26,20 @@ object Projectile {
 class Projectile(session: Session, val tank: Tank) extends GameObject(session) {
   var id: Int = -1
 
-  def color = {
-    try {
-      val skyCol = session.asInstanceOf[Client].skyImage.getColor((x * Main.GAME_WINDOW_RATIO).toInt, 
-                                                                  (y * Main.GAME_WINDOW_RATIO).toInt)
-      new slick.Color(1f-skyCol.r, 1f-skyCol.g, 1f-skyCol.b)
-    }
-    catch {
-      case e: ArrayIndexOutOfBoundsException => new slick.Color(1f, 1f, 1f)
-    }
-  }
+  def color = new slick.Color(1f, 1f, 1f)
+
+  var image: slick.Image = _
+
+  def imagePath = Config("projectile.imagePath")
+  def imageWidth = Config("projectile.imageWidth").toInt
+  def round = Config("projectile.round").toBoolean
 
   val explosionRadius = 4f
   val explosionDamageFactor = 1f
   lazy val radius = 0.6f
   val damage = 5
   val reloadTime = 4f
-  
+
   var collidedWith: GameObject = _
   
   override def shapes: List[ShapeDef] = {
@@ -69,6 +66,8 @@ class Projectile(session: Session, val tank: Tank) extends GameObject(session) {
 
   if (session.isInstanceOf[Server]) {
     body.setMassFromShapes
+  } else {
+    initImage
   }
 
   //body.addExcludedBody(session.ground.body)
@@ -97,6 +96,10 @@ class Projectile(session: Session, val tank: Tank) extends GameObject(session) {
                x > Main.GAME_WIDTH) {
         collide(session.ground, null)
       }
+      
+      if (!round) {
+        body.setXForm(body.getPosition, (Math.atan2(body.getLinearVelocity.x, -body.getLinearVelocity.y)).toFloat)
+      }
     }
   }
   
@@ -121,6 +124,12 @@ class Projectile(session: Session, val tank: Tank) extends GameObject(session) {
     return true
   }
   
+  def initImage {
+    image = new slick.Image(imagePath)
+  }
+  
+  def imageScale = (imageWidth.toFloat / image.getWidth) / Main.GAME_WINDOW_RATIO
+  
   def render(g : slick.Graphics) {
     renderTrail(g)
     if (!dead) {
@@ -129,8 +138,15 @@ class Projectile(session: Session, val tank: Tank) extends GameObject(session) {
   }
 
   def renderBody(g: slick.Graphics) {
-    g.setColor(color)
-    g.fillOval(x - radius, y - radius, radius*2, radius*2)
+    import GL._
+
+    translate(x, y) {
+      rotate(0, 0, body.getAngle.toDegrees) {
+        scale(imageScale, imageScale) {
+          image.draw(-image.getWidth/2f, -image.getHeight/2f)
+        }
+      }
+    }
   }
   
   def renderTrail(g: slick.Graphics) {

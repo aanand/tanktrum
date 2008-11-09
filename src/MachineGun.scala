@@ -21,28 +21,15 @@ class MachineGun(session: Session, tank: Tank) extends Projectile(session, tank)
   override val reloadTime = 0.4f
   override val projectileType = ProjectileTypes.MACHINE_GUN
 
+  override def imagePath = Config("projectile.machineGun.imagePath")
+  override def imageWidth = Config("projectile.machineGun.imageWidth").toInt
+  override def round = Config("projectile.missile.round").toBoolean
+
   override def shapes = {
     val polyDef = new PolygonDef
     polyDef.setAsBox(radius/2, radius)
     polyDef.restitution = 0f
     polyDef.density = 1f
     List(polyDef)
-  }
-  
-  override def update(delta : Int) {
-    super.update(delta)
-    if (session.isInstanceOf[Server]) {
-      body.setXForm(body.getPosition, (Math.atan2(body.getLinearVelocity.x, -body.getLinearVelocity.y)).toFloat)
-    }
-  }
-
-  override def renderBody(g: slick.Graphics) {
-    g.setColor(color)
-    g.translate(x, y)
-    g.rotate(0, 0, body.getAngle.toDegrees)
-    g.fillRect(-radius/2, -radius, radius, radius*2)
-    g.fillOval(-radius/2, -3*radius/2, radius, radius)
-    g.resetTransform
-    g.scale(Main.GAME_WINDOW_RATIO, Main.GAME_WINDOW_RATIO)
   }
 }

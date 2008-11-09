@@ -21,6 +21,10 @@ class Missile(session: Session, tank: Tank) extends MachineGun(session, tank) {
   override val reloadTime = 6f
   override val projectileType = ProjectileTypes.MISSILE
 
+  override def imagePath = Config("projectile.missile.imagePath")
+  override def imageWidth = Config("projectile.missile.imageWidth").toInt
+  override def round = Config("projectile.missile.round").toBoolean
+
   if (tank != null) {
     tank.missile = this
   }
