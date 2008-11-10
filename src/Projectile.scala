@@ -7,6 +7,8 @@ import org.jbox2d.dynamics.contacts._
 import org.jbox2d.common._
 import org.jbox2d.collision._
 
+import GL._
+
 object Projectile {
   val antiGravity = Config("physics.projectileGravity").toFloat - Config("physics.gravity").toFloat
 
@@ -163,7 +165,7 @@ class Projectile(session: Session, val tank: Tank) extends GameObject(session) {
         g.setColor(new slick.Color(1f, 1f, 1f, 0.5f - (t.toFloat / trailLifetime)*0.5f))
         g.setLineWidth(2f)
         g.setAntiAlias(true)
-        g.drawLine(x, y, prevX, prevY)
+        line(x, y, prevX, prevY)
         g.setAntiAlias(false)
       }
       
