@@ -130,16 +130,39 @@ class Ground(session : Session, width : Int, height : Int) extends GameObject(se
   }
   
   def render(g: Graphics, image: Image) {
+    val lightAngle = Math.toRadians(135)
+    val lightVector = new slick.geom.Vector2f(Math.sin(lightAngle).toFloat, -Math.cos(lightAngle).toFloat)
+    val shadingDepth = 2f
+    val shadingAlpha = 0.5f
+    
     g.setColor(new Color(1f, 1f, 1f))
     g.texture(drawShape, image, image.getTextureWidth/Main.GAME_WIDTH, image.getTextureHeight/Main.GAME_HEIGHT)
-    g.setColor(new Color(0f, 0f, 0f))
-    g.setLineWidth(2)
-    g.setAntiAlias(true)
-    for (i <- 0 until points.length-1) {
-      GL.line(points(i).x, points(i).y, points(i+1).x, points(i+1).y)
-    }
-    g.setAntiAlias(false)
 
+    import GL._
+
+    quadStrip {
+      for (i <- 0 until points.length-1) {
+        val groundVector = new slick.geom.Vector2f(points(i+1).x - points(i).x, points(i+1).y - points(i).y)
+        val shadeVector = new slick.geom.Vector2f
+      
+        groundVector.projectOntoUnit(lightVector, shadeVector)
+      
+        val intensity = 1f - shadeVector.length
+        val alpha = Math.abs(shadeVector.length * 2 - 1) * shadingAlpha
+      
+        color(intensity, intensity, intensity, alpha)
+        vertex(points(i).x, points(i).y)
+        
+        color(intensity, intensity, intensity, 0f)
+        vertex(points(i).x, points(i).y + shadingDepth)
+      
+        color(intensity, intensity, intensity, alpha)
+        vertex(points(i+1).x, points(i+1).y)
+        
+        color(intensity, intensity, intensity, 0f)
+        vertex(points(i+1).x, points(i+1).y + shadingDepth)
+      }
+    }
   }
   
   def serialise(seq: Short) = {
