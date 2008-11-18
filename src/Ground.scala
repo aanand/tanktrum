@@ -40,7 +40,7 @@ class Ground(session : Session, width : Int, height : Int) extends GameObject(se
   def buildPoints() {
     val rand = new Random()
     var x = 0f
-    val p = new PerlinNoise(width/granularity, 6, 0.95f)
+    val p = new PerlinNoise(width/granularity, 12, 0.95f)
     
     points = p.generate.map((h) => {
         val v = new Vector2f(x, height*(h+1)/2.0f)
@@ -132,8 +132,8 @@ class Ground(session : Session, width : Int, height : Int) extends GameObject(se
   def render(g: Graphics, image: Image) {
     val lightAngle = Math.toRadians(135)
     val lightVector = new slick.geom.Vector2f(Math.sin(lightAngle).toFloat, -Math.cos(lightAngle).toFloat)
-    val shadingDepth = 2f
-    val shadingAlpha = 0.5f
+    val shadingDepth = 4f
+    val shadingAlpha = 0.35f
     
     g.setColor(new Color(1f, 1f, 1f))
     g.texture(drawShape, image, image.getTextureWidth/Main.GAME_WIDTH, image.getTextureHeight/Main.GAME_HEIGHT)
@@ -163,6 +163,14 @@ class Ground(session : Session, width : Int, height : Int) extends GameObject(se
         vertex(points(i+1).x, points(i+1).y + shadingDepth)
       }
     }
+    
+    g.setColor(new Color(0f, 0f, 0f))
+    g.setLineWidth(2)
+    g.setAntiAlias(true)
+    for (i <- 0 until points.length-1) {
+      GL.line(points(i).x, points(i).y, points(i+1).x, points(i+1).y)
+    }
+    g.setAntiAlias(false)
   }
   
   def serialise(seq: Short) = {
