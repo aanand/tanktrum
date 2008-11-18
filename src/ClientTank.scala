@@ -24,6 +24,9 @@ class ClientTank(client: Client) extends Tank(client, 0) {
   var emitting = false
 
   var wasAlive = false
+  
+  val image = new Image("media/tanks/1.png")
+  val imageWidth = WIDTH
 
   override def create(x: Float) {
     jetEmitter = ParticleIO.loadEmitter("media/particles/jet.xml")
@@ -79,6 +82,8 @@ class ClientTank(client: Client) extends Tank(client, 0) {
 
   import GL._
 
+  def imageScale = (imageWidth.toFloat / image.getWidth)
+
   def render(g: Graphics) {
     if (isDead) {
       return
@@ -89,23 +94,36 @@ class ClientTank(client: Client) extends Tank(client, 0) {
     translate(x, y) {
       rotate(0, 0, angle) {
     
-        //Tank body
-        g.fill(tankShape)
+        // Draw the tank body
+    
+        // scale(0.9f, 0.9f) {
+        //   g.fill(tankShape)
+        // 
+        //   drawWheel(g, -WHEEL_OFFSET_X)
+        //   drawWheel(g, WHEEL_OFFSET_X)
+        //   drawBase(g)
+        // }
+
+        // Draw the sprite
+
+        scale(imageScale, imageScale) {
+          image.draw(-image.getWidth/2f, -image.getHeight)
+        }
+        
+        // Draw the gun arrow
 
         gun.render(g)
+        
+        // Draw the outline
 
-        drawWheel(g, -WHEEL_OFFSET_X)
-        drawWheel(g, WHEEL_OFFSET_X)
-        drawBase(g)
-
-        g.setAntiAlias(true);
-        g.setColor(new Color(0f, 0f, 0f, 0.5f))
-        g.setLineWidth(1.3f)
-        GL.line(-(WIDTH/2-TAPER), -HEIGHT, WIDTH/2-TAPER, -HEIGHT)
-        GL.line(-WIDTH/2, 0f, WIDTH/2, 0f)
-        GL.line(-(WIDTH/2-TAPER), -HEIGHT, -WIDTH/2, 0f)
-        GL.line(WIDTH/2-TAPER, -HEIGHT, WIDTH/2, 0f)
-        g.setAntiAlias(false);
+        // g.setAntiAlias(true);
+        // g.setColor(new Color(0f, 0f, 0f, 0.5f))
+        // g.setLineWidth(1.3f)
+        // GL.line(-(WIDTH/2-TAPER), -HEIGHT, WIDTH/2-TAPER, -HEIGHT)
+        // GL.line(-WIDTH/2, 0f, WIDTH/2, 0f)
+        // GL.line(-(WIDTH/2-TAPER), -HEIGHT, -WIDTH/2, 0f)
+        // GL.line(WIDTH/2-TAPER, -HEIGHT, WIDTH/2, 0f)
+        // g.setAntiAlias(false);
       }
     }
     
