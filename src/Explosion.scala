@@ -10,8 +10,10 @@ import org.jbox2d.common._
 import org.jbox2d.collision._
 
 class Explosion (var x: Float, var y: Float, var radius: Float, session: Session, projectile: Projectile, damageFactor: Float) extends GameObject(session) {
-  val lifetime = Config("explosion.lifetime").toFloat
-  var timeToDie = lifetime
+  val animationLifetime = Config("explosion.animationLifetime").toFloat
+  val damageLifetime = Config("explosion.damageLifetime").toFloat
+  var animationTime = animationLifetime
+  var damageTime = damageLifetime
 
   val sound = "explosion1.wav"
   
@@ -31,14 +33,15 @@ class Explosion (var x: Float, var y: Float, var radius: Float, session: Session
   }
     
   def update(delta: Int) {
-    timeToDie -= delta/1000f
-    if (timeToDie < 0) {
+    damageTime -= delta/1000f
+    animationTime -= delta/1000f
+    if (animationTime < 0) {
       session.removeExplosion(this)
     }
   }
 
   def render(g: Graphics) {
-    g.setColor(new Color(0.5f, 0.5f, 0.8f, timeToDie/lifetime))
+    g.setColor(new Color(0.5f, 0.5f, 0.8f, animationTime/animationLifetime))
     g.fillOval(x - radius, y - radius, radius*2, radius*2)
   }
 
@@ -61,7 +64,7 @@ class Explosion (var x: Float, var y: Float, var radius: Float, session: Session
     if (other.isInstanceOf[Tank]) {
       val tank = other.asInstanceOf[Tank]
       var damage = -contact.separation
-      damage *= (timeToDie/lifetime)
+      damage *= (damageTime/damageLifetime)
       damage *= damageFactor
       damage *= Main.GAME_WINDOW_RATIO
 
