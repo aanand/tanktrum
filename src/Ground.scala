@@ -130,40 +130,54 @@ class Ground(session : Session, width : Int, height : Int) extends GameObject(se
   }
   
   def render(g: Graphics, image: Image) {
+    g.setColor(new Color(1f, 1f, 1f))
+    g.texture(drawShape, image, image.getTextureWidth/Main.GAME_WIDTH, image.getTextureHeight/Main.GAME_HEIGHT)
+
+    renderShading(g)
+    renderOutline(g)
+  }
+  
+  def renderShading(g: Graphics) {
     val lightAngle = Math.toRadians(135)
     val lightVector = new slick.geom.Vector2f(Math.sin(lightAngle).toFloat, -Math.cos(lightAngle).toFloat)
     val shadingDepth = 4f
     val shadingAlpha = 0.35f
     
-    g.setColor(new Color(1f, 1f, 1f))
-    g.texture(drawShape, image, image.getTextureWidth/Main.GAME_WIDTH, image.getTextureHeight/Main.GAME_HEIGHT)
-
     import GL._
 
+    val projections = new Array[Float](points.length)
+    
+    for (i <- 0 until points.length-1) {
+      val groundVector = new slick.geom.Vector2f(points(i+1).x - points(i).x, points(i+1).y - points(i).y)
+      val shadeVector = new slick.geom.Vector2f
+    
+      groundVector.projectOntoUnit(lightVector, shadeVector)
+      projections(i) = shadeVector.length
+    }
+
     quadStrip {
-      for (i <- 0 until points.length-1) {
-        val groundVector = new slick.geom.Vector2f(points(i+1).x - points(i).x, points(i+1).y - points(i).y)
-        val shadeVector = new slick.geom.Vector2f
-      
-        groundVector.projectOntoUnit(lightVector, shadeVector)
-      
-        val intensity = 1f - shadeVector.length
-        val alpha = Math.abs(shadeVector.length * 2 - 1) * shadingAlpha
-      
+      for (i <- 0 until points.length) {
+        val projection = if (i == 0) {
+          projections(0)
+        } else if (i == points.length-1) {
+          projections(i)
+        } else {
+          (projections(i-1) + projections(i)) / 2
+        }
+
+        val intensity = 1f - projection
+        val alpha = Math.abs(projection * 2 - 1) * shadingAlpha
+        
         color(intensity, intensity, intensity, alpha)
         vertex(points(i).x, points(i).y)
-        
+      
         color(intensity, intensity, intensity, 0f)
         vertex(points(i).x, points(i).y + shadingDepth)
-      
-        color(intensity, intensity, intensity, alpha)
-        vertex(points(i+1).x, points(i+1).y)
-        
-        color(intensity, intensity, intensity, 0f)
-        vertex(points(i+1).x, points(i+1).y + shadingDepth)
       }
     }
-    
+  }
+  
+  def renderOutline(g: Graphics) {
     g.setColor(new Color(0f, 0f, 0f))
     g.setLineWidth(2)
     g.setAntiAlias(true)
