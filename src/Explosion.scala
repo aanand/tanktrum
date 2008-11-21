@@ -67,18 +67,20 @@ class Explosion (var x: Float, var y: Float, var radius: Float, session: Session
       damage *= (damageTime/damageLifetime)
       damage *= damageFactor
       damage *= Main.GAME_WINDOW_RATIO
-
-      if (!tanksHit.contains(tank)) {
-        println(tank.player.name + " in explosion for " + damage + " damage.")
-        tanksHit(tank) = damage
-        tank.damage(damage, this.projectile)
-      }
-      else {
-        val oldDamage = tanksHit(tank)
-        if (damage > oldDamage) {
-          println(tank.player.name + " in explosion for a further " + (damage-oldDamage) + " damage.")
+      
+      if (damage > 0) {
+        if (!tanksHit.contains(tank)) {
+          println(tank.player.name + " in " + projectile.getClass.getName + " explosion for " + damage + " damage.")
           tanksHit(tank) = damage
-          tank.damage(damage-oldDamage, this.projectile)
+          tank.damage(damage, this.projectile)
+        }
+        else {
+          val oldDamage = tanksHit(tank)
+          if (damage > oldDamage) {
+            println(tank.player.name + " in " + projectile.getClass.getName + " explosion for a further " + (damage-oldDamage) + " damage.")
+            tanksHit(tank) = damage
+            tank.damage(damage-oldDamage, this.projectile)
+          }
         }
       }
     }
