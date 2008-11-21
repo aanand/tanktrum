@@ -11,7 +11,7 @@ object MirvItem extends Item {
   override val projectileType = ProjectileTypes.MIRV
 }
 
-class Mirv(session: Session, tank: Tank) extends Projectile(session, tank) {
+class Mirv(session: Session, tank: ServerTank) extends Projectile(session, tank) {
   override lazy val radius = 0.8f
   override val projectileType = ProjectileTypes.MIRV
   override val explosionRadius = 2.6f
@@ -51,7 +51,7 @@ class Mirv(session: Session, tank: Tank) extends Projectile(session, tank) {
   }
 }
 
-class MirvCluster(session: Session, tank: Tank) extends Projectile(session, tank) {
+class MirvCluster(session: Session, tank: ServerTank) extends Projectile(session, tank) {
   override lazy val radius = 0.4f
   override val damage = 3
   override val explosionRadius = 2.6f

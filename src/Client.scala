@@ -9,8 +9,6 @@ import scala.collection.mutable.HashMap
 import sbinary.Operations
 import sbinary.Instances._
 
-import ClientTank._
-
 class Client (hostname: String, port: Int, name: String, container: GameContainer) extends Session(container) {
   val PING_PERIOD = Config("client.pingPeriod").toInt
   val TANK_UPDATE_INTERVAL = Config("client.tankUpdateInterval").toInt
@@ -36,8 +34,8 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
   var lastTankUpdate = new Array[Byte](6)
   var latency: Long = 0
 
-  val players = new HashMap[Short, Player]
-  var me: Player = null
+  val players = new HashMap[Short, ClientPlayer]
+  var me: ClientPlayer = null
 
   var errorState = false
   var errorMessage = ""
@@ -124,7 +122,7 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
     }
   }
   
-  override def tanks = players.values.map(player => player.tank)
+  def tanks = players.values.map(player => player.tank)
   
   def render(g: Graphics) {
     if (errorState) {
@@ -152,7 +150,7 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
       projectiles.values.foreach(_.render(g))
       explosions.foreach        (_.render(g))
       players.values.foreach    (_.render(g))
-      players.values.foreach    ((player) => if (null != player.tank) {player.tank.render(g)})
+      tanks.foreach             ((tank) => if (null != tank) {tank.render(g)})
     }
 
     g.resetTransform
@@ -380,7 +378,7 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
     for (player <- players.values) { player.updated = false }
 
     for (playerData <- playerDataList) {
-      val p = new Player(null, "Unknown.", 0)
+      val p = new ClientPlayer
       p.loadFrom(playerData)
       if (players.isDefinedAt(p.id) && players(p.id).name == p.name) {
         players(p.id).loadFrom(playerData)

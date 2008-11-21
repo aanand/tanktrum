@@ -61,8 +61,8 @@ class Explosion (var x: Float, var y: Float, var radius: Float, session: Session
   }
 
   override def collide(other: GameObject, contact: ContactPoint) {
-    if (other.isInstanceOf[Tank]) {
-      val tank = other.asInstanceOf[Tank]
+    if (other.isInstanceOf[ServerTank]) {
+      val tank = other.asInstanceOf[ServerTank]
       var damage = -contact.separation
       damage *= (damageTime/damageLifetime)
       damage *= damageFactor

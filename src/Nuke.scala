@@ -9,7 +9,7 @@ object NukeItem extends Item {
   override val projectileType = ProjectileTypes.NUKE
 }
 
-class Nuke(session: Session, tank: Tank) extends Projectile(session, tank) {
+class Nuke(session: Session, tank: ServerTank) extends Projectile(session, tank) {
   override val radius = 1f
   override val explosionRadius = 8f
   override val explosionDamageFactor = 1.5f

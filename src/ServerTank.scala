@@ -10,11 +10,9 @@ import org.jbox2d.dynamics.contacts._
 import org.jbox2d.common._
 import org.jbox2d.collision._
 
-object ServerTank {
-  implicit def tankToServerTank(tank: Tank) = tank.asInstanceOf[ServerTank]
-}
-
-class ServerTank(server: Server, id: Byte) extends Tank(server, id) {
+class ServerTank(val server: Server, id: Byte) extends Tank(server, id) {
+  var player: ServerPlayer = _
+  
   val rand = new Random
   
   val SPEED = Config("tank.speed").toFloat
@@ -44,6 +42,8 @@ class ServerTank(server: Server, id: Byte) extends Tank(server, id) {
 
   var previousValues: (Float, Float, Float, Float, Float, Int, Int, Int, Int, Boolean, Int, Int, Int) = _
   
+  val gun = new ServerGun(server, this)
+
   def currentValues = {
     (x, y, angle, 
      gun.angle, gun.power, 
@@ -60,11 +60,9 @@ class ServerTank(server: Server, id: Byte) extends Tank(server, id) {
   override def create(x: Float) {
     val y = server.ground.heightAt(x).toFloat - STARTING_ALTITUDE
     body.setXForm(new Vec2(x, y), 0)
-    super.create(x)
   }
 
-  override def update(delta: Int) {
-
+  def update(delta: Int) {
     //Keep the body angle between -Pi and Pi:
     if (body.getAngle > Pi) {
       body.setXForm(body.getPosition, body.getAngle - 2*Pi.toFloat)
@@ -72,8 +70,9 @@ class ServerTank(server: Server, id: Byte) extends Tank(server, id) {
     else if (body.getAngle < -Pi) {
       body.setXForm(body.getPosition, body.getAngle + 2*Pi.toFloat)
     }
+    
+    gun.update(delta)
 
-    super.update(delta)
     if (destroy) {
       health = 0
       for (i <- 0 until corbomite) {

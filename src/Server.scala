@@ -17,8 +17,6 @@ import org.jbox2d.dynamics.contacts._
 import org.jbox2d.common._
 import org.jbox2d.collision._
 
-import ServerTank._
-
 class Server(port: Int) extends Session(null) with Actor {
   val tick = Config("game.logicUpdateInterval").toInt
   
@@ -27,7 +25,7 @@ class Server(port: Int) extends Session(null) with Actor {
   var playerID: Byte = -1
 
   var channel: DatagramChannel = _
-  val players = new HashMap[SocketAddress, Player]
+  val players = new HashMap[SocketAddress, ServerPlayer]
   val data = ByteBuffer.allocate(1000)
   val rand = new Random()
   
@@ -108,7 +106,7 @@ class Server(port: Int) extends Session(null) with Actor {
     channel.disconnect()
   }
   
-  override def tanks = players.values.map(player => player.tank)
+  def tanks = players.values.map(player => player.tank)
 
   /**
    * Updates the server, processing physics and sending updates if it is time
@@ -194,11 +192,24 @@ class Server(port: Int) extends Session(null) with Actor {
   /***
    * Add methods.  These all add create an instance of a game object and add it to a collection to be tracked by the server.
    */
-  override def addProjectile(tank: Tank, x: Float, y: Float, angle: Float, speed: Float, projectileType: ProjectileTypes.Value) = {
-    val p = super.addProjectile(tank, x, y, angle, speed, projectileType)
+  def addProjectile(tank: ServerTank, x: Float, y: Float, angle: Float, speed: Float, projectileType : ProjectileTypes.Value): Projectile = {
+    val radians = Math.toRadians(angle-90)
+    
+    val velocity = new Vec2((speed * Math.cos(radians)).toFloat, (speed * Math.sin(radians)).toFloat)
+    velocity.addLocal(tank.velocity)
+
+    val position = new Vec2(x.toFloat, y.toFloat)
+    
+    var p: Projectile = ProjectileTypes.newProjectile(this, tank, projectileType)
+
+    p.body.setXForm(position, 0f)
+    p.body.setLinearVelocity(tank.velocity.add(velocity))
+    
     broadcast(projectileData(p))
-    p
+
+    addProjectile(p)
   }
+
 
   override def addExplosion(x: Float, y: Float, radius: Float, projectile: Projectile, damageFactor: Float) {
     val e = new Explosion(x, y, radius, this, projectile, damageFactor)
@@ -273,7 +284,7 @@ class Server(port: Int) extends Session(null) with Actor {
 
       findNextID
       val tank = createTank(playerID)
-      val player = new Player(tank, name, playerID)
+      val player = new ServerPlayer(tank, name, playerID)
       tank.player = player
       players.put(addr, player)
 
@@ -313,7 +324,7 @@ class Server(port: Int) extends Session(null) with Actor {
   }
 
   def leader = {
-    var leadPlayer: Player = null
+    var leadPlayer: ServerPlayer = null
     for (player <- players.values) {
       if (null == leadPlayer || player.score > leadPlayer.score) {
         leadPlayer = player
@@ -362,13 +373,13 @@ class Server(port: Int) extends Session(null) with Actor {
       case _                               => println("Warning: Server got unknown command: " + command.toByte)}
   }
 
-  def handleTankUpdate(player: Player) = {
+  def handleTankUpdate(player: ServerPlayer) = {
     val tankArray = new Array[byte](data.remaining)
     data.get(tankArray)
     player.tank.loadFrom(tankArray)
   }
 
-  def handleChat(player: Player) = {
+  def handleChat(player: ServerPlayer) = {
     val messageArray = new Array[byte](data.remaining)
     data.get(messageArray)
     val message = player.name + ": " + Operations.fromByteArray[String](messageArray)
@@ -376,7 +387,7 @@ class Server(port: Int) extends Session(null) with Actor {
     broadcastChat(message)
   }
 
-  def handleBuy(player: Player) = {
+  def handleBuy(player: ServerPlayer) = {
     val itemArray = new Array[byte](data.remaining)
     data.get(itemArray)
     val item = Operations.fromByteArray[Byte](itemArray)

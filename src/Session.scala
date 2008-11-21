@@ -98,22 +98,6 @@ abstract class Session(container: slick.GameContainer) extends ContactListener {
     explosions -= e
   }
 
-  def addProjectile(tank: Tank, x: Float, y: Float, angle: Float, speed: Float, projectileType : ProjectileTypes.Value): Projectile = {
-    val radians = Math.toRadians(angle-90)
-    
-    val velocity = new Vec2((speed * Math.cos(radians)).toFloat, (speed * Math.sin(radians)).toFloat)
-    velocity.addLocal(tank.velocity)
-
-    val position = new Vec2(x.toFloat, y.toFloat)
-    
-    var p: Projectile = ProjectileTypes.newProjectile(this, tank, projectileType)
-
-    p.body.setXForm(position, 0f)
-    p.body.setLinearVelocity(tank.velocity.add(velocity))
-
-    addProjectile(p)
-  }
-
   def addProjectile(projectile: Projectile): Projectile = {
     projectile.id = nextProjectileId
     projectiles.put(nextProjectileId, projectile)

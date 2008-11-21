@@ -13,8 +13,6 @@ import org.jbox2d.common._
 import org.jbox2d.collision._
 import org.jbox2d.collision
 
-import ClientTank._
-
 abstract class Tank (val session: Session, var id: Byte) extends GameObject(session) {
   lazy val WIDTH  = Config("tank.width").toFloat
   lazy val HEIGHT = Config("tank.height").toFloat
@@ -33,10 +31,6 @@ abstract class Tank (val session: Session, var id: Byte) extends GameObject(sess
   
   def color = Colors(id)
  
-  val gun = new Gun(session, this)
-  
-  var player: Player = null
-
   var health = 100f
 
   val contactGrace = 50
@@ -120,15 +114,11 @@ abstract class Tank (val session: Session, var id: Byte) extends GameObject(sess
   def isAlive = health > 0
   def isDead = !isAlive
 
-  def create(x: Float) = {
-  }
+  def create(x: Float)
 
-  def update(delta: Int): Unit = {
-    gun.update(delta)
-  }
+  def update(delta: Int)
 
-  def damage(d: Float, source: Projectile) {
-  }
+  def damage(d: Float, source: Projectile) {}
   
   def remove = {
     if (null != body) session.removeBody(body)

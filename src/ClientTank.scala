@@ -9,11 +9,9 @@ import org.jbox2d.common._
 
 import SwitchableParticleEmitter._
 
-object ClientTank {
-  implicit def tankToClientTank(tank: Tank) = tank.asInstanceOf[ClientTank]
-}
-
 class ClientTank(client: Client) extends Tank(client, 0) {
+  var player: ClientPlayer = _
+
   val drawShapePoints = shapePoints.foldLeft[List[Float]](List())((list, v) => list ++ List(v.getX(), v.getY())).toArray
   val tankShape = new Polygon(drawShapePoints)
   def wheelColor = color
@@ -24,6 +22,8 @@ class ClientTank(client: Client) extends Tank(client, 0) {
   var emitting = false
 
   var wasAlive = false
+  
+  val gun = new ClientGun(client, this)
 
   override def create(x: Float) {
     jetEmitter = ParticleIO.loadEmitter("media/particles/jet.xml")
@@ -33,11 +33,10 @@ class ClientTank(client: Client) extends Tank(client, 0) {
       client.particleSystem.addEmitter(e)
       e.setEmitting(false)
     }
-    super.create(x)
   }
 
   override def update(delta: Int) {
-    super.update(delta)
+    gun.update(delta)
 
     if (jumping && isAlive) {
       startEmitting

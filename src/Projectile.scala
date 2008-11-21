@@ -25,7 +25,7 @@ object Projectile {
   }
 }
 
-class Projectile(session: Session, val tank: Tank) extends GameObject(session) {
+class Projectile(session: Session, val tank: ServerTank) extends GameObject(session) {
   var id: Int = -1
 
   def color = new slick.Color(1f, 1f, 1f)
@@ -193,8 +193,8 @@ class Projectile(session: Session, val tank: Tank) extends GameObject(session) {
       session.ground.deform(x, y, explosionRadius)
     }
     
-    if (obj.isInstanceOf[Tank] && session.isInstanceOf[Server]) {
-      val hitTank = obj.asInstanceOf[Tank]
+    if (obj.isInstanceOf[ServerTank] && session.isInstanceOf[Server]) {
+      val hitTank = obj.asInstanceOf[ServerTank]
       val server = session.asInstanceOf[Server]
       
       hitTank.damage(damage, this)
@@ -236,7 +236,7 @@ object ProjectileTypes extends Enumeration {
   val PROJECTILE, NUKE, ROLLER, MIRV, MIRV_CLUSTER, CORBOMITE, 
       MACHINE_GUN, DEATHS_HEAD, DEATHS_HEAD_CLUSTER, MISSILE = Value
 
-  def newProjectile(session: Session, tank: Tank, projectileType: Value) : Projectile = {
+  def newProjectile(session: Session, tank: ServerTank, projectileType: Value) : Projectile = {
     projectileType match {
       case PROJECTILE          => new Projectile(session, tank) 
       case NUKE                => new Nuke(session, tank) 

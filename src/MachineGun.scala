@@ -14,7 +14,7 @@ object MachineGunItem extends Item {
   override val projectileType = ProjectileTypes.MACHINE_GUN
 }
 
-class MachineGun(session: Session, tank: Tank) extends Projectile(session, tank) {
+class MachineGun(session: Session, tank: ServerTank) extends Projectile(session, tank) {
   override lazy val radius = 0.4f
   override val explosionRadius = 0.8f
   override val damage = 3
