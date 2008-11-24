@@ -7,7 +7,7 @@ class Player {
   var id: Byte = -1
 
   var score = 0
-  var money = 0
+  var money = Config("player.startingMoney").toInt
 
   var me = false
 
