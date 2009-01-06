@@ -61,6 +61,7 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
   var skyImage: Image = _
   var groundImage: Image = _
   
+  var projectiles = new HashMap[Int, Projectile]
   var explosions = new HashSet[Explosion]
 
   override def enter {
@@ -99,6 +100,9 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
       ping
       checkTimeout
       
+      for (p <- projectiles.values) {
+        p.update(delta)
+      }
       for (tank <- tanks) {
         if (null != tank) { tank.update(delta) }
       }
@@ -143,8 +147,10 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
   def removeExplosion(e: Explosion) {
     explosions -= e
   }
-
-
+  
+  def removeProjectile(p : Projectile) {
+    projectiles -= p.id
+  }
   
   def render(g: Graphics) {
     if (errorState) {

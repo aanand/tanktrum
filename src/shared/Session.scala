@@ -6,9 +6,6 @@ import scala.collection.mutable.HashMap
 abstract class Session(container: slick.GameContainer) {
 
   var active = false
-  var projectiles = new HashMap[Int, Projectile]
-
-  var nextProjectileId = 0
 
   var supposedRunTime = 0
   var numTankUpdates = 0
@@ -24,10 +21,6 @@ abstract class Session(container: slick.GameContainer) {
   
   def update(delta: Int) {
     supposedRunTime += delta
-    
-    for (p <- projectiles.values) {
-      p.update(delta)
-    }
   }
   
   
@@ -37,18 +30,5 @@ abstract class Session(container: slick.GameContainer) {
     a
   }
 
-  def addProjectile(projectile: Projectile): Projectile = {
-    projectile.id = nextProjectileId
-    projectiles.put(nextProjectileId, projectile)
-    nextProjectileId += 1
-
-    projectile
-  }
-  
-  def removeProjectile(p : Projectile) {
-    p.onRemove
-    projectiles -= p.id
-  }
-  
   def isActive = active
 }

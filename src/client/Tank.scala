@@ -194,11 +194,10 @@ class Tank(client: Client) extends GameObject {
     x = newX
     y = newY
     angle = newAngle.toFloat.toRadians
-    println("Set angle to: " + angle)
     gun.timer = newGunTimer
     health = newHealth
     jumping = newJumping
-    gun.selectedWeapon = ProjectileTypes.apply(newSelectedWeapon)
+    gun.selectedWeapon = ProjectileTypes(newSelectedWeapon)
     gun.ammo(gun.selectedWeapon) = newSelectedAmmo
     jumpFuel = newFuel
     

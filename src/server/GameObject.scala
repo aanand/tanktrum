@@ -11,6 +11,9 @@ abstract class GameObject(server: Server) {
   def collide(other: GameObject, contact: ContactPoint) {}
   def persist(other: GameObject, contact: ContactPoint) {}
   
+  def x = body.getPosition.x
+  def y = body.getPosition.y
+  
   def shapes: List[ShapeDef]
   def bodyDef = new BodyDef
   

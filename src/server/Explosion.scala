@@ -13,7 +13,7 @@ import org.jbox2d.dynamics.contacts._
 import org.jbox2d.common._
 import org.jbox2d.collision._
 
-class Explosion (var x: Float, var y: Float, var radius: Float, server: Server, projectile: Projectile, damageFactor: Float) extends GameObject(server) {
+class Explosion (x: Float, y: Float, var radius: Float, server: Server, projectile: Projectile, damageFactor: Float) extends GameObject(server) {
   val damageLifetime = Config("explosion.damageLifetime").toFloat
   var damageTime = damageLifetime
 

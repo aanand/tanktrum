@@ -33,7 +33,7 @@ class Player extends shared.Player {
     if (tank.isAlive) {
       g.translate(10, 20)
 
-      ProjectileTypes.render(g, gun.selectedWeapon)
+      Projectile.render(g, gun.selectedWeapon)
 
       g.drawString(gun.ammo(gun.selectedWeapon).toString, 15, -9)
     }

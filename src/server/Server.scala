@@ -35,6 +35,7 @@ class Server(port: Int) extends shared.Session(null) with Actor with ContactList
   var nextTankColorIndex = 0
   
   var playerID: Byte = -1
+  var nextProjectileId = 0
 
   var channel: DatagramChannel = _
   val players = new HashMap[SocketAddress, Player]
@@ -61,6 +62,7 @@ class Server(port: Int) extends shared.Session(null) with Actor with ContactList
   var world = createWorld
   var bodies = new HashMap[Body, GameObject]
   var ground: Ground = _
+  var projectiles = new HashMap[Int, Projectile]
   var explosions = new HashSet[Explosion]
 
   def act {
@@ -145,6 +147,9 @@ class Server(port: Int) extends shared.Session(null) with Actor with ContactList
     }
 
     ground.update(delta)
+    for (p <- projectiles.values) {
+      p.update(delta)
+    }
     for (tank <- tanks) {
       if (null != tank) { tank.update(delta) }
     }
@@ -252,7 +257,7 @@ class Server(port: Int) extends shared.Session(null) with Actor with ContactList
 
     val position = new Vec2(x.toFloat, y.toFloat)
     
-    var p: Projectile = ProjectileTypes.newProjectile(this, tank, projectileType)
+    var p: Projectile = Projectile.create(this, tank, projectileType)
 
     p.body.setXForm(position, 0f)
     p.body.setLinearVelocity(tank.velocity.add(velocity))
@@ -262,6 +267,17 @@ class Server(port: Int) extends shared.Session(null) with Actor with ContactList
     addProjectile(p)
   }
 
+  def addProjectile(p: Projectile) = {
+    p.id = nextProjectileId
+    projectiles.put(nextProjectileId, p)
+    nextProjectileId += 1
+    p
+  }
+
+  def removeProjectile(p : Projectile) {
+    p.onRemove
+    projectiles -= p.id
+  }
 
   def addExplosion(x: Float, y: Float, radius: Float, projectile: Projectile, damageFactor: Float) {
     val e = new Explosion(x, y, radius, this, projectile, damageFactor)

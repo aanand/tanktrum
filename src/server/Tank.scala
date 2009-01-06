@@ -152,8 +152,6 @@ class Tank(val server: Server, val id: Byte) extends GameObject(server) {
   def grounded : Boolean = contactTime > 0
 
   def angle = body.getAngle.toDegrees
-  def x = body.getPosition.x
-  def y = body.getPosition.y
   def velocity = body.getLinearVelocity
 
   def isAlive = health > 0
