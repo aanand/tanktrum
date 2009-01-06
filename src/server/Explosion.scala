@@ -1,11 +1,10 @@
-package shared
+package server
 
-//TODO: This shouldn't be necessary.
-import client._
+import shared._
 
-import org.newdawn.slick._
 import sbinary.Instances._
 import sbinary.Operations
+
 
 import scala.collection.mutable.HashMap
 
@@ -14,14 +13,10 @@ import org.jbox2d.dynamics.contacts._
 import org.jbox2d.common._
 import org.jbox2d.collision._
 
-class Explosion (var x: Float, var y: Float, var radius: Float, session: Session, projectile: Projectile, damageFactor: Float) extends GameObject(session) {
-  val animationLifetime = Config("explosion.animationLifetime").toFloat
+class Explosion (var x: Float, var y: Float, var radius: Float, server: Server, projectile: Projectile, damageFactor: Float) extends GameObject(server) {
   val damageLifetime = Config("explosion.damageLifetime").toFloat
-  var animationTime = animationLifetime
   var damageTime = damageLifetime
 
-  val sound = "explosion1.wav"
-  
   var tanksHit = new HashMap[Tank, float]
 
   body.setXForm(new Vec2(x, y), 0f)
@@ -33,21 +28,11 @@ class Explosion (var x: Float, var y: Float, var radius: Float, session: Session
     List(expShape)
   }
 
-  if (session.isInstanceOf[Client]) {
-    SoundPlayer ! PlaySound(sound)
-  }
-    
   def update(delta: Int) {
     damageTime -= delta/1000f
-    animationTime -= delta/1000f
-    if (animationTime < 0) {
-      session.removeExplosion(this)
+    if (damageTime < 0) {
+      server.removeExplosion(this)
     }
-  }
-
-  def render(g: Graphics) {
-    g.setColor(new Color(0.5f, 0.5f, 0.8f, animationTime/animationLifetime))
-    g.fillOval(x - radius, y - radius, radius*2, radius*2)
   }
 
   def serialise = {
@@ -58,16 +43,9 @@ class Explosion (var x: Float, var y: Float, var radius: Float, session: Session
     ))
   }
 
-  def loadFrom(data: Array[Byte]) = {
-    val (newX, newY, newRadius) = Operations.fromByteArray[(Float, Float, Float)](data)
-    x = newX
-    y = newY
-    radius = newRadius
-  }
-
   override def collide(other: GameObject, contact: ContactPoint) {
-    if (other.isInstanceOf[server.Tank]) {
-      val tank = other.asInstanceOf[server.Tank]
+    if (other.isInstanceOf[Tank]) {
+      val tank = other.asInstanceOf[Tank]
       var damage = -contact.separation
       damage *= (damageTime/damageLifetime)
       damage *= damageFactor

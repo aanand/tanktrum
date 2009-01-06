@@ -1,4 +1,7 @@
 package shared
+
+import server._
+
 import org.newdawn.slick
 import sbinary.Instances._
 import sbinary.Operations

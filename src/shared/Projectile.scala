@@ -28,7 +28,7 @@ object Projectile {
   }
 }
 
-class Projectile(session: Session, val tank: server.Tank) extends GameObject(session) {
+class Projectile(session: Session, val tank: server.Tank) extends server.GameObject(session.asInstanceOf[Server]) {
   var id: Int = -1
 
   def color = new slick.Color(1f, 1f, 1f)
@@ -45,7 +45,7 @@ class Projectile(session: Session, val tank: server.Tank) extends GameObject(ses
   val damage = 5
   val reloadTime = 4f
 
-  var collidedWith: GameObject = _
+  var collidedWith: server.GameObject = _
   
   override def shapes: List[ShapeDef] = {
     val sDef = new CircleDef
@@ -96,10 +96,10 @@ class Projectile(session: Session, val tank: server.Tank) extends GameObject(ses
       if (y > Main.GAME_HEIGHT || destroy) {
         session.removeProjectile(this)
       }
-      else if (y + radius > session.ground.heightAt(x) || 
+      else if (y + radius > session.asInstanceOf[Server].ground.heightAt(x) || 
                x < 0 || 
                x > Main.GAME_WIDTH) {
-        collide(session.ground, null)
+        collide(session.asInstanceOf[Server].ground, null)
       }
       
       if (!round) {
@@ -178,13 +178,13 @@ class Projectile(session: Session, val tank: server.Tank) extends GameObject(ses
     }
   }
   
-  override def collide(obj: GameObject, contact: ContactPoint) {
-    if (!obj.isInstanceOf[Projectile] && !obj.isInstanceOf[Explosion]) {
+  override def collide(obj: server.GameObject, contact: ContactPoint) {
+    if (!obj.isInstanceOf[Projectile] && !obj.isInstanceOf[server.Explosion]) {
       collidedWith = obj
     }
   }
   
-  def explode(obj: GameObject) {
+  def explode(obj: server.GameObject) {
     if (destroy) {
       return
     }
@@ -192,8 +192,8 @@ class Projectile(session: Session, val tank: server.Tank) extends GameObject(ses
     destroy = true
 
     if (session.isInstanceOf[Server]) {
-      session.addExplosion(x, y, explosionRadius, this, explosionDamageFactor)
-      session.ground.deform(x, y, explosionRadius)
+      session.asInstanceOf[Server].addExplosion(x, y, explosionRadius, this, explosionDamageFactor)
+      session.asInstanceOf[Server].ground.deform(x, y, explosionRadius)
     }
     
     if (obj.isInstanceOf[server.Tank] && session.isInstanceOf[Server]) {
@@ -207,7 +207,7 @@ class Projectile(session: Session, val tank: server.Tank) extends GameObject(ses
   }
   
   def onRemove {
-    session.removeBody(body)
+    session.asInstanceOf[Server].removeBody(body)
   }
 
   def serialise = {

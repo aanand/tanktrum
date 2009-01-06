@@ -1,10 +1,10 @@
-package shared
+package server
 import org.jbox2d.dynamics._
 import org.jbox2d.dynamics.contacts._
 import org.jbox2d.common._
 import org.jbox2d.collision._
 
-abstract class GameObject(session: Session) {
+abstract class GameObject(server: Server) {
   var body = createBody
   loadShapes
 
@@ -15,13 +15,15 @@ abstract class GameObject(session: Session) {
   def bodyDef = new BodyDef
   
   def createBody = {
-    session.createBody(this, bodyDef)
+    server.createBody(this, bodyDef)
   }
   
   def loadShapes = {
     removeShapes
-    for (shape <- shapes) {
-      body.createShape(shape)
+    if (null != shapes) {
+      for (shape <- shapes) {
+        body.createShape(shape)
+      }
     }
   }
   

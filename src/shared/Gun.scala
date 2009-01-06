@@ -1,7 +1,7 @@
 package shared
 import scala.collection.mutable.HashMap
 
-class Gun(session: Session, tank: Tank) {
+class Gun(session: Session) {
   val ANGLE_SPEED = Config("gun.angleSpeed").toFloat
   val POWER_SPEED = Config("gun.powerSpeed").toFloat
 
@@ -11,7 +11,7 @@ class Gun(session: Session, tank: Tank) {
   val POWER_SCALE = Config("gun.powerScale").toFloat
 
   val OFFSET_X = 0f
-  val OFFSET_Y = Config("gun.offsetY").toFloat * tank.HEIGHT
+  val OFFSET_Y = Config("gun.offsetY").toFloat * Config("tank.height").toFloat
   
   var selectedWeapon = ProjectileTypes.PROJECTILE
   
@@ -27,9 +27,6 @@ class Gun(session: Session, tank: Tank) {
 
   def ready = timer <= 0
   
-  def x = (tank.x - OFFSET_X * Math.cos(tank.angle.toRadians) - OFFSET_Y * Math.sin(tank.angle.toRadians)).toFloat
-  def y = (tank.y - OFFSET_X * Math.sin(tank.angle.toRadians) + OFFSET_Y * Math.cos(tank.angle.toRadians)).toFloat
-
   def update(delta: Int) {
     
     if (angleChange != 0) {

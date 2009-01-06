@@ -8,10 +8,12 @@ import java.nio.channels._
 import java.nio._
 import java.net._
 import java.util.Random
+import java.util.Date
 
 import scala.collection.mutable.HashMap
 import scala.collection.mutable.HashSet
 import scala.actors.Actor
+
 
 import sbinary.Operations
 import sbinary.Instances._
@@ -21,7 +23,8 @@ import org.jbox2d.dynamics.contacts._
 import org.jbox2d.common._
 import org.jbox2d.collision._
 
-class Server(port: Int) extends shared.Session(null) with Actor {
+class Server(port: Int) extends shared.Session(null) with Actor with ContactListener  {
+  val TANK_BROADCAST_INTERVAL       = Config("server.tankBroadcastInterval").toInt
   val PROJECTILE_BROADCAST_INTERVAL = Config("server.projectileBroadcastInterval").toInt
   val PLAYER_BROADCAST_INTERVAL     = Config("server.playerBroadcastInterval").toInt
   val READY_ROOM_BROADCAST_INTERVAL = Config("server.readyRoomBroadcastInterval").toInt
@@ -55,6 +58,10 @@ class Server(port: Int) extends shared.Session(null) with Actor {
   val projectileSequence = new Sequence
   val groundSequence = new Sequence
   
+  var world = createWorld
+  var bodies = new HashMap[Body, GameObject]
+  var ground: Ground = _
+  var explosions = new HashSet[Explosion]
 
   def act {
     println("Server started on port " + port + ".")
@@ -98,6 +105,7 @@ class Server(port: Int) extends shared.Session(null) with Actor {
   override def enter() = {
     super.enter()
 
+    ground = new Ground(this, Main.GAME_WIDTH.toInt, Main.GAME_HEIGHT.toInt)
     ground.buildPoints()
 
     channel = DatagramChannel.open()
@@ -134,6 +142,14 @@ class Server(port: Int) extends shared.Session(null) with Actor {
         body.wakeUp
       }
       body = body.getNext
+    }
+
+    ground.update(delta)
+    for (tank <- tanks) {
+      if (null != tank) { tank.update(delta) }
+    }
+    for (e <- explosions) {
+      e.update(delta)
     }
 
     super.update(delta)
@@ -199,6 +215,32 @@ class Server(port: Int) extends shared.Session(null) with Actor {
     }
   }
 
+  def createWorld = {
+    val gravity = new Vec2(0.0f, Config("physics.gravity").toFloat)
+    val bounds = new AABB(new Vec2(-Main.GAME_WIDTH, -Main.GAME_HEIGHT),
+                          new Vec2(2*Main.GAME_WIDTH, 2*Main.GAME_HEIGHT))
+
+    val newWorld = new World(bounds, gravity, false)
+
+    newWorld.setContactListener(this)
+    newWorld
+  }
+
+  
+  def createBody(obj: GameObject, bodyDef: BodyDef) = {
+    val body = world.createBody(bodyDef)
+    if (null != body) {
+      bodies.put(body, obj)
+      body.setUserData(obj)
+    }
+    body
+  }
+
+  def removeBody(body: Body) {
+    world.destroyBody(body)
+    bodies -= body
+  }
+
   /***
    * Add methods.  These all add create an instance of a game object and add it to a collection to be tracked by the server.
    */
@@ -221,15 +263,41 @@ class Server(port: Int) extends shared.Session(null) with Actor {
   }
 
 
-  override def addExplosion(x: Float, y: Float, radius: Float, projectile: Projectile, damageFactor: Float) {
+  def addExplosion(x: Float, y: Float, radius: Float, projectile: Projectile, damageFactor: Float) {
     val e = new Explosion(x, y, radius, this, projectile, damageFactor)
     explosions += e
     broadcastExplosion(e)
   }
 
-  override def endRound {
-    super.endRound()
+  def removeExplosion(e: Explosion) {
+    removeBody(e.body)
+    explosions -= e
+  }
+
+  def endRound {
+    val runTime = (new Date().getTime - startTime).toFloat
     
+    val prefix = this.getClass.getName + ": "
+    
+    println(prefix + "runTime = " + runTime/1000)
+    println(prefix + "numTankUpdates = " + numTankUpdates)
+    
+    if (numTankUpdates > 0) {
+      val targetTankUpdateRate = 1000f / TANK_BROADCAST_INTERVAL
+      val actualTankUpdateRate = numTankUpdates.toFloat/runTime * 1000
+      val error = (actualTankUpdateRate - targetTankUpdateRate) / targetTankUpdateRate * 100
+      
+      println(prefix + "avg tank update interval = " + runTime/numTankUpdates)
+      println(prefix + "target tank update = " + targetTankUpdateRate + " updates/sec")
+      println(prefix + "actual tank update rate = " + actualTankUpdateRate + " updates/sec")
+      println(prefix + "update rate error = " + error + "%")
+    }
+    
+    val error = (supposedRunTime - runTime).toFloat / runTime * 100
+    
+    println(prefix + "supposedRunTime = " + supposedRunTime.toFloat/1000)
+    println(prefix + "delta error = " + error + "%")
+ 
     world = createWorld
     
     projectiles = new HashMap[Int, Projectile]
@@ -513,5 +581,30 @@ class Server(port: Int) extends shared.Session(null) with Actor {
    */
   def send(data: Array[byte], addr: SocketAddress) = {
     channel.send(ByteBuffer.wrap(data), addr)
+  }
+
+  /**
+   * Contact listener callbacks:
+   */
+  override def add(contact: ContactPoint) {
+    val a = contact.shape1.getBody()
+    val b = contact.shape2.getBody()
+    
+    bodies(a).collide(bodies(b), contact)
+    bodies(b).collide(bodies(a), contact)
+  }
+
+  override def persist(contact: ContactPoint) {
+    val a = contact.shape1.getBody()
+    val b = contact.shape2.getBody()
+    
+    bodies(a).persist(bodies(b), contact)
+    bodies(b).persist(bodies(a), contact)
+  }
+  
+  override def remove(contact: ContactPoint) {
+  }
+
+  override def result(result: ContactResult) {
   }
 }

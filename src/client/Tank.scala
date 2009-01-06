@@ -13,9 +13,32 @@ import org.jbox2d.common._
 
 import SwitchableParticleEmitter._
 
-class Tank(client: Client) extends shared.Tank(client, 0) {
-  var player: Player = _
+class Tank(client: Client) extends GameObject {
+  var id: Short = _
+  
+  lazy val WIDTH  = Config("tank.width").toFloat
+  lazy val HEIGHT = Config("tank.height").toFloat
+  lazy val TAPER  = Config("tank.taper").toFloat
+  lazy val BEVEL  = Config("tank.bevel").toFloat
+  
+  lazy val WHEEL_RADIUS = BEVEL
+  lazy val WHEEL_OFFSET_X = WIDTH/2-BEVEL
+  lazy val WHEEL_OFFSET_Y = -BEVEL
 
+  lazy val BASE_WIDTH = WIDTH - 2*WHEEL_RADIUS
+  lazy val BASE_HEIGHT = BEVEL
+  lazy val BASE_OFFSET_X = 0
+  lazy val BASE_OFFSET_Y = -BASE_HEIGHT/2
+
+  var player: Player = _
+  
+  lazy val shapePoints = List[Vector2f] (
+                      new Vector2f(-(WIDTH/2-TAPER), -HEIGHT),
+                      new Vector2f(WIDTH/2-TAPER, -HEIGHT),
+                      new Vector2f(WIDTH/2, -BEVEL),
+                      new Vector2f(-WIDTH/2, -BEVEL)
+                    ).toArray
+ 
   val drawShapePoints = shapePoints.foldLeft[List[Float]](List())((list, v) => list ++ List(v.getX(), v.getY())).toArray
   val tankShape = new Polygon(drawShapePoints)
   def wheelColor = color
@@ -27,11 +50,21 @@ class Tank(client: Client) extends shared.Tank(client, 0) {
 
   var wasAlive = false
   
-  val gun = new Gun(client, this)
+  val gun = new Gun(client)
 
   def color = Colors(id)
+  
+  var health = 100f
+  def isAlive = health > 0
+  def isDead = !isAlive
+  
+  var jumping = false
+  
+  var maxJumpFuel = Config("tank.jumpjet.maxFuel").toInt
+  var jumpFuel = 0f
+  def fuelPercent = (jumpFuel.toFloat/maxJumpFuel) * 100
  
-  override def create(x: Float) {
+  def create(x: Float) {
     jetEmitter = ParticleIO.loadEmitter("media/particles/jet.xml")
     vapourEmitter = ParticleIO.loadEmitter("media/particles/vapour.xml")
     
@@ -41,14 +74,14 @@ class Tank(client: Client) extends shared.Tank(client, 0) {
     }
   }
 
-  override def update(delta: Int) {
+  def update(delta: Int) {
     gun.update(delta)
 
     if (jumping && isAlive) {
       startEmitting
       for (e <- particleEmitters) {
         e.setPosition(x, y)
-        e.setRotation(body.getAngle.toDegrees)
+        e.setRotation(angle.toDegrees)
       }
     }
     else {
@@ -92,7 +125,7 @@ class Tank(client: Client) extends shared.Tank(client, 0) {
     g.setColor(color)
     
     translate(x, y) {
-      rotate(0, 0, angle) {
+      rotate(0, 0, angle.toDegrees) {
     
         //Tank body
         g.fill(tankShape)
@@ -158,7 +191,10 @@ class Tank(client: Client) extends shared.Tank(client, 0) {
         newSelectedWeapon, newSelectedAmmo, newFuel,
         newID) = values
 
-    body.setXForm(new Vec2(newX, newY), newAngle.toFloat.toRadians)
+    x = newX
+    y = newY
+    angle = newAngle.toFloat.toRadians
+    println("Set angle to: " + angle)
     gun.timer = newGunTimer
     health = newHealth
     jumping = newJumping

@@ -2,7 +2,10 @@ package server
 
 import shared._
 
-class Gun(server: Server, tank: Tank) extends shared.Gun(server, tank) {
+class Gun(server: Server, tank: Tank) extends shared.Gun(server) {
+  def x = (tank.x - OFFSET_X * Math.cos(tank.angle.toRadians) - OFFSET_Y * Math.sin(tank.angle.toRadians)).toFloat
+  def y = (tank.y - OFFSET_X * Math.sin(tank.angle.toRadians) + OFFSET_Y * Math.cos(tank.angle.toRadians)).toFloat
+  
   for (projectileType <- ProjectileTypes) {
     ammo(projectileType) = 0
   }

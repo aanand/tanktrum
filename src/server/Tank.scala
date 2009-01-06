@@ -14,7 +14,46 @@ import org.jbox2d.dynamics.contacts._
 import org.jbox2d.common._
 import org.jbox2d.collision._
 
-class Tank(val server: Server, id: Byte) extends shared.Tank(server, id) {
+class Tank(val server: Server, val id: Byte) extends GameObject(server) {
+  lazy val WIDTH  = Config("tank.width").toFloat
+  lazy val HEIGHT = Config("tank.height").toFloat
+  lazy val TAPER  = Config("tank.taper").toFloat
+  lazy val BEVEL  = Config("tank.bevel").toFloat
+  
+  lazy val WHEEL_RADIUS = BEVEL
+  lazy val WHEEL_OFFSET_X = WIDTH/2-BEVEL
+  lazy val WHEEL_OFFSET_Y = -BEVEL
+
+  lazy val BASE_WIDTH = WIDTH - 2*WHEEL_RADIUS
+  lazy val BASE_HEIGHT = BEVEL
+  lazy val BASE_OFFSET_X = 0
+  lazy val BASE_OFFSET_Y = -BASE_HEIGHT/2
+  lazy val friction = Config("tank.friction").toFloat
+  
+  var health = 100f
+  
+  val contactGrace = 50
+  var contactTime = 0
+
+  var jumping = false
+  var airborne = false
+
+  var maxJumpFuel = Config("tank.jumpjet.maxFuel").toInt
+  var purchasedJumpFuel = Config("tank.jumpjet.startingFuel").toInt
+  var jumpFuel = 0f
+  var jumpFuelBurn = Config("tank.jumpjet.burn").toFloat
+  var jumpFuelRegen = Config("tank.jumpjet.regen").toFloat
+  
+  var corbomite = 0
+  val maxCorbomite = Config("tank.maxCorbomite").toInt
+
+  var topShape: Shape = _
+  var baseShape: Shape = _
+  var wheelShape1: Shape = _
+  var wheelShape2: Shape = _
+
+  var missile: Missile = _
+
   var player: Player = _
   
   val rand = new Random
@@ -48,6 +87,53 @@ class Tank(val server: Server, id: Byte) extends shared.Tank(server, id) {
   
   val gun = new Gun(server, this)
 
+  lazy val shapePoints = List[Vec2] (
+                      new Vec2(-(WIDTH/2-TAPER), -HEIGHT),
+                      new Vec2(WIDTH/2-TAPER, -HEIGHT),
+                      new Vec2(WIDTH/2, -BEVEL),
+                      new Vec2(-WIDTH/2, -BEVEL)
+                    ).toArray
+  
+  override def shapes = {
+    val bodyShapeDefPoints = shapePoints.map((point) => new Vec2(point.x, point.y))
+    val bodyShapeDef = new PolygonDef
+    bodyShapeDefPoints.foreach(bodyShapeDef.addVertex(_))
+    bodyShapeDef.density = 1f
+    bodyShapeDef.restitution = 0f
+    bodyShapeDef.friction = friction
+
+    val baseShapeDef = new PolygonDef
+    baseShapeDef.setAsBox(BASE_WIDTH/2, BASE_HEIGHT/2, new Vec2(BASE_OFFSET_X, BASE_OFFSET_Y), 0f)
+    baseShapeDef.density = 5f
+    baseShapeDef.restitution = 0f
+    baseShapeDef.friction = friction
+    
+    val wheelShapeDef1 = new CircleDef
+    wheelShapeDef1.radius = WHEEL_RADIUS
+    wheelShapeDef1.localPosition = new Vec2(WHEEL_OFFSET_X, WHEEL_OFFSET_Y)
+    wheelShapeDef1.density = 5f
+    wheelShapeDef1.restitution = 0f
+    wheelShapeDef1.friction = friction
+    
+    val wheelShapeDef2 = new CircleDef
+    wheelShapeDef2.radius = WHEEL_RADIUS
+    wheelShapeDef2.localPosition = new Vec2(-WHEEL_OFFSET_X, WHEEL_OFFSET_Y)
+    wheelShapeDef2.density = 5f
+    wheelShapeDef2.restitution = 0f
+    wheelShapeDef2.friction = friction
+
+    List(bodyShapeDef, baseShapeDef, wheelShapeDef1, wheelShapeDef2)
+  }
+
+  override def loadShapes = {
+    val shapesList = shapes
+    topShape = body.createShape(shapesList(0))
+    baseShape = body.createShape(shapesList(1))
+    wheelShape1 = body.createShape(shapesList(2))
+    wheelShape2 = body.createShape(shapesList(3))
+    body.setMassFromShapes
+  }
+
   def currentValues = {
     (x, y, angle, 
      gun.angle, gun.power, 
@@ -60,8 +146,20 @@ class Tank(val server: Server, id: Byte) extends shared.Tank(server, id) {
   def direction = new Vec2(cos(body.getAngle).toFloat, sin(body.getAngle).toFloat)
   def targetSpeed = SPEED * thrust * (if (direction.y * thrust < 0) direction.x else (2-direction.x))
   def targetVelocity = new Vec2(direction.x*targetSpeed, direction.y*targetSpeed)
+  
+  def fuelPercent = (jumpFuel.toFloat/maxJumpFuel) * 100
 
-  override def create(x: Float) {
+  def grounded : Boolean = contactTime > 0
+
+  def angle = body.getAngle.toDegrees
+  def x = body.getPosition.x
+  def y = body.getPosition.y
+  def velocity = body.getLinearVelocity
+
+  def isAlive = health > 0
+  def isDead = !isAlive
+
+  def create(x: Float) {
     val y = server.ground.heightAt(x).toFloat - STARTING_ALTITUDE
     body.setXForm(new Vec2(x, y), 0)
   }
@@ -171,7 +269,7 @@ class Tank(val server: Server, id: Byte) extends shared.Tank(server, id) {
     }
   }
   
-  override def damage(d: Float, source: Projectile) {
+  def damage(d: Float, source: Projectile) {
     val oldHealth = health
     var damageDone = d
 
@@ -205,9 +303,9 @@ class Tank(val server: Server, id: Byte) extends shared.Tank(server, id) {
     }
   }
 
-  override def remove = {
+  def remove = {
     println("Removing tank.")
-    super.remove
+    if (null != body) server.removeBody(body)
     destroy = false
   }
 
