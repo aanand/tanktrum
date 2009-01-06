@@ -1,7 +1,7 @@
 /**
  * Class to keep track of things people can buy.
  */
-package shared;
+package shared
 import scala.collection.mutable.HashMap
 
 abstract class Item {
@@ -9,7 +9,7 @@ abstract class Item {
   def cost: Int
   def units: Int
   val projectileType: ProjectileTypes.Value = null
-  var itemType: Items.Value = null;
+  var itemType: Items.Value = null
 }
 
 object Items extends Enumeration {

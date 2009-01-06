@@ -1,8 +1,8 @@
-package shared;
+package shared
 class Sequence {
   val window = Math.MAX_SHORT
   var seq: Short = 0
-  var initialised = false;
+  var initialised = false
 
   def next = {
     if (seq == Math.MAX_SHORT) {
@@ -18,7 +18,7 @@ class Sequence {
     if ((newSeq > seq && (newSeq - seq) < window ) ||
          newSeq < 0 && seq > 0 ||
          !initialised) {
-      initialised = true;
+      initialised = true
       seq = newSeq
       true
     }

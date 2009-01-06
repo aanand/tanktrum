@@ -1,4 +1,4 @@
-package shared;
+package shared
 import org.newdawn.slick.geom._
 import org.newdawn.slick._
 import org.newdawn.slick
@@ -103,7 +103,7 @@ abstract class Tank (val session: Session, var id: Byte) extends GameObject(sess
 
   def fuelPercent = (jumpFuel.toFloat/maxJumpFuel) * 100
 
-  def grounded : Boolean = contactTime > 0; true
+  def grounded : Boolean = contactTime > 0
 
   def angle = body.getAngle.toDegrees
   def x = body.getPosition.x

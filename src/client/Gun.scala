@@ -1,4 +1,4 @@
-package client;
+package client
 import org.newdawn.slick.geom._
 import org.newdawn.slick._
 

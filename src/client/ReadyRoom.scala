@@ -1,4 +1,4 @@
-package client;
+package client
 import org.newdawn.slick._
 import shared._
 

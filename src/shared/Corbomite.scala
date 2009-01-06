@@ -1,4 +1,4 @@
-package shared;
+package shared
 
 import org.newdawn.slick
 import sbinary.Instances._

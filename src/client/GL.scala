@@ -1,4 +1,4 @@
-package client;
+package client
 import org.newdawn.slick.opengl
 import opengl.SlickCallable
 import opengl.renderer.{Renderer, SGL}
@@ -50,10 +50,10 @@ class GL {
   
   def line(x1: Float, y1: Float, x2: Float, y2: Float) = {
     safe {
-      glBegin(SGL.GL_LINES);
-      glVertex2f(x1, y1);
-      glVertex2f(x2, y2);
-      glEnd();
+      glBegin(SGL.GL_LINES)
+      glVertex2f(x1, y1)
+      glVertex2f(x2, y2)
+      glEnd()
     }
   }
 

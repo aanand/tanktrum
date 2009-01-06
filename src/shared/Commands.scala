@@ -1,4 +1,4 @@
-package shared;
+package shared
 
 object Commands {
   var i: Byte = 0

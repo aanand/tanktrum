@@ -1,6 +1,6 @@
-package client;
+package client
 
-import shared._;
+import shared._
 
 import org.newdawn.slick._
 import org.jbox2d.dynamics._

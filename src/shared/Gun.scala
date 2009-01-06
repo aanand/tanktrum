@@ -1,4 +1,4 @@
-package shared;
+package shared
 import scala.collection.mutable.HashMap
 
 class Gun(session: Session, tank: Tank) {

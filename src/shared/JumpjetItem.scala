@@ -1,4 +1,4 @@
-package shared;
+package shared
 object JumpjetItem extends Item {
   override def name = "Jumpjets"
   override def cost = 50

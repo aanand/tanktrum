@@ -1,4 +1,4 @@
-package shared;
+package shared
 import org.newdawn.slick
 
 import org.jbox2d.dynamics._

@@ -1,4 +1,4 @@
-package client;
+package client
 
 import java.io._
 import java.net.URL

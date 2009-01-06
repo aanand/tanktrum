@@ -1,4 +1,4 @@
-package shared;
+package shared
 import java.util.Properties
 import java.io.FileInputStream
 

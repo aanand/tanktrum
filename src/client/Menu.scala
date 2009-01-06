@@ -1,4 +1,4 @@
-package client;
+package client
 
 import shared._
 import org.newdawn.slick._
@@ -46,7 +46,7 @@ class Menu(initTree: List[(String, MenuItem)], offsetX: Int, offsetY: Int) {
   }
   
   def render(g: Graphics) {
-    if (!showing) return;
+    if (!showing) return
     
     for (i <- 0 until subTree.length) {
       val (x, y, key, command) = subTree(i)

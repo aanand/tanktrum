@@ -1,4 +1,4 @@
-package shared;
+package shared
 import org.jbox2d.dynamics._
 import org.jbox2d.dynamics.contacts._
 import org.jbox2d.common._

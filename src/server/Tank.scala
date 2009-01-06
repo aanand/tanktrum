@@ -214,7 +214,7 @@ class Tank(val server: Server, id: Byte) extends shared.Tank(server, id) {
   override def collide(other: GameObject, contact: ContactPoint) {
     if (other.isInstanceOf[Ground]) {
       if (body.getLinearVelocity.length > fallThreshold && fallImmuneTimer < 0) {
-        println(player + " hit the ground at velocity " + body.getLinearVelocity);
+        println(player + " hit the ground at velocity " + body.getLinearVelocity)
         damage((body.getLinearVelocity.length.toInt - fallThreshold)/fallDamageDivider, null)
         fallImmuneTimer = fallImmuneTime
       }

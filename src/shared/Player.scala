@@ -1,4 +1,4 @@
-package shared;
+package shared
 object Player {
   val MAX_NAME_LENGTH = Config("player.maxNameLength").toInt
 }

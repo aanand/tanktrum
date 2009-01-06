@@ -1,8 +1,8 @@
-package shared;
+package shared
 import org.newdawn.slick
 import sbinary.Instances._
 import sbinary.Operations
-import java.util.Random;
+import java.util.Random
 
 object DeathsHeadItem extends Item {
   override def name = "Death's Head"

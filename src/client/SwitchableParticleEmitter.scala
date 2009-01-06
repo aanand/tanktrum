@@ -1,4 +1,4 @@
-package client; 
+package client 
 import org.newdawn.slick.particles._
 
 object SwitchableParticleEmitter {

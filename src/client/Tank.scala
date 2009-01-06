@@ -103,14 +103,14 @@ class Tank(client: Client) extends shared.Tank(client, 0) {
         drawWheel(g, WHEEL_OFFSET_X)
         drawBase(g)
 
-        g.setAntiAlias(true);
+        g.setAntiAlias(true)
         g.setColor(new Color(0f, 0f, 0f, 0.5f))
         g.setLineWidth(1.3f)
         GL.line(-(WIDTH/2-TAPER), -HEIGHT, WIDTH/2-TAPER, -HEIGHT)
         GL.line(-WIDTH/2, 0f, WIDTH/2, 0f)
         GL.line(-(WIDTH/2-TAPER), -HEIGHT, -WIDTH/2, 0f)
         GL.line(WIDTH/2-TAPER, -HEIGHT, WIDTH/2, 0f)
-        g.setAntiAlias(false);
+        g.setAntiAlias(false)
       }
     }
     
