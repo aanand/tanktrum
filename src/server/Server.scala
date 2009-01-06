@@ -267,8 +267,6 @@ class Server(port: Int) extends shared.Session(null) with Actor {
   }
   
   def startRound {
-    new client.ChatBox(this)
-    
     startTime = System.currentTimeMillis
     supposedRunTime = 0
     numTankUpdates = 0
