@@ -30,11 +30,15 @@ else
 end
 LIBPATH = "lib/natives-#{OS}"
 
-TARGETS = Dir['src/**.scala'].map{|f| f.sub(/^src/, 'classes').sub(/scala$/, 'class')}
+SOURCE = Dir['src/**/*.scala']
+TARGETS = SOURCE.map{|f| f.sub(/^src/, 'classes').sub(/scala$/, 'class')}
 
 TARGETS.each do |target|
-  file target => Dir['src/**.scala'] do
-    sh "fsc -deprecation -classpath #{CLASSPATH} src/**.scala -d classes"
+  #This depends on each scala file actually containing a class by the name of
+  #the file in the correct package, which may not always be the case.  If this
+  #insists on building every time, that might be the problem.
+  file target => SOURCE do
+    sh "fsc -deprecation -classpath #{CLASSPATH} src/**/*.scala -d classes"
   end
 end
 
@@ -43,27 +47,27 @@ task :compile => (['install:deps', 'classes'] + TARGETS)
 
 desc "start the game"
 task :run => :compile do
-  sh "java -classpath classes:#{CLASSPATH} -Djava.library.path=#{LIBPATH} Main"
+  sh "java -classpath classes:#{CLASSPATH} -Djava.library.path=#{LIBPATH} shared.Main"
 end
 
 desc "start the game from the jar file"
 task :run_jar => :jar do
-  sh "java -classpath #{GAME_JAR_FILE}:#{CLASSPATH} -Djava.library.path=#{LIBPATH} Main"
+  sh "java -classpath #{GAME_JAR_FILE}:#{CLASSPATH} -Djava.library.path=#{LIBPATH} shared.Main"
 end
 
 desc "profile the game"
 task :profile => :compile do
-  sh "java -agentpath:#{ENV['AGENTPATH']} -classpath classes:#{CLASSPATH} -Djava.library.path=#{LIBPATH} Main"
+  sh "java -agentpath:#{ENV['AGENTPATH']} -classpath classes:#{CLASSPATH} -Djava.library.path=#{LIBPATH} shared.Main"
 end
 
 desc "profile the server"
 task :profile_server => :compile do
-  sh "java -agentpath:#{AGENTPATH} -classpath classes:#{CLASSPATH} -Djava.library.path=#{LIBPATH} ServerMain"
+  sh "java -agentpath:#{AGENTPATH} -classpath classes:#{CLASSPATH} -Djava.library.path=#{LIBPATH} server.ServerMain"
 end
 
 desc "start a server on the default port"
 task :run_server => :compile do
-  sh "java -classpath classes:#{CLASSPATH} -Djava.library.path=#{LIBPATH} ServerMain"
+  sh "java -classpath classes:#{CLASSPATH} -Djava.library.path=#{LIBPATH} server.ServerMain"
 end
 
 desc "build #{GAME_JAR_NAME}.jar"
