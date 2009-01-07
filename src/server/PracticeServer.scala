@@ -2,9 +2,6 @@ package server
 
 import shared._
 
-import org.newdawn.slick
-import org.newdawn.slick._
-
 import java.nio.channels._
 import java.nio._
 import java.net._

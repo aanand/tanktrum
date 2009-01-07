@@ -2,8 +2,6 @@ package server
 
 import shared._
 
-import org.newdawn.slick._
-
 import java.nio.channels._
 import java.nio._
 import java.net._
@@ -13,7 +11,6 @@ import java.util.Date
 import scala.collection.mutable.HashMap
 import scala.collection.mutable.HashSet
 import scala.actors.Actor
-
 
 import sbinary.Operations
 import sbinary.Instances._
