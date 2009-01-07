@@ -350,30 +350,39 @@ class Server(port: Int) extends Session with Actor with ContactListener  {
 
   def addPlayer(addr: SocketAddress) {
     if (players.size >= MAX_PLAYERS) {
-      sendFull(addr)
+      sendError(addr, "Server full.")
       return
     }
 
     if (!players.isDefinedAt(addr)) {
-      val nameArray = new Array[byte](data.remaining())
-      data.get(nameArray)
-      val name = new String(nameArray)
-      broadcastChat(name + " has joined the game.")
-      println(name + " has joined the game.")
+      val helloArray = new Array[byte](data.remaining())
+      data.get(helloArray)
+      val (name, version) = Operations.fromByteArray[(String, Int)](helloArray)
+      
+      if (version > Main.VERSION) {
+        sendError(addr, "Client version (" + version + ") is newer than server version (" + Main.VERSION + ").")
+      }
+      else if (version < Main.VERSION) {
+        sendError(addr, "Client version (" + version + ") is older than server version (" + Main.VERSION + ").")
+      }
+      else {
+        broadcastChat(name + " has joined the game.")
+        println(name + " has joined the game.")
 
-      findNextID
-      val tank = createTank(playerID)
-      val player = new Player(tank, name, playerID)
-      tank.player = player
-      players.put(addr, player)
+        findNextID
+        val tank = createTank(playerID)
+        val player = new Player(tank, name, playerID)
+        tank.player = player
+        players.put(addr, player)
 
-      broadcastPlayers
+        broadcastPlayers
 
-      send(imageSetData, addr)
+        send(imageSetData, addr)
 
-      if (!inReadyRoom) {
-        sendGround(addr)
-        tank.health = 0
+        if (!inReadyRoom) {
+          sendGround(addr)
+          tank.health = 0
+        }
       }
     }
   }
@@ -560,8 +569,8 @@ class Server(port: Int) extends Session with Actor with ContactListener  {
     send(byteToArray(Commands.PING), addr)
   }
 
-  def sendFull(addr: SocketAddress) = {
-    send(byteToArray(Commands.SERVER_FULL), addr)
+  def sendError(addr: SocketAddress, message: String) = {
+    send(byteToArray(Commands.ERROR) ++ Operations.toByteArray(message), addr)
   }
 
   def sendGround(addr: SocketAddress) = {

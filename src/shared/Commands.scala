@@ -16,7 +16,7 @@ object Commands {
   val PROJECTILES = nextI
   val EXPLOSION = nextI
   val PLAYERS = nextI
-  val SERVER_FULL = nextI
+  val ERROR = nextI
   val READY_ROOM = nextI
   val CHAT_MESSAGE = nextI
   val IMAGE_SET = nextI

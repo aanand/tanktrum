@@ -216,7 +216,7 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
   def processCommand(command: Char) {
     resetTimeout
     command match {
-      case Commands.SERVER_FULL  => error("Server full.")
+      case Commands.ERROR        => serverError
       case Commands.GROUND       => loadGround
       case Commands.PING         => latency = System.currentTimeMillis - lastPing
       case Commands.TANKS        => processUpdate
@@ -426,6 +426,14 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
       }
     }
   }
+
+  def serverError {
+    val byteArray = new Array[byte](data.remaining)
+    data.get(byteArray)
+    val message = Operations.fromByteArray[String](byteArray)
+
+    error("Server Error: " + message)
+  }
   
   def processUpdate {
     if (inReadyRoom) {
@@ -496,7 +504,7 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
   }
 
   def sendHello = {
-    send(byteToArray(Commands.HELLO) ++ name.getBytes)
+    send(byteToArray(Commands.HELLO) ++ Operations.toByteArray((name, Main.VERSION)))
   }
 
   def sendPing = {
