@@ -4,7 +4,8 @@ import shared._
 
 import org.newdawn.slick._
 
-object ChatColor extends Color(0f, 0f, 1f)
+object ChatColor extends Color(1f, 1f, 1f, 0.7f)
+object ChatBG extends Color(0f, 0f, 0f)
 
 object Chat {
   val height = 100
@@ -41,7 +42,7 @@ class Chat(client: Client) {
 
   def render(g: Graphics) {
     g.setColor(new Color(0f, 0f, 0f, 0.7f))
-    g.fillRect(0, Main.WINDOW_HEIGHT - Chat.height, Chat.width, Main.WINDOW_HEIGHT)
+    //g.fillRect(0, Main.WINDOW_HEIGHT - Chat.height, Chat.width, Main.WINDOW_HEIGHT)
     if (input) {
       g.resetTransform
       g.translate(0, 560)
@@ -49,10 +50,14 @@ class Chat(client: Client) {
     }
     g.resetTransform
     g.translate(20, 560 - 15*messages.length)
-    g.setColor(ChatColor)
     for (message <- messages) {
       g.translate(0, 15)
+      g.setColor(ChatBG)
       g.drawString(message, 0, 0)
+      g.translate(-2, -2)
+      g.setColor(ChatColor)
+      g.drawString(message, 0, 0)
+      g.translate(2, 2)
     }
   }
 
