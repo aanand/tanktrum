@@ -3,10 +3,6 @@ package client
 import shared._
 
 import org.newdawn.slick._
-import org.jbox2d.dynamics._
-import org.jbox2d.dynamics.contacts._
-import org.jbox2d.common._
-import org.jbox2d.collision._
 
 object ChatColor extends Color(0f, 0f, 1f)
 
