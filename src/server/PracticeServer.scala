@@ -20,7 +20,7 @@ class PracticeServer(port : Int) extends Server(port) {
     super.addPlayer(addr)
     val player = players(addr)
     
-    player.tank.health = 100
+    player.tank.destroy = false
 
     if (newPlayer) {
       for (projectileType <- ProjectileTypes) {

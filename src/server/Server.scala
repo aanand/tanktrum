@@ -382,7 +382,7 @@ class Server(port: Int) extends Session with Actor with ContactListener  {
 
         if (!inReadyRoom) {
           sendGround(addr)
-          tank.health = 0
+          tank.destroy = true
         }
       }
     }
