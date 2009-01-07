@@ -2,7 +2,7 @@ package client
 import org.newdawn.slick.geom._
 import org.newdawn.slick._
 
-class Gun(client: Client, tank: Tank) extends shared.Gun(client, tank) {
+class Gun(client: Client) extends shared.Gun(client) {
   val arrowShape = new Polygon(List[Float](-1, 0, -1, -10, -2, -10, 0, -12, 2, -10, 1, -10, 1, 0).toArray)
   
   val READY_COLOR   = new Color(0.0f, 1.0f, 0.0f, 0.5f)

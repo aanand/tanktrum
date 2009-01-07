@@ -15,19 +15,6 @@ object Chat {
   val width = 325
 }
 
-class ChatBox(session: Session) extends GameObject(session) {
-  override def shapes = {
-    println("Creating chat box.")
-    val box = new PolygonDef()
-    box.setAsBox(Chat.width/(2*Main.GAME_WINDOW_RATIO), 
-                 Chat.height/(2*Main.GAME_WINDOW_RATIO), 
-                 new Vec2(Chat.width/(2*Main.GAME_WINDOW_RATIO), 
-                         (Main.WINDOW_HEIGHT-(Chat.height/2))/Main.GAME_WINDOW_RATIO), 
-                 0)
-    List(box)
-  }
-}
-
 class Chat(client: Client) {
   val MAX_MESSAGES = Config("chat.maxMessages").toInt
 

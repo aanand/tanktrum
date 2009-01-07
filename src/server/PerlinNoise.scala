@@ -1,4 +1,4 @@
-package shared
+package server
 import java.util.Random
 
 class PerlinNoise(size: Int, layers: Int, pers: float) {

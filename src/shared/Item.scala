@@ -15,27 +15,27 @@ abstract class Item {
 object Items extends Enumeration {
   val items = new HashMap[Value, Item]
   
-  NukeItem.itemType = Value
-  items.put(NukeItem.itemType, NukeItem)
+  Nuke.itemType = Value
+  items.put(Nuke.itemType, Nuke)
   
-  MirvItem.itemType = Value
-  items.put(MirvItem.itemType, MirvItem)
+  Mirv.itemType = Value
+  items.put(Mirv.itemType, Mirv)
   
-  RollerItem.itemType = Value
-  items.put(RollerItem.itemType, RollerItem)
+  Roller.itemType = Value
+  items.put(Roller.itemType, Roller)
 
-  MachineGunItem.itemType = Value
-  items.put(MachineGunItem.itemType, MachineGunItem)
+  MachineGun.itemType = Value
+  items.put(MachineGun.itemType, MachineGun)
 
-  DeathsHeadItem.itemType = Value
-  items.put(DeathsHeadItem.itemType, DeathsHeadItem)
+  DeathsHead.itemType = Value
+  items.put(DeathsHead.itemType, DeathsHead)
   
   JumpjetItem.itemType = Value
   items.put(JumpjetItem.itemType, JumpjetItem)
   
-  CorbomiteItem.itemType = Value
-  items.put(CorbomiteItem.itemType, CorbomiteItem)
+  Corbomite.itemType = Value
+  items.put(Corbomite.itemType, Corbomite)
   
-  MissileItem.itemType = Value
-  items.put(MissileItem.itemType, MissileItem)
+  Missile.itemType = Value
+  items.put(Missile.itemType, Missile)
 }

@@ -1,17 +1,14 @@
-package shared
-
-import org.newdawn.slick
-import sbinary.Instances._
-import sbinary.Operations
-
-object CorbomiteItem extends Item {
-  override def name = "Corbomite"
-  override def cost = 50
-  override def units = 8
+package shared {
+  object Corbomite extends Item {
+    override def name = "Corbomite"
+    override def cost = 50
+    override def units = 8
+  }
 }
 
-class Corbomite(session: Session, tank: server.Tank) extends Projectile(session, tank) {
-  override val radius = 0.4f
-  override val explosionRadius = 2f
-  override val projectileType = ProjectileTypes.CORBOMITE
+package server {
+  import shared._
+  class Corbomite(server: Server, tank: Tank) extends Projectile(server, tank) {
+    override val projectileType = ProjectileTypes.CORBOMITE
+  }
 }

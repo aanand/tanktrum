@@ -8,6 +8,7 @@ import java.nio._
 import java.net._
 
 import scala.collection.mutable.HashMap
+import scala.collection.mutable.HashSet
 
 import sbinary.Operations
 import sbinary.Instances._
@@ -36,6 +37,8 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
   var timeToTankUpdate = 0
   var lastTankUpdate = new Array[Byte](6)
   var latency: Long = 0
+  
+  var ground: Ground = _
 
   val players = new HashMap[Short, Player]
   var me: Player = null
@@ -57,9 +60,13 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
   var imageSetIndex = 0
   var skyImage: Image = _
   var groundImage: Image = _
+  
+  var projectiles = new HashMap[Int, Projectile]
+  var explosions = new HashSet[Explosion]
 
   override def enter {
     super.enter()
+    ground = new Ground(Main.GAME_WIDTH.toInt, Main.GAME_HEIGHT.toInt)
     channel = DatagramChannel.open()
     try {
       channel.connect(new InetSocketAddress(hostname, port))
@@ -92,6 +99,16 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
       super.update(delta)
       ping
       checkTimeout
+      
+      for (p <- projectiles.values) {
+        p.update(delta)
+      }
+      for (tank <- tanks) {
+        if (null != tank) { tank.update(delta) }
+      }
+      for (e <- explosions) {
+        e.update(delta)
+      }
 
       data.clear
       if (channel.receive(data) != null) {
@@ -126,6 +143,14 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
   }
   
   def tanks = players.values.map(player => player.tank)
+
+  def removeExplosion(e: Explosion) {
+    explosions -= e
+  }
+  
+  def removeProjectile(p : Projectile) {
+    projectiles -= p.id
+  }
   
   def render(g: Graphics) {
     if (errorState) {
@@ -368,7 +393,7 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
   def loadExplosion = {
     val explosionArray = new Array[byte](data.remaining)
     data.get(explosionArray)
-    val e = new Explosion(0, 0, 0, this, null, 0)
+    val e = new Explosion(this)
     e.loadFrom(explosionArray)
     explosions += e
   }
@@ -440,7 +465,6 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
   def processReadyRoomUpdate {
     if (!inReadyRoom) {
       inReadyRoom = true
-      endRound()
     }
   }
   
