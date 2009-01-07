@@ -413,14 +413,12 @@ class Server(port: Int) extends Session with Actor with ContactListener  {
   }
 
   /**
-   * Finds the next available player id.
-   * TODO: Decide if this should be the lowest possible id or the next
-   * available after the last used one. (it's currently the next available)
+   * Finds the lowest available player id.
    */
   def findNextID {
-    playerID = ((playerID + 1) % MAX_PLAYERS).toByte
+    playerID = 0
     if (players.values.exists(player => { player.id == playerID })) {
-      findNextID
+      playerID = (playerID+1).toByte
     }
   }
   
