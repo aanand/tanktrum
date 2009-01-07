@@ -370,6 +370,7 @@ class Server(port: Int) extends Session with Actor with ContactListener  {
         println(name + " has joined the game.")
 
         findNextID
+        
         val tank = createTank(playerID)
         val player = new Player(tank, name, playerID)
         tank.player = player
@@ -392,6 +393,10 @@ class Server(port: Int) extends Session with Actor with ContactListener  {
     var x = rand.nextFloat * (Main.GAME_WIDTH - tank.WIDTH * 2) + tank.WIDTH
     while (tanks.exists(tank => {x > tank.x - tank.WIDTH && x < tank.x + tank.WIDTH})) {
       x = rand.nextFloat * (Main.GAME_WIDTH - tank.WIDTH * 2) + tank.WIDTH
+    }
+
+    if (inReadyRoom) {
+      ground.flatten(x)
     }
     tank.create(x)
     tank
@@ -426,7 +431,7 @@ class Server(port: Int) extends Session with Actor with ContactListener  {
    */
   def findNextID {
     playerID = 0
-    if (players.values.exists(player => { player.id == playerID })) {
+    while (players.values.exists(player => { player.id == playerID })) {
       playerID = (playerID+1).toByte
     }
   }
