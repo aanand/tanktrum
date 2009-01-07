@@ -45,4 +45,9 @@ class Gun(session: Session) {
       timer -= delta / 1000.0f
     }
   }
+
+  def reset {
+    angle = 0f
+    power = POWER_RANGE.end/2f
+  }
 }

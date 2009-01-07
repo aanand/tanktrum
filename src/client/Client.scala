@@ -437,6 +437,9 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
   
   def processUpdate {
     if (inReadyRoom) {
+      if (null != me && null != me.tank) {
+        me.tank.gun.reset
+      }
       inReadyRoom = false
     }
     
