@@ -13,7 +13,7 @@ import scala.collection.mutable.HashSet
 import sbinary.Operations
 import sbinary.Instances._
 
-class Client (hostname: String, port: Int, name: String, container: GameContainer) extends Session(container) {
+class Client (hostname: String, port: Int, name: String, container: GameContainer) extends Session {
   val PING_PERIOD = Config("client.pingPeriod").toInt
   val TANK_UPDATE_INTERVAL = Config("client.tankUpdateInterval").toInt
   val SERVER_TIMEOUT = Config("client.serverTimeout").toInt
@@ -64,8 +64,8 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
   var projectiles = new HashMap[Int, Projectile]
   var explosions = new HashSet[Explosion]
 
-  override def enter {
-    super.enter()
+  def enter {
+    active = true
     ground = new Ground(Main.GAME_WIDTH.toInt, Main.GAME_HEIGHT.toInt)
     channel = DatagramChannel.open()
     try {
@@ -87,16 +87,15 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
     sendHello
   }
 
-  override def leave {
-    super.leave()
+  def leave() {
+    active = false
     if (!channel.isConnected) return
     sendCommand(Commands.GOODBYE)
   }
   
-  override def update(delta: Int) {
+  def update(delta: Int) {
     if (!channel.isConnected) return
     try {
-      super.update(delta)
       ping
       checkTimeout
       
@@ -429,13 +428,8 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
   }
   
   def processUpdate {
-    numTankUpdates += 1
-    
     if (inReadyRoom) {
       inReadyRoom = false
-      startTime = System.currentTimeMillis
-      supposedRunTime = 0
-      numTankUpdates = 0
     }
     
     val byteArray = new Array[byte](data.remaining)

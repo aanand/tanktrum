@@ -20,7 +20,7 @@ import org.jbox2d.dynamics.contacts._
 import org.jbox2d.common._
 import org.jbox2d.collision._
 
-class Server(port: Int) extends shared.Session(null) with Actor with ContactListener  {
+class Server(port: Int) extends Session with Actor with ContactListener  {
   val TANK_BROADCAST_INTERVAL       = Config("server.tankBroadcastInterval").toInt
   val PROJECTILE_BROADCAST_INTERVAL = Config("server.projectileBroadcastInterval").toInt
   val PLAYER_BROADCAST_INTERVAL     = Config("server.playerBroadcastInterval").toInt
@@ -44,6 +44,10 @@ class Server(port: Int) extends shared.Session(null) with Actor with ContactList
   var timeToPlayerUpdate = PLAYER_BROADCAST_INTERVAL
   var timeToReadyRoomUpdate = READY_ROOM_BROADCAST_INTERVAL
 
+  var supposedRunTime = 0
+  var numTankUpdates = 0
+  var startTime: Long = 0
+
   var inReadyRoom = true
   
   val imageSetCount = 7
@@ -61,7 +65,8 @@ class Server(port: Int) extends shared.Session(null) with Actor with ContactList
   var ground: Ground = _
   var projectiles = new HashMap[Int, Projectile]
   var explosions = new HashSet[Explosion]
-
+  def tanks = players.values.map(player => player.tank)
+  
   def act {
     println("Server started on port " + port + ".")
     var time = System.currentTimeMillis
@@ -82,7 +87,7 @@ class Server(port: Int) extends shared.Session(null) with Actor with ContactList
         }
       }
       
-      if (isActive) {
+      if (active) {
         val newTime = System.currentTimeMillis
         val delta = (newTime - time)
         time = newTime
@@ -97,13 +102,8 @@ class Server(port: Int) extends shared.Session(null) with Actor with ContactList
     }
   }
 
-  /**
-   * Notionally private, until we rearchitect and it's actually private.
-   * Use "server !? 'enter" instead.
-   */
-  override def enter() = {
-    super.enter()
-
+  protected def enter() {
+    active = true
     ground = new Ground(this, Main.GAME_WIDTH.toInt, Main.GAME_HEIGHT.toInt)
     ground.buildPoints()
 
@@ -112,24 +112,15 @@ class Server(port: Int) extends shared.Session(null) with Actor with ContactList
     channel.configureBlocking(false)
   }
   
-  /**
-   * Notionally private, until we rearchitect and it's actually private.
-   * Use "server !? 'leave" instead.
-   */
-  override def leave() = {
-    super.leave()
-
+  protected def leave() = {
+    active = false
     channel.socket.close()
     channel.disconnect()
   }
   
-  def tanks = players.values.map(player => player.tank)
 
-  /**
-   * Updates the server, processing physics and sending updates if it is time
-   * to.
-   */
-  override def update(delta: Int) = {
+  protected def update(delta: Int) = {
+    supposedRunTime += delta
     if (!inReadyRoom) {
       world.step(delta/1000f, 10)
     }
@@ -154,7 +145,6 @@ class Server(port: Int) extends shared.Session(null) with Actor with ContactList
       e.update(delta)
     }
 
-    super.update(delta)
     checkTimeouts()
 
     if (inReadyRoom) {

@@ -7,7 +7,7 @@ import java.nio._
 import java.net._
 
 class PracticeServer(port : Int) extends Server(port) {
-  override def enter {
+  override def enter() {
     super.enter
     startRound
   }

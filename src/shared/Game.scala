@@ -53,7 +53,7 @@ class Game(title: String) extends BasicGame(title) {
 
   def update(container: GameContainer, delta: Int) {
     //println("Updating: " + new java.util.Random().nextInt)
-    if (client != null && client.isActive) {
+    if (client != null && client.active) {
       client.update(delta)
     }
   }
@@ -64,7 +64,7 @@ class Game(title: String) extends BasicGame(title) {
       menu.render(g)
       return
     }
-    if (client != null && client.isActive) {
+    if (client != null && client.active) {
       client.render(g)
     }
   }
@@ -151,7 +151,7 @@ class Game(title: String) extends BasicGame(title) {
       client.leave
     }
     if (server != null) {
-      server.leave
+      server !? 'leave
     }
     if (container != null) {
       container.exit
