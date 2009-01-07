@@ -37,7 +37,7 @@ class Player(var tank: Tank, playerName: String, playerId: Byte) extends shared.
           tank.purchasedJumpFuel = tank.maxJumpFuel
         }
       }
-      if (item == CorbomiteItem) {
+      if (item == Corbomite) {
         tank.corbomite += item.units
         if (tank.corbomite > tank.maxCorbomite) {
           tank.corbomite = tank.maxCorbomite
@@ -54,7 +54,6 @@ class Player(var tank: Tank, playerName: String, playerId: Byte) extends shared.
     else {
       pointsAwarded = damage
       
-      //Ugly ugly ugly. :(
       if (tank.server.leader.tank == tank) {
         pointsAwarded = (1.5 * pointsAwarded).toInt
         println("Extra points for hitting the leader.")

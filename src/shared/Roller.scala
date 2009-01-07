@@ -9,30 +9,19 @@ import org.jbox2d.common._
 import org.jbox2d.collision._
 
 package shared {
-  object RollerItem extends Item { 
+  object Roller extends Item { 
     override def name = "Roller"
     override def cost = 100
     override def units = 5
     override val projectileType = ProjectileTypes.ROLLER
   }
-
-  trait Roller extends Projectile {
-    override val projectileType = ProjectileTypes.ROLLER
-    //override val color = new slick.Color(0f, 0.3f, 0f)
-    override lazy val radius = 0.8f
-    override val damage = 10
-    override val explosionRadius = 5f
-    override val explosionDamageFactor = 1.2f
-
-    override def imagePath = Config("projectile.roller.imagePath")
-    override def imageWidth = Config("projectile.roller.imageWidth").toInt
-    override def round = Config("projectile.roller.round").toBoolean
-  }
 }
 
 package server {
-  class Roller(server: Server, tank: Tank) extends Projectile(server, tank) with shared.Roller {
-    //body.removeExcludedBody(session.ground.body)
+  import shared._
+  class Roller(server: Server, tank: Tank) extends Projectile(server, tank) {
+    override val projectileType = ProjectileTypes.ROLLER
+    
     override def shapes = {
       val sDef = new CircleDef
       sDef.radius = radius
@@ -48,8 +37,4 @@ package server {
       }
     }
   }
-}
-
-package client {
-  class Roller extends Projectile with shared.Roller
 }

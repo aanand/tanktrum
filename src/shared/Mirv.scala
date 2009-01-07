@@ -5,39 +5,25 @@ import java.util.Random
 import org.jbox2d.common._
 
 package shared {
-  object MirvItem extends Item {
+  object Mirv extends Item {
     override def name = "MIRV"
     override def cost = 75
     override def units = 1
     override val projectileType = ProjectileTypes.MIRV
   }
+}
 
-  trait Mirv extends Projectile {
-    override lazy val radius = 0.8f
+package server {
+  import shared._
+  class Mirv(server: Server, tank: Tank) extends Projectile(server, tank) {
     override val projectileType = ProjectileTypes.MIRV
-    override val explosionRadius = 2.6f
-
-    override def imagePath = Config("projectile.mirv.imagePath")
-    override def imageWidth = Config("projectile.mirv.imageWidth").toInt
-    override def round = Config("projectile.mirv.round").toBoolean
 
     val distribution = 10
     val clusterSize = 10
     val lifetime = 2000
     var timeUntilSplit = lifetime
     val rand = new Random
-  }
-  
-  trait MirvCluster extends Projectile {
-    override lazy val radius = 0.4f
-    override val damage = 3
-    override val explosionRadius = 2.6f
-    override val projectileType = ProjectileTypes.MIRV_CLUSTER
-  }
-}
 
-package server {
-  class Mirv(server: Server, tank: Tank) extends Projectile(server, tank) with shared.Mirv {
     def clusterProjectile: Projectile = new MirvCluster(server, tank)
     
     override def update(delta: Int) {
@@ -56,13 +42,7 @@ package server {
     }
   }
 
-  class MirvCluster(server: Server, tank: Tank) extends Projectile(server, tank) with shared.MirvCluster
+  class MirvCluster(server: Server, tank: Tank) extends Projectile(server, tank) {
+    override val projectileType = ProjectileTypes.MIRV_CLUSTER
+  }
 }
-
-package client {
-  class Mirv extends Projectile with shared.Mirv
-  class MirvCluster extends Projectile with shared.MirvCluster
-}
-
-
-

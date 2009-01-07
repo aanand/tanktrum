@@ -38,7 +38,7 @@ TARGETS.each do |target|
   #the file in the correct package, which may not always be the case.  If this
   #insists on building every time, that might be the problem.
   file target => SOURCE do
-    sh "fsc -deprecation -classpath #{CLASSPATH} src/**/*.scala -d classes"
+    sh "fsc -deprecation -classpath #{CLASSPATH} src/**/*.scala -d classes ##{target}"
   end
 end
 

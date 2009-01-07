@@ -1,6 +1,7 @@
 package server
 
 import shared._
+import shared.ProjectileTypes._
 
 import sbinary.Instances._
 import sbinary.Operations
@@ -10,10 +11,44 @@ import org.jbox2d.dynamics.contacts._
 import org.jbox2d.common._
 import org.jbox2d.collision._
 
-class Projectile(server: Server, val tank: Tank) extends GameObject(server) with shared.Projectile {
+object Projectile {
+  val antiGravity = Config("physics.projectileGravity").toFloat - Config("physics.gravity").toFloat
+  
+  def create(server: Server, tank: Tank, projectileType: ProjectileTypes.Value): Projectile = {
+    projectileType match {
+      case PROJECTILE          => new Projectile(server, tank) 
+      case NUKE                => new Nuke(server, tank) 
+      case ROLLER              => new Roller(server, tank) 
+      case MIRV                => new Mirv(server, tank) 
+      case MIRV_CLUSTER        => new MirvCluster(server, tank)
+      case CORBOMITE           => new Corbomite(server, tank)
+      case MACHINE_GUN         => new MachineGun(server, tank) 
+      case DEATHS_HEAD         => new DeathsHead(server, tank)
+      case DEATHS_HEAD_CLUSTER => new DeathsHeadCluster(server, tank)
+      case MISSILE             => new Missile(server, tank)
+    }
+  }
+}
+
+class Projectile(server: Server, val tank: Tank) extends GameObject(server) {
+  var id: Int = -1
+  val projectileType = ProjectileTypes.PROJECTILE
+  def name = getClass.getName.split("\\.").last
+  
+  def conf(property: String) = Config("projectile." + name + "." + property)
+
+  def explosionRadius = conf("explosionRadius").toFloat
+  def explosionDamageFactor = conf("damageFactor").toFloat
+  def radius = conf("radius").toFloat
+  def damage = conf("damage").toInt
+  val reloadTime = conf("reload").toFloat
+
   var collidedWith: GameObject = _
-    
+
+  var destroy = false
+
   body.setMassFromShapes
+  def round = Config("projectile." + name + ".round").toBoolean
   
   override def shapes: List[ShapeDef] = {
     val sDef = new CircleDef
