@@ -26,8 +26,8 @@ object Projectile {
     }
   }
 
-  def newFromTuple(client: Client, tuple: (Int, Float, Float, Float, Float, Float, Float, Byte)) = {
-    val (id, _, _, _, _, _, _, projectileType) = tuple
+  def newFromTuple(client: Client, tuple: (Int, Float, Float, Float, Byte)) = {
+    val (id, _, _, _, projectileType) = tuple
     
     val p = create(ProjectileTypes(projectileType))
     p.id = id
@@ -35,7 +35,8 @@ object Projectile {
     
     p
   }
-  def deserialise(data: Array[byte]) = Operations.fromByteArray[(Int, Float, Float, Float, Float, Float, Float, Byte)](data)
+
+  def deserialise(data: Array[byte]) = Operations.fromByteArray[(Int, Float, Float, Float, Byte)](data)
 
   def render(g: Graphics, value: Value) {
     g.setColor(new Color(1f, 1f, 1f))
@@ -172,8 +173,8 @@ class Projectile extends GameObject {
     }
   }
   
-  def updateFromTuple(tuple: (Int, Float, Float, Float, Float, Float, Float, Byte)) {
-    val (id, x, y, xVel, yVel, rot, angVel, projectileType) = tuple
+  def updateFromTuple(tuple: (Int, Float, Float, Float, Byte)) {
+    val (id, x, y, rot, projectileType) = tuple
     
     this.x = x
     this.y = y
