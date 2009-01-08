@@ -16,6 +16,7 @@ class Game(title: String) extends BasicGame(title) {
   var container: GameContainer = _
 
   var menu : Menu = _
+  val serverList  = new ServerList(this)
   
   SoundPlayer.start
   
@@ -48,6 +49,7 @@ class Game(title: String) extends BasicGame(title) {
 
     this.menu = new Menu(List(
       ("name", userName),
+      ("find server", MenuCommand(Unit => listServers(userName.value))),
       ("start server", Submenu(List(
         ("port", serverPort),
         ("ok", MenuCommand(Unit => startServer(serverPort.value.toInt, userName.value)))))),
@@ -74,7 +76,11 @@ class Game(title: String) extends BasicGame(title) {
       menu.render(g)
       return
     }
-    if (client != null && client.active) {
+    else if (serverList.showing) {
+      g.drawImage(titleImage, 0, 0)
+      serverList.render(g)
+    }
+    else if (client != null && client.active) {
       client.render(g)
     }
   }
@@ -123,12 +129,20 @@ class Game(title: String) extends BasicGame(title) {
 
     startClient("localhost", port, userName)
   }
+
+  def listServers(userName: String) {
+    menu.hide
+    serverList.show(userName)
+  }
   
   override def keyPressed(key : Int, char : Char) {
     if (menu.showing) {
       menu.keyPressed(key, char)
     } else if (key == Input.KEY_ESCAPE) {
       menu.show()
+      serverList.hide()
+    } else if (serverList.showing) {
+      serverList.keyPressed(key, char)
     } else if (client != null) {
       client.keyPressed(key, char)
     }

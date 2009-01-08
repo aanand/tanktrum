@@ -24,7 +24,7 @@ class Menu(initTree: List[(String, MenuItem)], offsetX: Int, offsetY: Int) {
   val path = new Stack[SubmenuWithPositions]
   var selection = 0
 
-  val tree = buildTree(initTree)
+  var tree = buildTree(initTree)
 
   def this(initTree: List[(String, MenuItem)]) = this(initTree, Menu.defaultPositionX, Menu.defaultPositionY)
   
