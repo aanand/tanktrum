@@ -455,7 +455,7 @@ class Server(port: Int) extends Session with Actor with ContactListener  {
       case Commands.STOP_FIRE              => player.gun.firing = false 
       case Commands.CYCLE_WEAPON           => player.gun.cycleWeapon() 
                                            
-      case Commands.READY                  => player.ready = true; broadcastPlayers 
+      case Commands.READY                  => player.ready = !player.ready; broadcastPlayers 
       case Commands.BUY                    => handleBuy(player) 
                                            
       case Commands.CHAT_MESSAGE           => handleChat(player) 
