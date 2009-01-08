@@ -36,7 +36,7 @@ class Server(port: Int) extends Session with Actor with ContactListener  {
 
   var channel: DatagramChannel = _
   val players = new HashMap[SocketAddress, Player]
-  val data = ByteBuffer.allocate(1000)
+  val data = ByteBuffer.allocate(10000)
   val rand = new Random()
   
   var timeToTankUpdate = TANK_BROADCAST_INTERVAL

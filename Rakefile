@@ -55,6 +55,16 @@ task :run_jar => :jar do
   sh "java -classpath #{GAME_JAR_FILE}:#{CLASSPATH} -Djava.library.path=#{LIBPATH} shared.Main"
 end
 
+desc "start a metaserver"
+task :run_metaserver => :compile do
+  sh "java -classpath classes:#{CLASSPATH} -Djava.library.path=#{LIBPATH} metaserver.MetaServerMain"
+end
+
+desc "start a server on the default port"
+task :run_server => :compile do
+  sh "java -classpath classes:#{CLASSPATH} -Djava.library.path=#{LIBPATH} server.ServerMain"
+end
+
 desc "profile the game"
 task :profile => :compile do
   sh "java -agentpath:#{ENV['AGENTPATH']} -classpath classes:#{CLASSPATH} -Djava.library.path=#{LIBPATH} shared.Main"
@@ -63,11 +73,6 @@ end
 desc "profile the server"
 task :profile_server => :compile do
   sh "java -agentpath:#{AGENTPATH} -classpath classes:#{CLASSPATH} -Djava.library.path=#{LIBPATH} server.ServerMain"
-end
-
-desc "start a server on the default port"
-task :run_server => :compile do
-  sh "java -classpath classes:#{CLASSPATH} -Djava.library.path=#{LIBPATH} server.ServerMain"
 end
 
 desc "build #{GAME_JAR_NAME}.jar"

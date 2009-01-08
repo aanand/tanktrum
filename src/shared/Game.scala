@@ -11,7 +11,6 @@ import java.util.Date
 class Game(title: String) extends BasicGame(title) {
   var client: Client = _
   var server: Server = _
-  var error: String = _
   
   var container: GameContainer = _
 
@@ -65,6 +64,10 @@ class Game(title: String) extends BasicGame(title) {
     //println("Updating: " + new java.util.Random().nextInt)
     if (client != null && client.active) {
       client.update(delta)
+    } 
+    
+    if (serverList.showing) {
+      serverList.update()
     }
   }
 
@@ -138,11 +141,11 @@ class Game(title: String) extends BasicGame(title) {
   override def keyPressed(key : Int, char : Char) {
     if (menu.showing) {
       menu.keyPressed(key, char)
+    } else if (serverList.showing) {
+      serverList.keyPressed(key, char)
     } else if (key == Input.KEY_ESCAPE) {
       menu.show()
       serverList.hide()
-    } else if (serverList.showing) {
-      serverList.keyPressed(key, char)
     } else if (client != null) {
       client.keyPressed(key, char)
     }
