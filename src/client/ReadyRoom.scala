@@ -44,7 +44,7 @@ class ReadyRoom (client: Client) {
         g.setColor(new Color(col.getRed, col.getGreen, col.getBlue, 0.5f))
         g.drawString(player.name, 300, 20 + offset * 20)
       }
-      g.drawString(player.score.toString, 400, 20 + offset * 20)
+      g.drawString(player.score.toString, 500, 20 + offset * 20)
       offset += 1
     }
     g.resetTransform
