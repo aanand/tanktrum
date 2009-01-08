@@ -11,7 +11,7 @@ object Main {
 
   val GAME_WINDOW_RATIO = WINDOW_WIDTH/GAME_WIDTH
 
-  val VERSION = 1
+  val VERSION = 2
 
   val logicUpdateInterval = Config("game.logicUpdateInterval").toInt
   val targetFrameRate = Config("game.targetFrameRate").toInt
