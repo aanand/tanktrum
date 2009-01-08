@@ -10,7 +10,7 @@ import sbinary.Operations
 import sbinary.Instances._
 
 class ServerList(game: Game) extends Menu(List()) with Session {
-  super.hide
+  hide
 
   val serverHostname = Config("metaServer.hostname")
   val serverPort = Config("metaServer.port").toInt
@@ -35,6 +35,7 @@ class ServerList(game: Game) extends Menu(List()) with Session {
     this.userName = userName
 
     serverList = List()
+    rebuildMenu
 
     channel = DatagramChannel.open()
     try {
@@ -50,10 +51,6 @@ class ServerList(game: Game) extends Menu(List()) with Session {
     }
   }
 
-  override def hide() {
-    game.menu.show
-  }
-
   def update() {
     if (!channel.isConnected) return
     data.clear
@@ -64,21 +61,22 @@ class ServerList(game: Game) extends Menu(List()) with Session {
       if (command == Commands.SERVER_INFO) {
         val serverArray = new Array[byte](data.remaining)
         data.get(serverArray)
-        val (address, port) = Operations.fromByteArray[(String, Int)](serverArray)
-        addServer(address, port)
+        val (name, address, port, players, maxPlayers) = Operations.fromByteArray[(String, String, Int, Int, Int)](serverArray)
+        addServer(name, address, port, players, maxPlayers)
       }
     }
   }
 
   def connect(address: String, port: Int) {
     if (userName != null) {
-      super.hide
+      hide
       game.startClient(address, port, userName)
     }
   }
 
-  def addServer(address: String, port: Int) {
-    serverList = serverList + (address + ":" + port, new MenuCommand(Unit => connect(address, port)))
+  def addServer(name: String, address: String, port: Int, players: Int, maxPlayers: Int) {
+    serverList = serverList + (name + "(" + address + ":" + port + ") " + players + "/" + maxPlayers, 
+                               new MenuCommand(Unit => connect(address, port)))
     rebuildMenu
   }
 

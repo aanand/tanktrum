@@ -25,7 +25,13 @@ class Server(port: Int) extends Session with Actor with ContactListener  {
   val PROJECTILE_BROADCAST_INTERVAL = Config("server.projectileBroadcastInterval").toInt
   val PLAYER_BROADCAST_INTERVAL     = Config("server.playerBroadcastInterval").toInt
   val READY_ROOM_BROADCAST_INTERVAL = Config("server.readyRoomBroadcastInterval").toInt
+  val STATUS_UPDATE_INTERVAL        = Config("server.statusBroadcastInterval").toInt
   val MAX_PLAYERS                   = Config("server.maxPlayers").toInt
+  val metaServerHostname            = Config("metaServer.hostname")
+  val metaServerPort                = Config("metaServer.port").toInt
+  val name                          = Config("server.name")
+  
+  val metaServerAddr = new InetSocketAddress(metaServerHostname, metaServerPort)
   
   val tick = Config("game.logicUpdateInterval").toInt
   
@@ -43,6 +49,7 @@ class Server(port: Int) extends Session with Actor with ContactListener  {
   var timeToProjectileUpdate = PROJECTILE_BROADCAST_INTERVAL
   var timeToPlayerUpdate = PLAYER_BROADCAST_INTERVAL
   var timeToReadyRoomUpdate = READY_ROOM_BROADCAST_INTERVAL
+  var timeToStatusUpdate = STATUS_UPDATE_INTERVAL
 
   var supposedRunTime = 0
   var numTankUpdates = 0
@@ -146,6 +153,12 @@ class Server(port: Int) extends Session with Actor with ContactListener  {
     }
 
     checkTimeouts()
+    
+    timeToStatusUpdate -= delta
+    if (timeToStatusUpdate < 0) {
+      sendStatus()
+      timeToStatusUpdate = STATUS_UPDATE_INTERVAL
+    }
 
     if (inReadyRoom) {
       if (players.size > 1 && players.values.forall(player => player.ready)) {
@@ -586,6 +599,11 @@ class Server(port: Int) extends Session with Actor with ContactListener  {
 
   def sendReadyRoom(addr: SocketAddress) = {
     send(byteToArray(Commands.READY_ROOM) ++ Operations.toByteArray(players(addr).itemsAsArray), addr)
+  }
+
+  def sendStatus() = {
+    println("Sending status.")
+    send(byteToArray(Commands.STATUS_UPDATE) ++ Operations.toByteArray(name, players.size, MAX_PLAYERS), metaServerAddr)
   }
 
   /**
