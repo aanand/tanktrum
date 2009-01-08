@@ -117,6 +117,8 @@ class Server(port: Int) extends Session with Actor with ContactListener  {
     channel = DatagramChannel.open()
     channel.socket.bind(new InetSocketAddress(port))
     channel.configureBlocking(false)
+
+    sendStatus
   }
   
   protected def leave() = {

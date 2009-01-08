@@ -27,10 +27,18 @@ class MetaServer extends Session {
   def start() {
     channel = DatagramChannel.open()
     channel.socket.bind(new InetSocketAddress(port))
+    channel.configureBlocking(false)
 
     println("Metaserver listening on " + port)
 
     while(true) {
+      for (key <- servers.keys) {
+        if (servers(key).expired) {
+          println("Server " + servers(key).name + " timed out.")
+          servers -= key
+        }
+      }
+
       data.clear
       val addr = channel.receive(data)
       if (addr != null) {
@@ -42,6 +50,7 @@ class MetaServer extends Session {
           for (server <- servers.values) {
             send(byteToArray(Commands.SERVER_INFO) ++ Operations.toByteArray(server.name, server.hostname, server.port, server.players, server.maxPlayers), addr)
           }
+
         }
         else if (command == Commands.STATUS_UPDATE) {
           val serverArray = new Array[byte](data.remaining)
@@ -54,6 +63,7 @@ class MetaServer extends Session {
           servers.put(inetAddr, new Server(name, host, port, players, maxPlayers))
         }
       }
+      Thread.sleep(10)
     }
   }
 
