@@ -468,6 +468,14 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
   }
   
   def processReadyRoomUpdate {
+    val byteArray = new Array[byte](data.remaining)
+    data.get(byteArray)
+    val items = Operations.fromByteArray[Array[(Byte, Short)]](byteArray)
+
+    for ((value, number) <- items) {
+      me.items.put(Items(value), number)
+    }
+
     if (!inReadyRoom) {
       inReadyRoom = true
     }
@@ -483,6 +491,7 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
     skyImage = new Image("media/sky/" + imageSetIndex.toString + ".jpg")
 
     // force groundImage.init() (which is private) to be called. I know, wtf.
+    // I don't get it, why don't we need to do this for skyImage too?  What? - N
     groundImage.toString
   }
 

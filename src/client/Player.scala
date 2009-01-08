@@ -2,6 +2,8 @@ package client
 
 import shared._
 
+import scala.collection.mutable.HashMap
+
 import org.newdawn.slick._
 import java.net._
 import sbinary.Instances._
@@ -12,6 +14,7 @@ class Player extends shared.Player {
   var tank: Tank = _
   def gun = tank.gun
   def color = Colors(id)
+  val items = new HashMap[Items.Value, Int]
 
   def render(g: Graphics) {
     g.resetTransform

@@ -563,7 +563,9 @@ class Server(port: Int) extends Session with Actor with ContactListener  {
   }
   
   def broadcastReadyRoom {
-    broadcast(byteToArray(Commands.READY_ROOM))
+    for (addr <- players.keys) {
+      sendReadyRoom(addr)
+    }
   }
 
 
@@ -580,7 +582,11 @@ class Server(port: Int) extends Session with Actor with ContactListener  {
 
   def sendGround(addr: SocketAddress) = {
     send(byteToArray(Commands.GROUND) ++ ground.serialise(groundSequence.seq), addr)
-  }  
+  }
+
+  def sendReadyRoom(addr: SocketAddress) = {
+    send(byteToArray(Commands.READY_ROOM) ++ Operations.toByteArray(players(addr).itemsAsArray), addr)
+  }
 
   /**
    * Sends the provided byte array to all clients.
