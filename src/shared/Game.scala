@@ -30,7 +30,7 @@ class Game(title: String) extends BasicGame(title) {
     container.getInput.enableKeyRepeat(Config("game.keyRepeatWait").toInt, Config("game.keyRepeatInterval").toInt)
 
     val startFont = java.awt.Font.createFont(java.awt.Font.TRUETYPE_FONT,
-                      new java.io.BufferedInputStream(new java.io.FileInputStream("media/fonts/" + Config("gui.fontFile"))))
+                      new java.io.BufferedInputStream(Resource.get("media/fonts/" + Config("gui.fontFile"))))
 
     val baseFont  = startFont.deriveFont(java.awt.Font.PLAIN, Config("gui.fontSize").toInt)
 
