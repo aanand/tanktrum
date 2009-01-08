@@ -4,7 +4,7 @@ import shared._
 
 import org.newdawn.slick._
 
-object ChatColor extends Color(1f, 1f, 1f, 0.7f)
+object ChatColor extends Color(1f, 1f, 1f, 0.9f)
 object ChatBG extends Color(0f, 0f, 0f)
 
 object Chat {
