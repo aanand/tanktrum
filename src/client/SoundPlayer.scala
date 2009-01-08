@@ -31,8 +31,6 @@ object SoundPlayer extends Actor {
   }
   
   def play(filename: String) = {
-    println("Playing: " + filename)
-
     val (format, data) = sounds(filename)
     val clip = AudioSystem.getClip
 

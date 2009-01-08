@@ -64,6 +64,9 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
   var projectiles = new HashMap[Int, Projectile]
   var explosions = new HashSet[Explosion]
 
+  var previousProjectileUpdate = 0L
+  var currentProjectileUpdate = 0L
+
   def enter {
     active = true
     ground = new Ground(Main.GAME_WIDTH.toInt, Main.GAME_HEIGHT.toInt)
@@ -356,6 +359,9 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
     data.get(projArray)
 
     val (seq, projDataArray) = Operations.fromByteArray[(Short, Array[Array[byte]])](projArray)
+
+    previousProjectileUpdate = currentProjectileUpdate
+    currentProjectileUpdate = System.currentTimeMillis
 
     if (!projectileSequence.inOrder(seq)) {
       return

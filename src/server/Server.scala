@@ -249,9 +249,9 @@ class Server(port: Int) extends Session with Actor with ContactListener  {
     p.body.setXForm(position, 0f)
     p.body.setLinearVelocity(tank.velocity.add(velocity))
     
-    broadcast(projectileData(p))
-
     addProjectile(p)
+    broadcast(projectileData(p))
+    p
   }
 
   def addProjectile(p: Projectile) = {
