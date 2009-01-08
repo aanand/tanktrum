@@ -604,7 +604,6 @@ class Server(port: Int) extends Session with Actor with ContactListener  {
   }
 
   def sendStatus() = {
-    println("Sending status.")
     send(byteToArray(Commands.STATUS_UPDATE) ++ Operations.toByteArray(name, players.size, MAX_PLAYERS), metaServerAddr)
   }
 
