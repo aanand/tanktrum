@@ -200,7 +200,7 @@ class Server(port: Int) extends Session with Actor with ContactListener  {
         addPlayer(addr)
       }
       else {
-        if (players.isDefinedAt(addr)) {
+        if (players.isDefinedAt(addr) || command == Commands.PING) {
           processCommand(command, addr)
         }
       }
