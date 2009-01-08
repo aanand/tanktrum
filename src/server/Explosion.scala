@@ -53,7 +53,7 @@ class Explosion (x: Float, y: Float, var radius: Float, server: Server, projecti
       
       if (damage > 0) {
         if (!tanksHit.contains(tank)) {
-          println(tank.player.name + " in " + projectile.getClass.getName + " explosion for " + damage + " damage.")
+          println(tank.player.name + " in " + projectile.name + " explosion for " + damage + " damage.")
           tanksHit(tank) = damage
           tank.damage(damage, this.projectile)
         }

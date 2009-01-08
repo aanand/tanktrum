@@ -288,7 +288,7 @@ class Tank(val server: Server, val id: Byte) extends GameObject(server) {
     
     if (isDead && oldHealth > 0) {
       if (null != source) {
-        server.broadcastChat(source.tank.player.name + " killed " + player.name + " with " + source.getClass.getName + ".")
+        server.broadcastChat(source.tank.player.name + " killed " + player.name + " with " + source.name + ".")
       }
       else {
         server.broadcastChat(player.name + " went splat.")
