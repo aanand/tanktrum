@@ -6,9 +6,8 @@ import java.nio.channels._
 import java.nio._
 import java.net._
 
-class PracticeServer(port : Int) extends Server(port) {
+class PracticeServer(port : Int) extends Server(port, "", false) {
   override def enter() {
-    public = false
     super.enter
     startRound
   }

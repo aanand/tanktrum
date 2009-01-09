@@ -20,7 +20,7 @@ import org.jbox2d.dynamics.contacts._
 import org.jbox2d.common._
 import org.jbox2d.collision._
 
-class Server(port: Int) extends Session with Actor with ContactListener  {
+class Server(port: Int, name: String, public: Boolean) extends Session with Actor with ContactListener  {
   val TANK_BROADCAST_INTERVAL       = Config("server.tankBroadcastInterval").toInt
   val PROJECTILE_BROADCAST_INTERVAL = Config("server.projectileBroadcastInterval").toInt
   val PLAYER_BROADCAST_INTERVAL     = Config("server.playerBroadcastInterval").toInt
@@ -29,7 +29,6 @@ class Server(port: Int) extends Session with Actor with ContactListener  {
   val MAX_PLAYERS                   = Config("server.maxPlayers").toInt
   val metaServerHostname            = Config("metaServer.hostname")
   val metaServerPort                = Config("metaServer.port").toInt
-  val name                          = Config("server.name")
   
   val metaServerAddr = new InetSocketAddress(metaServerHostname, metaServerPort)
   
@@ -74,8 +73,6 @@ class Server(port: Int) extends Session with Actor with ContactListener  {
   var explosions = new HashSet[Explosion]
   def tanks = players.values.map(player => player.tank)
   
-  var public = true
-
   def act {
     println("Server started on port " + port + ".")
     var time = System.currentTimeMillis

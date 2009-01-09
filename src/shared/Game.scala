@@ -39,15 +39,15 @@ class Game(title: String) extends BasicGame(title) {
     val storedUserName = prefs.get("username", "Player")
     val storedPort = prefs.get("port", Config("default.port"))
     val storedHostname = prefs.get("hostname", Config("default.hostname"))
+    val storedServerPort = prefs.get("serverPort", Config("server.port"))
     val storedServerName = prefs.get("serverName", Config("server.name"))
     val storedServerPublic = prefs.get("serverPublic", Config("server.public")).toBoolean
 
     val userName = MenuEditable(storedUserName, Player.MAX_NAME_LENGTH)
-    val serverPort = MenuEditable(storedPort, 5)
+    val serverPort = MenuEditable(storedServerPort, 5)
     val serverHostname = MenuEditable(storedHostname, 255)
     val serverName = MenuEditable(storedServerName, 127)
     val serverPublic = MenuToggle(storedServerPublic)
-
 
     titleImage = new Image("media/images/title.png")
 
@@ -58,7 +58,7 @@ class Game(title: String) extends BasicGame(title) {
         ("Name", serverName),
         ("Port", serverPort),
         ("Public", serverPublic),
-        ("Ok", MenuCommand(Unit => startServer(serverPort.value.toInt, userName.value)))))),
+        ("Ok", MenuCommand(Unit => startServer(serverPort.value.toInt, userName.value, serverName.value, serverPublic.value)))))),
       ("Connect", Submenu(List(
         ("Hostname", serverHostname),
         ("Port", serverPort),
@@ -95,13 +95,17 @@ class Game(title: String) extends BasicGame(title) {
     }
   }
   
-  def startServer(port : Int, userName : String) {
+  def startServer(port: Int, userName: String, serverName: String, public: Boolean) {
+    prefs.put("serverPort", port.toString)
+    prefs.put("serverName", serverName)
+    prefs.put("serverPublic", public.toString)
+
     if (server != null) {
       server !? 'leave
       server = null
     }
    
-    server = new Server(port)
+    server = new Server(port, serverName, public)
     server.start
     println("Starting server.")
     server !? 'enter
