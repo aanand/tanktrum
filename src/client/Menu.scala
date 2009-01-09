@@ -196,6 +196,17 @@ case class MenuEditable(initValue : String, maxLength: Int) extends MenuItem {
   }
 }
 
+case class MenuToggle(var value: boolean) extends MenuItem {
+  val offset = 100
+  override def perform(menu: Menu) = {
+    value = !value
+  }
+
+  override def render(g: Graphics, menu: Menu, current: Boolean) {
+    g.drawString(if (value) "yes" else "no", offset, 0)
+  }
+}
+
 case class MenuCommand(callback : Unit => Unit) extends MenuItem {
   override def perform(menu : Menu) = {
     callback(menu)
