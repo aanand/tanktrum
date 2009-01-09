@@ -2,6 +2,8 @@ package client
 
 import shared._
 
+import org.newdawn.slick.Input
+
 import scala.collection.mutable.LinkedList
 import java.nio.channels._
 import java.nio._
@@ -16,7 +18,7 @@ class ServerList(game: Game) extends Menu(List()) with Session {
   val serverPort = Config("metaServer.port").toInt
   
   val filter = new MenuEditable("", 32) {
-    override def keyPressed(key : Int, char : Char, menu : Menu) {
+    override def keyPressed(key: Int, char: Char, menu: Menu) {
       super.keyPressed(key, char, menu)
       rebuildMenu
     }
@@ -69,8 +71,15 @@ class ServerList(game: Game) extends Menu(List()) with Session {
 
   def connect(address: String, port: Int) {
     if (userName != null) {
-      hide
+      super.hide
       game.startClient(address, port, userName)
+    }
+  }
+
+  override def hide() = {
+    super.hide
+    if (game.menu != null) {
+      game.menu.show
     }
   }
 
