@@ -53,6 +53,11 @@ class ServerList(game: Game) extends Menu(List()) with Session {
     }
   }
 
+  override def cancel() = {
+    super.cancel()
+    game.menu.show
+  }
+
   def update() {
     if (!channel.isConnected) return
     data.clear
@@ -71,15 +76,7 @@ class ServerList(game: Game) extends Menu(List()) with Session {
 
   def connect(address: String, port: Int) {
     if (userName != null) {
-      super.hide
       game.startClient(address, port, userName)
-    }
-  }
-
-  override def hide() = {
-    super.hide
-    if (game.menu != null) {
-      game.menu.show
     }
   }
 

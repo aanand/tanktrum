@@ -145,7 +145,6 @@ class Game(title: String) extends BasicGame(title) {
   }
 
   def listServers(userName: String) {
-    menu.hide
     serverList.show(userName)
   }
   
@@ -156,7 +155,6 @@ class Game(title: String) extends BasicGame(title) {
       serverList.keyPressed(key, char)
     } else if (key == Input.KEY_ESCAPE) {
       menu.show()
-      serverList.hide()
     } else if (client != null) {
       client.keyPressed(key, char)
     }

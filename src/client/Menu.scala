@@ -87,7 +87,7 @@ class Menu(initTree: List[(String, MenuItem)], offsetX: Int, offsetY: Int) {
 
         case Input.KEY_ESCAPE => {
           if (path.isEmpty) {
-            hide()
+            cancel()
           }
           else {
             val subMenu = path.pop()
@@ -140,6 +140,10 @@ class Menu(initTree: List[(String, MenuItem)], offsetX: Int, offsetY: Int) {
   
   def hide() {
     showing = false
+  }
+
+  def cancel() {
+    hide()
   }
   
   def subTree = {
