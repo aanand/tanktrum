@@ -8,6 +8,7 @@ import java.net._
 
 class PracticeServer(port : Int) extends Server(port) {
   override def enter() {
+    public = false
     super.enter
     startRound
   }

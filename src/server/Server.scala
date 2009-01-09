@@ -74,6 +74,8 @@ class Server(port: Int) extends Session with Actor with ContactListener  {
   var explosions = new HashSet[Explosion]
   def tanks = players.values.map(player => player.tank)
   
+  var public = true
+
   def act {
     println("Server started on port " + port + ".")
     var time = System.currentTimeMillis
@@ -158,7 +160,7 @@ class Server(port: Int) extends Session with Actor with ContactListener  {
     
     timeToStatusUpdate -= delta
     if (timeToStatusUpdate < 0) {
-      sendStatus()
+      sendStatus
       timeToStatusUpdate = STATUS_UPDATE_INTERVAL
     }
 
@@ -604,7 +606,9 @@ class Server(port: Int) extends Session with Actor with ContactListener  {
   }
 
   def sendStatus() = {
-    send(byteToArray(Commands.STATUS_UPDATE) ++ Operations.toByteArray(name, players.size, MAX_PLAYERS), metaServerAddr)
+    if (public) {
+      send(byteToArray(Commands.STATUS_UPDATE) ++ Operations.toByteArray(name, players.size, MAX_PLAYERS), metaServerAddr)
+    }
   }
 
   /**

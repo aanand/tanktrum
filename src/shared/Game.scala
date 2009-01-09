@@ -39,25 +39,32 @@ class Game(title: String) extends BasicGame(title) {
     val storedUserName = prefs.get("username", "Player")
     val storedPort = prefs.get("port", Config("default.port"))
     val storedHostname = prefs.get("hostname", Config("default.hostname"))
+    val storedServerName = prefs.get("serverName", Config("server.name"))
+    val storedServerPublic = prefs.get("serverPublic", Config("server.public")).toBoolean
 
+    val userName = MenuEditable(storedUserName, Player.MAX_NAME_LENGTH)
     val serverPort = MenuEditable(storedPort, 5)
     val serverHostname = MenuEditable(storedHostname, 255)
-    val userName = MenuEditable(storedUserName, Player.MAX_NAME_LENGTH)
+    val serverName = MenuEditable(storedServerName, 127)
+    val serverPublic = MenuToggle(storedServerPublic)
+
 
     titleImage = new Image("media/images/title.png")
 
     this.menu = new Menu(List(
-      ("name", userName),
-      ("find server", MenuCommand(Unit => listServers(userName.value))),
-      ("start server", Submenu(List(
-        ("port", serverPort),
-        ("ok", MenuCommand(Unit => startServer(serverPort.value.toInt, userName.value)))))),
-      ("connect", Submenu(List(
-        ("hostname", serverHostname),
-        ("port", serverPort),
-        ("join", MenuCommand(Unit => startClient(serverHostname.value, serverPort.value.toInt, userName.value)))))),
-      ("practice", MenuCommand(Unit => startPractice(userName.value))),
-      ("quit", MenuCommand(Unit => quit))))
+      ("Name", userName),
+      ("Find Server", MenuCommand(Unit => listServers(userName.value))),
+      ("Start Server", Submenu(List(
+        ("Name", serverName),
+        ("Port", serverPort),
+        ("Public", serverPublic),
+        ("Ok", MenuCommand(Unit => startServer(serverPort.value.toInt, userName.value)))))),
+      ("Connect", Submenu(List(
+        ("Hostname", serverHostname),
+        ("Port", serverPort),
+        ("Join", MenuCommand(Unit => startClient(serverHostname.value, serverPort.value.toInt, userName.value)))))),
+      ("Practice", MenuCommand(Unit => startPractice(userName.value))),
+      ("Quit", MenuCommand(Unit => quit))))
   }
 
   def update(container: GameContainer, delta: Int) {
