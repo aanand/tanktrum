@@ -1,11 +1,11 @@
 package client
 
 import shared._
+import RichGraphics._
 
 import org.newdawn.slick._
 
 object ChatColor extends Color(1f, 1f, 1f, 0.9f)
-object ChatBG extends Color(0f, 0f, 0f)
 
 object Chat {
   val height = 100
@@ -50,14 +50,11 @@ class Chat(client: Client) {
     }
     g.resetTransform
     g.translate(20, 560 - 15*messages.length)
+    g.setColor(ChatColor)
+
     for (message <- messages) {
       g.translate(0, 15)
-      g.setColor(ChatBG)
-      g.drawString(message, 0, 0)
-      g.translate(-2, -2)
-      g.setColor(ChatColor)
-      g.drawString(message, 0, 0)
-      g.translate(2, 2)
+      g.drawString(message, 0, 0, true)
     }
   }
 

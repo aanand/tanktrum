@@ -2,6 +2,7 @@ package client
 import org.newdawn.slick
 import org.newdawn.slick._
 import shared._
+import RichGraphics._
 
 import java.nio.channels._
 import java.nio._
@@ -185,7 +186,7 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
 
     g.resetTransform
     g.setColor(new Color(1f, 1f, 1f))
-    g.drawString("Ping: " + latency, 735, 575)
+    g.drawString("Ping: " + latency, 735, 575, true)
 
     chat.render(g)
   }

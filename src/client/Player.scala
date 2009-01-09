@@ -1,6 +1,7 @@
 package client
 
 import shared._
+import RichGraphics._
 
 import scala.collection.mutable.HashMap
 
@@ -25,7 +26,7 @@ class Player extends shared.Player {
     g.translate(10 + id*110, 10)
     g.setColor(color)
 
-    g.drawString(name, 0, 0)
+    g.drawString(name, 0, 0, true)
 
     g.translate(0, 16)
     g.fillRect(0, 0, tank.health, 10)
@@ -38,7 +39,7 @@ class Player extends shared.Player {
 
       Projectile.render(g, gun.selectedWeapon)
 
-      g.drawString(gun.ammo(gun.selectedWeapon).toString, 15, -9)
+      g.drawString(gun.ammo(gun.selectedWeapon).toString, 15, -9, true)
     }
 
     g.resetTransform
