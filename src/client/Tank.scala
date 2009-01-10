@@ -48,7 +48,8 @@ class Tank(client: Client) extends GameObject {
 
   var wasAlive = false
   
-  val image = new Image("media/tanks/1.png")
+  val image = new Image("media/tanks/base.png")
+  val stripImage = new Image("media/tanks/strip.png")
   val imageWidth = WIDTH
 
   val gun = new Gun(client)
@@ -144,6 +145,7 @@ class Tank(client: Client) extends GameObject {
 
         scale(imageScale, imageScale) {
           image.draw(-image.getWidth/2f, -image.getHeight)
+          stripImage.draw(-image.getWidth/2f, -image.getHeight, color)
         }
         
         // Draw the gun arrow
