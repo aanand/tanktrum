@@ -11,71 +11,101 @@ import java.util.Date
 class Game(title: String) extends BasicGame(title) {
   var client: Client = _
   var server: Server = _
-  var error: String = _
   
   var container: GameContainer = _
 
   var menu : Menu = _
+  val serverList  = new ServerList(this)
   
   SoundPlayer.start
   
   val prefs = Preferences.userRoot.node("boomtrapezoid")
 
   var titleImage: Image = _
+  var font: Font = _
 
   def init(container: GameContainer) {
     this.container = container
 
     container.getInput.enableKeyRepeat(Config("game.keyRepeatWait").toInt, Config("game.keyRepeatInterval").toInt)
 
+    val startFont = java.awt.Font.createFont(java.awt.Font.TRUETYPE_FONT,
+                      new java.io.BufferedInputStream(Resource.get("media/fonts/" + Config("gui.fontFile"))))
+
+    val baseFont  = startFont.deriveFont(java.awt.Font.PLAIN, Config("gui.fontSize").toInt)
+
+    font = new TrueTypeFont(baseFont, Config("gui.fontSmooth").toBoolean)
+
     val storedUserName = prefs.get("username", "Player")
     val storedPort = prefs.get("port", Config("default.port"))
     val storedHostname = prefs.get("hostname", Config("default.hostname"))
+    val storedServerPort = prefs.get("serverPort", Config("server.port"))
+    val storedServerName = prefs.get("serverName", Config("server.name"))
+    val storedServerPublic = prefs.get("serverPublic", Config("server.public")).toBoolean
 
-    val serverPort = MenuEditable(storedPort, 5)
-    val serverHostname = MenuEditable(storedHostname, 255)
     val userName = MenuEditable(storedUserName, Player.MAX_NAME_LENGTH)
+    val serverPort = MenuEditable(storedServerPort, 5)
+    val serverHostname = MenuEditable(storedHostname, 255)
+    val serverName = MenuEditable(storedServerName, 127)
+    val serverPublic = MenuToggle(storedServerPublic)
 
     titleImage = new Image("media/images/title.png")
 
     this.menu = new Menu(List(
-      ("name", userName),
-      ("start server", Submenu(List(
-        ("port", serverPort),
-        ("ok", MenuCommand(Unit => startServer(serverPort.value.toInt, userName.value)))))),
-      ("connect", Submenu(List(
-        ("hostname", serverHostname),
-        ("port", serverPort),
-        ("join", MenuCommand(Unit => startClient(serverHostname.value, serverPort.value.toInt, userName.value)))))),
-      ("practice", MenuCommand(Unit => startPractice(userName.value))),
-      ("quit", MenuCommand(Unit => quit))))
+      ("Name", userName),
+      ("Find Server", MenuCommand(Unit => listServers(userName.value))),
+      ("Start Server", Submenu(List(
+        ("Name", serverName),
+        ("Port", serverPort),
+        ("Public", serverPublic),
+        ("Ok", MenuCommand(Unit => startServer(serverPort.value.toInt, userName.value, serverName.value, serverPublic.value)))))),
+      ("Connect", Submenu(List(
+        ("Hostname", serverHostname),
+        ("Port", serverPort),
+        ("Join", MenuCommand(Unit => startClient(serverHostname.value, serverPort.value.toInt, userName.value)))))),
+      ("Practice", MenuCommand(Unit => startPractice(userName.value))),
+      ("Quit", MenuCommand(Unit => quit))))
   }
 
   def update(container: GameContainer, delta: Int) {
     //println("Updating: " + new java.util.Random().nextInt)
-    if (client != null && client.isActive) {
+    if (client != null && client.active) {
       client.update(delta)
+    } 
+    
+    if (serverList.showing) {
+      serverList.update()
     }
   }
 
   def render(container: GameContainer, g: Graphics) {
+    g.setFont(font)
+
     if (menu != null && menu.showing) {
       g.drawImage(titleImage, 0, 0)
       menu.render(g)
       return
     }
-    if (client != null && client.isActive) {
+    else if (serverList.showing) {
+      g.drawImage(titleImage, 0, 0, new Color(1f, 1f, 1f, 0.2f))
+      serverList.render(g)
+    }
+    else if (client != null && client.active) {
       client.render(g)
     }
   }
   
-  def startServer(port : Int, userName : String) {
+  def startServer(port: Int, userName: String, serverName: String, public: Boolean) {
+    prefs.put("serverPort", port.toString)
+    prefs.put("serverName", serverName)
+    prefs.put("serverPublic", public.toString)
+
     if (server != null) {
       server !? 'leave
       server = null
     }
    
-    server = new Server(port)
+    server = new Server(port, serverName, public)
     server.start
     println("Starting server.")
     server !? 'enter
@@ -113,10 +143,16 @@ class Game(title: String) extends BasicGame(title) {
 
     startClient("localhost", port, userName)
   }
+
+  def listServers(userName: String) {
+    serverList.show(userName)
+  }
   
   override def keyPressed(key : Int, char : Char) {
     if (menu.showing) {
       menu.keyPressed(key, char)
+    } else if (serverList.showing) {
+      serverList.keyPressed(key, char)
     } else if (key == Input.KEY_ESCAPE) {
       menu.show()
     } else if (client != null) {
@@ -133,6 +169,8 @@ class Game(title: String) extends BasicGame(title) {
   override def mouseMoved(oldx: Int, oldy: Int, newx: Int, newy: Int) {
     if (menu.showing) {
       menu.mouseMoved(oldx, oldy, newx, newy)
+    } else if (serverList.showing) {
+      serverList.mouseMoved(oldx, oldy, newx, newy)
     } else if (client != null) {
       client.mouseMoved(oldx, oldy, newx, newy)
     }
@@ -141,6 +179,8 @@ class Game(title: String) extends BasicGame(title) {
   override def mouseClicked(button: Int, x: Int, y: Int, clickCount: Int) {
     if (menu.showing) {
       menu.mouseClicked(button, x, y, clickCount)
+    } else if (serverList.showing) {
+      serverList.mouseClicked(button, x, y, clickCount)
     } else if (client != null) {
       client.mouseClicked(button, x, y, clickCount)
     }
@@ -151,7 +191,7 @@ class Game(title: String) extends BasicGame(title) {
       client.leave
     }
     if (server != null) {
-      server.leave
+      server !? 'leave
     }
     if (container != null) {
       container.exit

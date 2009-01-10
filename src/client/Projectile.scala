@@ -11,31 +11,32 @@ import sbinary.Operations
 import GL._
 
 object Projectile {
-  def create(projectileType: ProjectileTypes.Value): Projectile = {
+  def create(client: Client, projectileType: ProjectileTypes.Value): Projectile = {
     projectileType match {
-      case PROJECTILE          => new Projectile
-      case NUKE                => new Nuke
-      case ROLLER              => new Roller
-      case MIRV                => new Mirv
-      case MIRV_CLUSTER        => new MirvCluster
-      case CORBOMITE           => new Corbomite
-      case MACHINE_GUN         => new MachineGun
-      case DEATHS_HEAD         => new DeathsHead
-      case DEATHS_HEAD_CLUSTER => new DeathsHeadCluster
-      case MISSILE             => new Missile
+      case PROJECTILE          => new Projectile(client)
+      case NUKE                => new Nuke(client)
+      case ROLLER              => new Roller(client)
+      case MIRV                => new Mirv(client)
+      case MIRV_CLUSTER        => new MirvCluster(client)
+      case CORBOMITE           => new Corbomite(client)
+      case MACHINE_GUN         => new MachineGun(client)
+      case DEATHS_HEAD         => new DeathsHead(client)
+      case DEATHS_HEAD_CLUSTER => new DeathsHeadCluster(client)
+      case MISSILE             => new Missile(client)
     }
   }
 
-  def newFromTuple(client: Client, tuple: (Int, Float, Float, Float, Float, Float, Float, Byte)) = {
-    val (id, _, _, _, _, _, _, projectileType) = tuple
+  def newFromTuple(client: Client, tuple: (Int, Float, Float, Float, Byte)) = {
+    val (id, _, _, _, projectileType) = tuple
     
-    val p = create(ProjectileTypes(projectileType))
+    val p = create(client, ProjectileTypes(projectileType))
     p.id = id
     p.updateFromTuple(tuple)
     
     p
   }
-  def deserialise(data: Array[byte]) = Operations.fromByteArray[(Int, Float, Float, Float, Float, Float, Float, Byte)](data)
+
+  def deserialise(data: Array[byte]) = Operations.fromByteArray[(Int, Float, Float, Float, Byte)](data)
 
   def render(g: Graphics, value: Value) {
     g.setColor(new Color(1f, 1f, 1f))
@@ -79,13 +80,13 @@ object Projectile {
   }
 }
 
-class Projectile extends GameObject {
+class Projectile(client: Client) extends GameObject {
   var id: Int = -1
   
   var image: Image = _
   
   initImage
-  
+
   val trailLifetime = Config("projectile.trail.lifetime").toInt
   var trail: List[(Float, Float, Int)] = Nil
   var stationaryTime = 0
@@ -96,27 +97,47 @@ class Projectile extends GameObject {
   def name = getClass.getName.split("\\.").last
   def imagePath = Config("projectile." + name + ".imagePath")
   def imageWidth = Config("projectile." + name + ".imageWidth").toInt
+
+  var lastX = -1f
+  var lastY = -1f
+
+  var interpX = 0f
+  var interpY = 0f
+  
+  val INTERPOLATION_TIME = Config("projectile.interpolationTime").toInt
+  
+  def previousUpdate = client.previousProjectileUpdate
+  def currentUpdate = client.currentProjectileUpdate
   
   def update(delta : Int) {
     updateTrail(delta)
   }
 
   def updateTrail(delta: Int) {
-    if (shouldDrawTrail) {    
-      trail = (x, y, delta + stationaryTime) :: trail
+    if (shouldUpdateTrail) {
+      trail = (interpX, interpY, delta + stationaryTime) :: trail
       stationaryTime = 0
     } else {
       stationaryTime += delta
     }
   }
   
-  def shouldDrawTrail: Boolean = {
-    if (!trail.isEmpty) {
-      val (lastX, lastY, _) = trail.head
+  def shouldUpdateTrail: Boolean = {
+    if (dead) {
+      return false
+    }
 
-      if ((x, y) == (lastX, lastY)) {
+    if (!trail.isEmpty) {
+      val (prevX, prevY, _) = trail.head
+
+      if (Math.abs(interpX-prevX) < 1 && Math.abs(interpY-prevY) < 1) {
         return false
       }
+    }
+
+    //Stops trail drawing from top left of the screen before interpolation settles.
+    if (interpX < 0.01f || interpY < 0.01f) {
+      return false
     }
     
     return true
@@ -130,6 +151,31 @@ class Projectile extends GameObject {
  
 
   def render(g : Graphics) {
+    val time = System.currentTimeMillis
+    val interpTime = time - INTERPOLATION_TIME
+
+    if (x == lastX && y == lastY) {
+      interpX = x
+      interpY = y
+    }
+    else if (interpTime > currentUpdate) {
+      interpX = x
+      interpY = y
+    }
+    else if (interpTime < previousUpdate) {
+      interpX = lastX
+      interpY = lastY
+    }
+    else if (lastX != -1f && lastY != -1f) {
+      val interpFactor = (currentUpdate - interpTime) / (currentUpdate - previousUpdate).toFloat
+      interpX = lastX * interpFactor + x * (1-interpFactor)
+      interpY = lastY * interpFactor + y * (1-interpFactor)
+    }
+    else {
+      interpX = x
+      interpY = y
+    }
+
     renderTrail(g)
     if (!dead) {
       renderBody(g)
@@ -139,7 +185,7 @@ class Projectile extends GameObject {
   def renderBody(g: Graphics) {
     import GL._
 
-    translate(x, y) {
+    translate(interpX, interpY) {
       rotate(0, 0, angle.toDegrees) {
         scale(imageScale, imageScale) {
           image.draw(-image.getWidth/2f, -image.getHeight/2f)
@@ -152,46 +198,55 @@ class Projectile extends GameObject {
     var prevX: Float = 0
     var prevY: Float = 0
     var t = stationaryTime
+    g.setLineWidth(2f)
+    g.setAntiAlias(true)
     
     for ((x, y, delta) <- trail) {
       if (t > trailLifetime) {
         return
       }
-      
+
       if (prevX > 0 && Math.abs(x-prevX) < Main.GAME_WIDTH/2) {
         g.setColor(new Color(1f, 1f, 1f, 0.5f - (t.toFloat / trailLifetime)*0.5f))
-        g.setLineWidth(2f)
-        g.setAntiAlias(true)
         line(x, y, prevX, prevY)
-        g.setAntiAlias(false)
       }
-      
+    
       prevX = x
       prevY = y
       t += delta
     }
+    g.setAntiAlias(false)
   }
   
-  def updateFromTuple(tuple: (Int, Float, Float, Float, Float, Float, Float, Byte)) {
-    val (id, x, y, xVel, yVel, rot, angVel, projectileType) = tuple
+  def updateFromTuple(tuple: (Int, Float, Float, Float, Byte)) {
+    val (id, newX, newY, newAngle, projectileType) = tuple
     
-    this.x = x
-    this.y = y
-    this.angle = rot
+    if (x > 0f && y > 0f) {
+      lastX = x
+      lastY = y
+    }
+    else {
+      lastX = newX
+      lastY = newY
+    }
+    x = newX
+    y = newY
+    angle = newAngle
+
   }
 
 }
 
-class Nuke extends Projectile
+class Nuke(client: Client) extends Projectile(client)
 
-class Mirv extends Projectile
-class MirvCluster extends Projectile
+class Mirv(client: Client) extends Projectile(client)
+class MirvCluster(client: Client) extends Projectile(client)
 
-class DeathsHead extends Mirv
-class DeathsHeadCluster extends Projectile
+class DeathsHead(client: Client) extends Mirv(client)
+class DeathsHeadCluster(client: Client) extends Projectile(client)
 
-class MachineGun extends Projectile
-class Roller extends Projectile
-class Missile extends MachineGun
+class MachineGun(client: Client) extends Projectile(client)
+class Roller(client: Client) extends Projectile(client)
+class Missile(client: Client) extends MachineGun(client)
 
-class Corbomite extends Projectile
+class Corbomite(client: Client) extends Projectile(client)

@@ -2,6 +2,8 @@ package server
 
 import shared._
 
+import scala.collection.mutable.HashMap
+
 import java.net._
 import sbinary.Instances._
 import sbinary.Operations
@@ -80,5 +82,20 @@ class Player(var tank: Tank, playerName: String, playerId: Byte) extends shared.
     ))
   }
 
-
+  def itemsAsArray = {
+    val numItems = new HashMap[Byte, Short]
+    for (itemVal <- Items) {
+      val item = Items.items(itemVal)
+      if (null != item.projectileType) {
+        numItems.put(itemVal.id.toByte, gun.ammo(item.projectileType).toShort)
+      }
+      else if (item == JumpjetItem) {
+        numItems.put(itemVal.id.toByte, tank.purchasedJumpFuel.toShort)
+      }
+      else if (item == Corbomite) {
+        numItems.put(itemVal.id.toByte, tank.corbomite.toShort)
+      }
+    }
+    numItems.toArray
+  }
 }

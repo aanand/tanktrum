@@ -1,5 +1,6 @@
 package client
 
+import shared.Resource
 import java.io._
 import java.net.URL
 import java.util.Properties
@@ -31,8 +32,6 @@ object SoundPlayer extends Actor {
   }
   
   def play(filename: String) = {
-    println("Playing: " + filename)
-
     val (format, data) = sounds(filename)
     val clip = AudioSystem.getClip
 
@@ -49,13 +48,7 @@ object SoundPlayer extends Actor {
   }
 
   def decodeFile(fileName: String) = {
-    var rawStream: AudioInputStream = null
-    if (new File(fileName).exists) {
-      rawStream = AudioSystem.getAudioInputStream(new BufferedInputStream(new FileInputStream(fileName)))
-    }
-    else {
-      rawStream = AudioSystem.getAudioInputStream(new BufferedInputStream(getClass.getResourceAsStream(fileName)))
-    }
+    var rawStream: AudioInputStream = AudioSystem.getAudioInputStream(new BufferedInputStream(Resource.get(fileName)))
     
     val baseFormat = rawStream.getFormat()
 

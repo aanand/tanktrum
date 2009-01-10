@@ -14,6 +14,8 @@ import sbinary.Operations
 class Ground(server: Server, width: Int, height: Int) extends GameObject(server) {
   val MIN_HEIGHT = Config("ground.minHeight").toFloat
   val granularity = Config("ground.granularity").toInt
+  val FLATNESS_WIDTH = 10
+  val TANK_WIDTH = Config("tank.width").toInt
 
   var points : Array[Vec2] = _
   
@@ -107,6 +109,18 @@ class Ground(server: Server, width: Int, height: Int) extends GameObject(server)
       initPoints()
       server.broadcastGround()
     }
+  }
+
+  def flatten(x: Float) {
+    val h = heightAt(x)
+    
+    val range = new Range(x.toInt - FLATNESS_WIDTH/2, x.toInt + FLATNESS_WIDTH/2, 1)
+    
+    for (i <- range) {
+      val index = (i/granularity).toInt + 1
+      points(index).y = h
+    }
+    initPoints
   }
   
   def serialise(seq: Short) = {

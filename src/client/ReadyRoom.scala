@@ -5,7 +5,7 @@ import shared._
 class ReadyRoom (client: Client) {
   val itemList = Items.map(itemVal => {
       val item = Items.items(itemVal)
-      (item.name, MenuCommandWithLabel(Unit => buy(item), item.cost.toString))
+      (item.name, MenuCommandWithLabel(Unit => buy(item), "£" + item.cost.toString))
   }).toList
 
   val menu = new Menu(
@@ -25,7 +25,15 @@ class ReadyRoom (client: Client) {
 
       g.setColor(new Color(0f, 1f, 0f))
       g.drawString("Funds:", 20, 0)
-      g.drawString(client.me.money.toString, 120, 0)
+      g.drawString("£" + client.me.money.toString, 120, 0)
+
+      g.drawString("#", 180, 0) 
+      for (item <- Items) {
+        if (client.me.items.isDefinedAt(item)) {
+          val num = client.me.items(item)
+          g.drawString(num.toString, 180, 20+20*item.id)
+        }
+      }
 
       g.resetTransform
     }
@@ -34,17 +42,22 @@ class ReadyRoom (client: Client) {
     g.resetTransform
     
     var offset = 0
+
+    g.translate(20, 20)
+    g.setColor(new Color(0f, 1f, 0f))
+    g.drawString("Players", 450, 0)
+    g.translate(0, 20)
     for (player <- client.players.values.toList.sort((p1, p2) => {p1.score > p2.score})) {
       val col = (player.color)
       if (player.ready) {
         g.setColor(new Color(col.getRed, col.getGreen, col.getBlue, 1f))
-        g.drawString(player.name + " is go.", 300, 20 + offset * 20)
+        g.drawString(player.name + " is go.", 350, offset * 20)
       }
       else {
         g.setColor(new Color(col.getRed, col.getGreen, col.getBlue, 0.5f))
-        g.drawString(player.name, 300, 20 + offset * 20)
+        g.drawString(player.name, 350, offset * 20)
       }
-      g.drawString(player.score.toString, 400, 20 + offset * 20)
+      g.drawString(player.score.toString, 600, offset * 20)
       offset += 1
     }
     g.resetTransform

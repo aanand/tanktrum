@@ -36,5 +36,5 @@
     <all-permissions/>
   </security>
   
-  <application-desc main-class="Main"/>
+  <application-desc main-class="shared.Main"/>
 </jnlp>

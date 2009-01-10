@@ -2,15 +2,12 @@ package server
 
 import shared._
 
-import org.newdawn.slick
-import org.newdawn.slick._
-
 import java.nio.channels._
 import java.nio._
 import java.net._
 
-class PracticeServer(port : Int) extends Server(port) {
-  override def enter {
+class PracticeServer(port : Int) extends Server(port, "", false) {
+  override def enter() {
     super.enter
     startRound
   }
@@ -23,7 +20,7 @@ class PracticeServer(port : Int) extends Server(port) {
     super.addPlayer(addr)
     val player = players(addr)
     
-    player.tank.health = 100
+    player.tank.destroy = false
 
     if (newPlayer) {
       for (projectileType <- ProjectileTypes) {

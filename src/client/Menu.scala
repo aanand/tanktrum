@@ -24,7 +24,7 @@ class Menu(initTree: List[(String, MenuItem)], offsetX: Int, offsetY: Int) {
   val path = new Stack[SubmenuWithPositions]
   var selection = 0
 
-  val tree = buildTree(initTree)
+  var tree = buildTree(initTree)
 
   def this(initTree: List[(String, MenuItem)]) = this(initTree, Menu.defaultPositionX, Menu.defaultPositionY)
   
@@ -87,7 +87,7 @@ class Menu(initTree: List[(String, MenuItem)], offsetX: Int, offsetY: Int) {
 
         case Input.KEY_ESCAPE => {
           if (path.isEmpty) {
-            hide()
+            cancel()
           }
           else {
             val subMenu = path.pop()
@@ -141,6 +141,10 @@ class Menu(initTree: List[(String, MenuItem)], offsetX: Int, offsetY: Int) {
   def hide() {
     showing = false
   }
+
+  def cancel() {
+    hide()
+  }
   
   def subTree = {
     if (path.isEmpty) {
@@ -193,6 +197,17 @@ case class MenuEditable(initValue : String, maxLength: Int) extends MenuItem {
     }
     
     g.drawString(str, offset, 0)
+  }
+}
+
+case class MenuToggle(var value: boolean) extends MenuItem {
+  val offset = 100
+  override def perform(menu: Menu) = {
+    value = !value
+  }
+
+  override def render(g: Graphics, menu: Menu, current: Boolean) {
+    g.drawString(if (value) "yes" else "no", offset, 0)
   }
 }
 

@@ -2,8 +2,6 @@ package server
 
 import shared._
 
-import org.newdawn.slick._
-
 import java.nio.channels._
 import java.nio._
 import java.net._
@@ -14,7 +12,6 @@ import scala.collection.mutable.HashMap
 import scala.collection.mutable.HashSet
 import scala.actors.Actor
 
-
 import sbinary.Operations
 import sbinary.Instances._
 
@@ -23,12 +20,17 @@ import org.jbox2d.dynamics.contacts._
 import org.jbox2d.common._
 import org.jbox2d.collision._
 
-class Server(port: Int) extends shared.Session(null) with Actor with ContactListener  {
+class Server(port: Int, name: String, public: Boolean) extends Session with Actor with ContactListener  {
   val TANK_BROADCAST_INTERVAL       = Config("server.tankBroadcastInterval").toInt
   val PROJECTILE_BROADCAST_INTERVAL = Config("server.projectileBroadcastInterval").toInt
   val PLAYER_BROADCAST_INTERVAL     = Config("server.playerBroadcastInterval").toInt
   val READY_ROOM_BROADCAST_INTERVAL = Config("server.readyRoomBroadcastInterval").toInt
+  val STATUS_UPDATE_INTERVAL        = Config("server.statusBroadcastInterval").toInt
   val MAX_PLAYERS                   = Config("server.maxPlayers").toInt
+  val metaServerHostname            = Config("metaServer.hostname")
+  val metaServerPort                = Config("metaServer.port").toInt
+  
+  val metaServerAddr = new InetSocketAddress(metaServerHostname, metaServerPort)
   
   val tick = Config("game.logicUpdateInterval").toInt
   
@@ -39,13 +41,18 @@ class Server(port: Int) extends shared.Session(null) with Actor with ContactList
 
   var channel: DatagramChannel = _
   val players = new HashMap[SocketAddress, Player]
-  val data = ByteBuffer.allocate(1000)
+  val data = ByteBuffer.allocate(10000)
   val rand = new Random()
   
   var timeToTankUpdate = TANK_BROADCAST_INTERVAL
   var timeToProjectileUpdate = PROJECTILE_BROADCAST_INTERVAL
   var timeToPlayerUpdate = PLAYER_BROADCAST_INTERVAL
   var timeToReadyRoomUpdate = READY_ROOM_BROADCAST_INTERVAL
+  var timeToStatusUpdate = STATUS_UPDATE_INTERVAL
+
+  var supposedRunTime = 0
+  var numTankUpdates = 0
+  var startTime: Long = 0
 
   var inReadyRoom = true
   
@@ -64,7 +71,8 @@ class Server(port: Int) extends shared.Session(null) with Actor with ContactList
   var ground: Ground = _
   var projectiles = new HashMap[Int, Projectile]
   var explosions = new HashSet[Explosion]
-
+  def tanks = players.values.map(player => player.tank)
+  
   def act {
     println("Server started on port " + port + ".")
     var time = System.currentTimeMillis
@@ -85,7 +93,7 @@ class Server(port: Int) extends shared.Session(null) with Actor with ContactList
         }
       }
       
-      if (isActive) {
+      if (active) {
         val newTime = System.currentTimeMillis
         val delta = (newTime - time)
         time = newTime
@@ -100,39 +108,27 @@ class Server(port: Int) extends shared.Session(null) with Actor with ContactList
     }
   }
 
-  /**
-   * Notionally private, until we rearchitect and it's actually private.
-   * Use "server !? 'enter" instead.
-   */
-  override def enter() = {
-    super.enter()
-
+  protected def enter() {
+    active = true
     ground = new Ground(this, Main.GAME_WIDTH.toInt, Main.GAME_HEIGHT.toInt)
     ground.buildPoints()
 
     channel = DatagramChannel.open()
     channel.socket.bind(new InetSocketAddress(port))
     channel.configureBlocking(false)
+
+    sendStatus
   }
   
-  /**
-   * Notionally private, until we rearchitect and it's actually private.
-   * Use "server !? 'leave" instead.
-   */
-  override def leave() = {
-    super.leave()
-
+  protected def leave() = {
+    active = false
     channel.socket.close()
     channel.disconnect()
   }
   
-  def tanks = players.values.map(player => player.tank)
 
-  /**
-   * Updates the server, processing physics and sending updates if it is time
-   * to.
-   */
-  override def update(delta: Int) = {
+  protected def update(delta: Int) = {
+    supposedRunTime += delta
     if (!inReadyRoom) {
       world.step(delta/1000f, 10)
     }
@@ -157,8 +153,13 @@ class Server(port: Int) extends shared.Session(null) with Actor with ContactList
       e.update(delta)
     }
 
-    super.update(delta)
     checkTimeouts()
+    
+    timeToStatusUpdate -= delta
+    if (timeToStatusUpdate < 0) {
+      sendStatus
+      timeToStatusUpdate = STATUS_UPDATE_INTERVAL
+    }
 
     if (inReadyRoom) {
       if (players.size > 1 && players.values.forall(player => player.ready)) {
@@ -213,7 +214,7 @@ class Server(port: Int) extends shared.Session(null) with Actor with ContactList
         addPlayer(addr)
       }
       else {
-        if (players.isDefinedAt(addr)) {
+        if (players.isDefinedAt(addr) || command == Commands.PING) {
           processCommand(command, addr)
         }
       }
@@ -262,9 +263,9 @@ class Server(port: Int) extends shared.Session(null) with Actor with ContactList
     p.body.setXForm(position, 0f)
     p.body.setLinearVelocity(tank.velocity.add(velocity))
     
-    broadcast(projectileData(p))
-
     addProjectile(p)
+    broadcast(projectileData(p))
+    p
   }
 
   def addProjectile(p: Projectile) = {
@@ -363,30 +364,40 @@ class Server(port: Int) extends shared.Session(null) with Actor with ContactList
 
   def addPlayer(addr: SocketAddress) {
     if (players.size >= MAX_PLAYERS) {
-      sendFull(addr)
+      sendError(addr, "Server full.")
       return
     }
 
     if (!players.isDefinedAt(addr)) {
-      val nameArray = new Array[byte](data.remaining())
-      data.get(nameArray)
-      val name = new String(nameArray)
-      broadcastChat(name + " has joined the game.")
-      println(name + " has joined the game.")
+      val helloArray = new Array[byte](data.remaining())
+      data.get(helloArray)
+      val (name, version) = Operations.fromByteArray[(String, Int)](helloArray)
+      
+      if (version > Main.VERSION) {
+        sendError(addr, "Client version (" + version + ") is newer than server version (" + Main.VERSION + ").")
+      }
+      else if (version < Main.VERSION) {
+        sendError(addr, "Client version (" + version + ") is older than server version (" + Main.VERSION + ").")
+      }
+      else {
+        broadcastChat(name + " has joined the game.")
+        println(name + " has joined the game.")
 
-      findNextID
-      val tank = createTank(playerID)
-      val player = new Player(tank, name, playerID)
-      tank.player = player
-      players.put(addr, player)
+        findNextID
+        
+        val tank = createTank(playerID)
+        val player = new Player(tank, name, playerID)
+        tank.player = player
+        players.put(addr, player)
 
-      broadcastPlayers
+        broadcastPlayers
 
-      send(imageSetData, addr)
+        send(imageSetData, addr)
 
-      if (!inReadyRoom) {
-        sendGround(addr)
-        tank.health = 0
+        if (!inReadyRoom) {
+          sendGround(addr)
+          tank.destroy = true
+        }
       }
     }
   }
@@ -396,6 +407,10 @@ class Server(port: Int) extends shared.Session(null) with Actor with ContactList
     var x = rand.nextFloat * (Main.GAME_WIDTH - tank.WIDTH * 2) + tank.WIDTH
     while (tanks.exists(tank => {x > tank.x - tank.WIDTH && x < tank.x + tank.WIDTH})) {
       x = rand.nextFloat * (Main.GAME_WIDTH - tank.WIDTH * 2) + tank.WIDTH
+    }
+
+    if (inReadyRoom) {
+      ground.flatten(x)
     }
     tank.create(x)
     tank
@@ -426,14 +441,12 @@ class Server(port: Int) extends shared.Session(null) with Actor with ContactList
   }
 
   /**
-   * Finds the next available player id.
-   * TODO: Decide if this should be the lowest possible id or the next
-   * available after the last used one. (it's currently the next available)
+   * Finds the lowest available player id.
    */
   def findNextID {
-    playerID = ((playerID + 1) % MAX_PLAYERS).toByte
-    if (players.values.exists(player => { player.id == playerID })) {
-      findNextID
+    playerID = 0
+    while (players.values.exists(player => { player.id == playerID })) {
+      playerID = (playerID+1).toByte
     }
   }
   
@@ -456,7 +469,7 @@ class Server(port: Int) extends shared.Session(null) with Actor with ContactList
       case Commands.STOP_FIRE              => player.gun.firing = false 
       case Commands.CYCLE_WEAPON           => player.gun.cycleWeapon() 
                                            
-      case Commands.READY                  => player.ready = true; broadcastPlayers 
+      case Commands.READY                  => player.ready = !player.ready; broadcastPlayers 
       case Commands.BUY                    => handleBuy(player) 
                                            
       case Commands.CHAT_MESSAGE           => handleChat(player) 
@@ -564,7 +577,9 @@ class Server(port: Int) extends shared.Session(null) with Actor with ContactList
   }
   
   def broadcastReadyRoom {
-    broadcast(byteToArray(Commands.READY_ROOM))
+    for (addr <- players.keys) {
+      sendReadyRoom(addr)
+    }
   }
 
 
@@ -575,13 +590,23 @@ class Server(port: Int) extends shared.Session(null) with Actor with ContactList
     send(byteToArray(Commands.PING), addr)
   }
 
-  def sendFull(addr: SocketAddress) = {
-    send(byteToArray(Commands.SERVER_FULL), addr)
+  def sendError(addr: SocketAddress, message: String) = {
+    send(byteToArray(Commands.ERROR) ++ Operations.toByteArray(message), addr)
   }
 
   def sendGround(addr: SocketAddress) = {
     send(byteToArray(Commands.GROUND) ++ ground.serialise(groundSequence.seq), addr)
-  }  
+  }
+
+  def sendReadyRoom(addr: SocketAddress) = {
+    send(byteToArray(Commands.READY_ROOM) ++ Operations.toByteArray(players(addr).itemsAsArray), addr)
+  }
+
+  def sendStatus() = {
+    if (public) {
+      send(byteToArray(Commands.STATUS_UPDATE) ++ Operations.toByteArray(name, players.size, MAX_PLAYERS), metaServerAddr)
+    }
+  }
 
   /**
    * Sends the provided byte array to all clients.

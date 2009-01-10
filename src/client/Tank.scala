@@ -9,8 +9,6 @@ import org.newdawn.slick.geom._
 import org.newdawn.slick.particles._
 import org.newdawn.slick._
 
-import org.jbox2d.common._
-
 import SwitchableParticleEmitter._
 
 class Tank(client: Client) extends GameObject {
