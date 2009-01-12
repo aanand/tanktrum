@@ -3,6 +3,7 @@ package client
 import shared._
 import org.newdawn.slick._
 import scala.collection.mutable.Stack
+import RichGraphics._
 
 object Menu {
   val defaultPositionX = Config("menu.defaultPositionX").toInt
@@ -57,7 +58,7 @@ class Menu(initTree: List[(String, MenuItem)], offsetX: Int, offsetY: Int) {
       g.translate(x, y)
       g.setColor(color)
 
-      g.drawString(key, 0, 0)
+      g.drawString(key, 0, 0, true)
       command.render(g, this, current)
       
       // g.drawRect(Menu.clickableItemOffsetX, Menu.clickableItemOffsetY, Menu.clickableItemWidth, Menu.clickableItemHeight)
@@ -196,7 +197,7 @@ case class MenuEditable(initValue : String, maxLength: Int) extends MenuItem {
       str = str + '_'
     }
     
-    g.drawString(str, offset, 0)
+    g.drawString(str, offset, 0, true)
   }
 }
 
@@ -207,7 +208,7 @@ case class MenuToggle(var value: boolean) extends MenuItem {
   }
 
   override def render(g: Graphics, menu: Menu, current: Boolean) {
-    g.drawString(if (value) "yes" else "no", offset, 0)
+    g.drawString(if (value) "yes" else "no", offset, 0, true)
   }
 }
 
@@ -222,7 +223,7 @@ case class MenuCommandWithLabel(override val callback : Unit => Unit, label: Str
   val offset = 100
   
   override def render(g: Graphics, menu: Menu, current: Boolean) {
-    g.drawString(label, offset, 0)
+    g.drawString(label, offset, 0, true)
   }
 }
 

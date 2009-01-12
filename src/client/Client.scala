@@ -147,7 +147,7 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
   def render(g: Graphics) {
     if (errorState) {
       g.setColor(new Color(1f, 0f, 0f))
-      g.drawString(errorMessage, 300, 300)
+      g.drawString(errorMessage, 300, 300, true)
       return
     }
 

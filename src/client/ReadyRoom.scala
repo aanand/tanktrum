@@ -1,6 +1,7 @@
 package client
 import org.newdawn.slick._
 import shared._
+import RichGraphics._
 
 class ReadyRoom (client: Client) {
   val itemList = Items.map(itemVal => {
@@ -24,14 +25,14 @@ class ReadyRoom (client: Client) {
       g.translate(20, 20)
 
       g.setColor(new Color(0f, 1f, 0f))
-      g.drawString("Funds:", 20, 0)
-      g.drawString("£" + client.me.money.toString, 120, 0)
+      g.drawString("Funds:", 20, 0, true)
+      g.drawString("£" + client.me.money.toString, 120, 0, true)
 
-      g.drawString("#", 180, 0) 
+      g.drawString("#", 180, 0, true)
       for (item <- Items) {
         if (client.me.items.isDefinedAt(item)) {
           val num = client.me.items(item)
-          g.drawString(num.toString, 180, 20+20*item.id)
+          g.drawString(num.toString, 180, 20+20*item.id, true)
         }
       }
 
@@ -45,19 +46,19 @@ class ReadyRoom (client: Client) {
 
     g.translate(20, 20)
     g.setColor(new Color(0f, 1f, 0f))
-    g.drawString("Players", 450, 0)
+    g.drawString("Players", 450, 0, true)
     g.translate(0, 20)
     for (player <- client.players.values.toList.sort((p1, p2) => {p1.score > p2.score})) {
       val col = (player.color)
       if (player.ready) {
         g.setColor(new Color(col.getRed, col.getGreen, col.getBlue, 1f))
-        g.drawString(player.name + " is go.", 350, offset * 20)
+        g.drawString(player.name + " is go.", 350, offset * 20, true)
       }
       else {
         g.setColor(new Color(col.getRed, col.getGreen, col.getBlue, 0.5f))
-        g.drawString(player.name, 350, offset * 20)
+        g.drawString(player.name, 350, offset * 20, true)
       }
-      g.drawString(player.score.toString, 600, offset * 20)
+      g.drawString(player.score.toString, 600, offset * 20, true)
       offset += 1
     }
     g.resetTransform
