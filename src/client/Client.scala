@@ -19,17 +19,6 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
   val TANK_UPDATE_INTERVAL = Config("client.tankUpdateInterval").toInt
   val SERVER_TIMEOUT = Config("client.serverTimeout").toInt
 
-  val CHAT_KEY              = Input.KEY_T
-  val MOVE_LEFT_KEY         = Input.KEY_A
-  val MOVE_RIGHT_KEY        = Input.KEY_D
-  val JUMP_KEY              = Input.KEY_W
-  val AIM_ANTICLOCKWISE_KEY = Input.KEY_LEFT
-  val AIM_CLOCKWISE_KEY     = Input.KEY_RIGHT
-  val POWER_UP_KEY          = Input.KEY_UP
-  val POWER_DOWN_KEY        = Input.KEY_DOWN
-  val FIRE_KEY              = Input.KEY_SPACE
-  val CYCLE_WEAPON_KEY      = Input.KEY_Q
-
   var channel: DatagramChannel = _
   val data = ByteBuffer.allocate(10000)
   
@@ -242,24 +231,21 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
         return
       }
       if (inReadyRoom) {
-        if (key == CHAT_KEY) { chat.start }
+        if (key == KeyCommands.chat.key) { chat.start }
         else { readyRoom.menu.keyPressed(key, char) }
         return
       }
       else {
-        key match {
-          case CHAT_KEY              => chat.start 
-          case MOVE_LEFT_KEY         => sendCommand(Commands.MOVE_LEFT) 
-          case MOVE_RIGHT_KEY        => sendCommand(Commands.MOVE_RIGHT) 
-          case JUMP_KEY              => sendCommand(Commands.JUMP) 
-          case AIM_ANTICLOCKWISE_KEY => me.tank.gun.angleChange = -1
-          case AIM_CLOCKWISE_KEY     => me.tank.gun.angleChange = 1
-          case POWER_UP_KEY          => me.tank.gun.powerChange = 1
-          case POWER_DOWN_KEY        => me.tank.gun.powerChange = -1
-          case FIRE_KEY              => sendCommand(Commands.START_FIRE) 
-          case CYCLE_WEAPON_KEY      => sendCommand(Commands.CYCLE_WEAPON) 
-          case _                     => 
-        }
+        if      (key == KeyCommands.chat.key)             { chat.start }
+        else if (key == KeyCommands.left.key)             { sendCommand(Commands.MOVE_LEFT) }
+        else if (key == KeyCommands.right.key)            { sendCommand(Commands.MOVE_RIGHT) }
+        else if (key == KeyCommands.jump.key)             { sendCommand(Commands.JUMP) }
+        else if (key == KeyCommands.aimClockwise.key)     { me.tank.gun.angleChange = -1 }
+        else if (key == KeyCommands.aimAnticlockwise.key) { me.tank.gun.angleChange = 1 }
+        else if (key == KeyCommands.powerUp.key)          { me.tank.gun.powerChange = 1 }
+        else if (key == KeyCommands.powerDown.key)        { me.tank.gun.powerChange = -1 }
+        else if (key == KeyCommands.fire.key)             { sendCommand(Commands.START_FIRE) }
+        else if (key == KeyCommands.cycleWeapon.key)      { sendCommand(Commands.CYCLE_WEAPON) }
       }
     }
     catch {
@@ -273,17 +259,14 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
   def keyReleased(key : Int, char : Char) {
     try {
       if (!inReadyRoom) {
-        key match {
-          case MOVE_LEFT_KEY         => sendCommand(Commands.STOP_MOVE_LEFT) 
-          case MOVE_RIGHT_KEY        => sendCommand(Commands.STOP_MOVE_RIGHT) 
-          case JUMP_KEY              => sendCommand(Commands.STOP_JUMP) 
-          case AIM_ANTICLOCKWISE_KEY => if (me.tank.gun.angleChange == -1) {me.tank.gun.angleChange = 0}
-          case AIM_CLOCKWISE_KEY     => if (me.tank.gun.angleChange ==  1) {me.tank.gun.angleChange = 0}
-          case POWER_UP_KEY          => if (me.tank.gun.powerChange ==  1) {me.tank.gun.powerChange = 0}
-          case POWER_DOWN_KEY        => if (me.tank.gun.powerChange == -1) {me.tank.gun.powerChange = 0}
-          case FIRE_KEY              => sendCommand(Commands.STOP_FIRE) 
-          case _                     => 
-        }
+        if      (key == KeyCommands.left.key)             { sendCommand(Commands.STOP_MOVE_LEFT) }
+        else if (key == KeyCommands.right.key)            { sendCommand(Commands.STOP_MOVE_RIGHT) }
+        else if (key == KeyCommands.jump.key)             { sendCommand(Commands.STOP_JUMP) }
+        else if (key == KeyCommands.aimClockwise.key)     { if (me.tank.gun.angleChange ==  1) {me.tank.gun.angleChange = 0} }
+        else if (key == KeyCommands.aimAnticlockwise.key) { if (me.tank.gun.angleChange == -1) {me.tank.gun.angleChange = 0} }
+        else if (key == KeyCommands.powerUp.key)          { if (me.tank.gun.powerChange ==  1) {me.tank.gun.powerChange = 0} }
+        else if (key == KeyCommands.powerDown.key)        { if (me.tank.gun.powerChange == -1) {me.tank.gun.powerChange = 0} }
+        else if (key == KeyCommands.fire.key)             { sendCommand(Commands.STOP_FIRE) }
       }
     }
     catch {
