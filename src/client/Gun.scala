@@ -5,8 +5,8 @@ import org.newdawn.slick._
 class Gun(client: Client) extends shared.Gun(client) {
   val arrowShape = new Polygon(List[Float](-1, 0, -1, -10, -2, -10, 0, -12, 2, -10, 1, -10, 1, 0).toArray)
   
-  val READY_COLOR   = new Color(0.0f, 1.0f, 0.0f, 0.5f)
-  val LOADING_COLOR = new Color(1.0f, 0.0f, 0.0f, 0.5f)
+  val READY_COLOR   = new Color(0.0f, 1.0f, 0.0f, 0.8f)
+  val LOADING_COLOR = new Color(1.0f, 0.0f, 0.0f, 0.8f)
 
   def render(g: Graphics) {
     import GL._
