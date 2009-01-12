@@ -97,6 +97,11 @@ class Projectile(client: Client) extends GameObject {
   def name = getClass.getName.split("\\.").last
   def imagePath = Config("projectile." + name + ".imagePath")
   def imageWidth = Config("projectile." + name + ".imageWidth").toInt
+  
+  /*Two updates containing a projectile are required before we can do
+    interpolation on its position, if we draw it before then it will look like
+    it changes velocity oddly.*/
+  var readyToInterpolate = false
 
   var lastX = -1f
   var lastY = -1f
@@ -110,7 +115,9 @@ class Projectile(client: Client) extends GameObject {
   def currentUpdate = client.currentProjectileUpdate
   
   def update(delta : Int) {
-    updateTrail(delta)
+    if (readyToInterpolate) {
+      updateTrail(delta)
+    }
   }
 
   def updateTrail(delta: Int) {
@@ -151,6 +158,16 @@ class Projectile(client: Client) extends GameObject {
  
 
   def render(g : Graphics) {
+    if (readyToInterpolate) {
+      interpolatePosition
+      renderTrail(g)
+      if (!dead) {
+        renderBody(g)
+      }
+    }
+  }
+
+  def interpolatePosition {
     val time = System.currentTimeMillis
     val interpTime = time - INTERPOLATION_TIME
 
@@ -174,11 +191,6 @@ class Projectile(client: Client) extends GameObject {
     else {
       interpX = x
       interpY = y
-    }
-
-    renderTrail(g)
-    if (!dead) {
-      renderBody(g)
     }
   }
 
@@ -221,18 +233,16 @@ class Projectile(client: Client) extends GameObject {
   def updateFromTuple(tuple: (Int, Float, Float, Float, Byte)) {
     val (id, newX, newY, newAngle, projectileType) = tuple
     
-    if (x > 0f && y > 0f) {
-      lastX = x
-      lastY = y
-    }
-    else {
-      lastX = newX
-      lastY = newY
-    }
+    lastX = x
+    lastY = y
+    
     x = newX
     y = newY
     angle = newAngle
 
+    if (lastX != -1f && lastY != -1f) {
+      readyToInterpolate = true
+    }
   }
 
 }
