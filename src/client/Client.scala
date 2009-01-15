@@ -240,8 +240,8 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
         else if (key == KeyCommands.left.key)             { sendCommand(Commands.MOVE_LEFT) }
         else if (key == KeyCommands.right.key)            { sendCommand(Commands.MOVE_RIGHT) }
         else if (key == KeyCommands.jump.key)             { sendCommand(Commands.JUMP) }
-        else if (key == KeyCommands.aimClockwise.key)     { me.tank.gun.angleChange = -1 }
-        else if (key == KeyCommands.aimAnticlockwise.key) { me.tank.gun.angleChange = 1 }
+        else if (key == KeyCommands.aimClockwise.key)     { me.tank.gun.angleChange = 1 }
+        else if (key == KeyCommands.aimAnticlockwise.key) { me.tank.gun.angleChange = -1 }
         else if (key == KeyCommands.powerUp.key)          { me.tank.gun.powerChange = 1 }
         else if (key == KeyCommands.powerDown.key)        { me.tank.gun.powerChange = -1 }
         else if (key == KeyCommands.fire.key)             { sendCommand(Commands.START_FIRE) }
