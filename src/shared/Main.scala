@@ -3,13 +3,19 @@ package shared
 import org.newdawn.slick
 
 object Main {
-  val WINDOW_WIDTH  = Config("window.width").toInt
-  val WINDOW_HEIGHT = Config("window.height").toInt
+  val game = new Game("Boom Trapezoid")
+  val container = new slick.AppGameContainer(game)
+  
+  val INITIAL_WINDOW_WIDTH  = Prefs("windowWidth", "window.width").toInt
+  val INITIAL_WINDOW_HEIGHT = Prefs("windowHeight", "window.height").toInt
   
   val GAME_WIDTH = Config("game.width").toFloat
   val GAME_HEIGHT = Config("game.height").toFloat
 
-  val GAME_WINDOW_RATIO = WINDOW_WIDTH/GAME_WIDTH
+  def windowWidth = container.getWidth
+  def windowHeight = container.getHeight
+  def gameWindowWidthRatio = windowWidth/GAME_WIDTH
+  def gameWindowHeightRatio = windowHeight/GAME_HEIGHT
 
   val VERSION = 2
 
@@ -19,10 +25,7 @@ object Main {
   val showFPS = Config("game.showFPS").toBoolean
 
   def main(args : Array[String]) {
-    val game = new Game("Boom Trapezoid")
-    
-    val container = new slick.AppGameContainer(game)
-    container.setDisplayMode(WINDOW_WIDTH, WINDOW_HEIGHT, false)
+    container.setDisplayMode(INITIAL_WINDOW_WIDTH, INITIAL_WINDOW_HEIGHT, false)
 
     if (logicUpdateInterval > 0) {
       container.setMaximumLogicUpdateInterval(logicUpdateInterval)

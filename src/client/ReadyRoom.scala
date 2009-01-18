@@ -16,7 +16,7 @@ class ReadyRoom (client: Client) {
 
   def render(g: Graphics) {
     g.setColor(new Color(0f, 0f, 0f, 0.5f))
-    g.fillRect(0, 0, Main.WINDOW_WIDTH, Main.WINDOW_HEIGHT)
+    g.fillRect(0, 0, Main.windowWidth, Main.windowHeight)
     
     menu.showing = true
 

@@ -162,7 +162,7 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
       }
 
       players.values.foreach    (_.render(g))
-      scale(Main.GAME_WINDOW_RATIO, Main.GAME_WINDOW_RATIO) {
+      scale(Main.gameWindowWidthRatio, Main.gameWindowHeightRatio) {
         if (ground.initialised && null != groundImage) {
           particleSystem.render()
           ground.render(g, groundImage)
@@ -182,7 +182,7 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
   
   def renderSky(g : Graphics) {
     if (null != skyImage) {
-      skyImage.draw(0, 0, Main.WINDOW_WIDTH.toFloat, Main.WINDOW_HEIGHT.toFloat)
+      skyImage.draw(0, 0, Main.windowWidth.toFloat, Main.windowWidth.toFloat)
     }
   }
   

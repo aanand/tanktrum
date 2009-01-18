@@ -49,7 +49,6 @@ class Explosion (x: Float, y: Float, var radius: Float, server: Server, projecti
       var damage = -contact.separation
       damage *= (damageTime/damageLifetime)
       damage *= damageFactor
-      damage *= Main.GAME_WINDOW_RATIO
       
       if (damage > 0) {
         if (!tanksHit.contains(tank)) {

@@ -2,7 +2,6 @@ package client
 
 import shared._
 import org.newdawn.slick.Input
-import java.util.prefs._
 import scala.collection.mutable._
 
 object KeyCommands extends ArrayBuffer[(String, KeyCommand)] {
@@ -21,8 +20,7 @@ object KeyCommands extends ArrayBuffer[(String, KeyCommand)] {
 class KeyCommand(name: String, configName: String) extends MenuEditable("", 255) {
   KeyCommands.append((name, this))
 
-  val prefs = Preferences.userRoot.node("boomtrapezoid")
-  var key = prefs.get("key." + configName, Config("key." + configName)).toInt
+  var key = Prefs("key." + configName).toInt
 
   override val offset = 150
   value = Input.getKeyName(key)
@@ -34,7 +32,7 @@ class KeyCommand(name: String, configName: String) extends MenuEditable("", 255)
         this.key = key
         value = Input.getKeyName(key)
         menu.editing = false
-        prefs.put("key." + configName, key.toString)
+        Prefs.save("key." + configName, key.toString)
       }
     }
   }

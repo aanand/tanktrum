@@ -5,7 +5,6 @@ import server._
 
 import org.newdawn.slick._
 import java.io._
-import java.util.prefs._
 import java.util.Date
 
 class Game(title: String) extends BasicGame(title) {
@@ -19,7 +18,6 @@ class Game(title: String) extends BasicGame(title) {
   
   SoundPlayer.start
   
-  val prefs = Preferences.userRoot.node("boomtrapezoid")
 
   var titleImage: Image = _
   var font: Font = _
@@ -36,12 +34,12 @@ class Game(title: String) extends BasicGame(title) {
 
     font = new TrueTypeFont(baseFont, Config("gui.fontSmooth").toBoolean)
 
-    val storedUserName = prefs.get("username", "Player")
-    val storedPort = prefs.get("port", Config("default.port"))
-    val storedHostname = prefs.get("hostname", Config("default.hostname"))
-    val storedServerPort = prefs.get("serverPort", Config("server.port"))
-    val storedServerName = prefs.get("serverName", Config("server.name"))
-    val storedServerPublic = prefs.get("serverPublic", Config("server.public")).toBoolean
+    val storedUserName = Prefs("username", "default.username")
+    val storedPort = Prefs("port", "default.port")
+    val storedHostname = Prefs("hostname", "default.hostname")
+    val storedServerPort = Prefs("serverPort", "server.port")
+    val storedServerName = Prefs("serverName", "server.name")
+    val storedServerPublic = Prefs("serverPublic", "server.public").toBoolean
 
     val userName = MenuEditable(storedUserName, Player.MAX_NAME_LENGTH)
     val serverPort = MenuEditable(storedServerPort, 5)
@@ -83,7 +81,7 @@ class Game(title: String) extends BasicGame(title) {
     g.setFont(font)
 
     if (menu != null && menu.showing) {
-      titleImage.draw(0, 0, Main.WINDOW_WIDTH, Main.WINDOW_HEIGHT)
+      titleImage.draw(0, 0, Main.windowWidth, Main.windowHeight)
       menu.render(g)
       return
     }
@@ -97,9 +95,9 @@ class Game(title: String) extends BasicGame(title) {
   }
   
   def startServer(port: Int, userName: String, serverName: String, public: Boolean) {
-    prefs.put("serverPort", port.toString)
-    prefs.put("serverName", serverName)
-    prefs.put("serverPublic", public.toString)
+    Prefs.save("serverPort", port.toString)
+    Prefs.save("serverName", serverName)
+    Prefs.save("serverPublic", public.toString)
 
     if (server != null) {
       server !? 'leave
@@ -115,9 +113,9 @@ class Game(title: String) extends BasicGame(title) {
   }
 
   def startClient(address: String, port: Int, userName: String) = {
-    prefs.put("username", userName)
-    prefs.put("hostname", address)
-    prefs.put("port", port.toString)
+    Prefs.save("username", userName)
+    Prefs.save("hostname", address)
+    Prefs.save("port", port.toString)
 
     if (client != null) {
       client.leave()
