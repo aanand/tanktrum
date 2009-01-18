@@ -5,6 +5,8 @@ import RichGraphics._
 
 import org.newdawn.slick._
 
+import GL._
+
 object ChatColor extends Color(1f, 1f, 1f, 0.9f)
 
 object Chat {
@@ -43,18 +45,21 @@ class Chat(client: Client) {
   def render(g: Graphics) {
     g.setColor(new Color(0f, 0f, 0f, 0.7f))
     //g.fillRect(0, Main.WINDOW_HEIGHT - Chat.height, Chat.width, Main.WINDOW_HEIGHT)
-    if (input) {
-      g.resetTransform
-      g.translate(0, 560)
-      inputMenu.render(g)
-    }
-    g.resetTransform
-    g.translate(20, 560 - 15*messages.length)
-    g.setColor(ChatColor)
+    translate(0, 560) {
+      if (input) {
+        inputMenu.render(g)
+      }
+      translate(20, -15*messages.length) {
+        g.setColor(ChatColor)
+      }
 
-    for (message <- messages) {
-      g.translate(0, 15)
-      g.drawString(message, 0, 0, true)
+      var i = 1
+      for (message <- messages) {
+        translate(0, 15 * i) {
+          i+=1
+          g.drawString(message, 0, 0, true)
+        }
+      }
     }
   }
 
