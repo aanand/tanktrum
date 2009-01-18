@@ -3,6 +3,7 @@ import org.newdawn.slick
 import org.newdawn.slick._
 import shared._
 import RichGraphics._
+import GL._
 
 import java.nio.channels._
 import java.nio._
@@ -160,20 +161,19 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
         renderSky(g)
       }
 
-      g.scale(Main.GAME_WINDOW_RATIO, Main.GAME_WINDOW_RATIO)
-
-      if (ground.initialised && null != groundImage) {
-        particleSystem.render()
-        ground.render(g, groundImage)
-      }
-      
-      projectiles.values.foreach(_.render(g))
-      explosions.foreach        (_.render(g))
       players.values.foreach    (_.render(g))
-      tanks.foreach             ((tank) => if (null != tank) {tank.render(g)})
+      scale(Main.GAME_WINDOW_RATIO, Main.GAME_WINDOW_RATIO) {
+        if (ground.initialised && null != groundImage) {
+          particleSystem.render()
+          ground.render(g, groundImage)
+        }
+        
+        projectiles.values.foreach(_.render(g))
+        explosions.foreach        (_.render(g))
+        tanks.foreach             ((tank) => if (null != tank) {tank.render(g)})
+      }
     }
 
-    g.resetTransform
     g.setColor(new Color(1f, 1f, 1f))
     g.drawString("Ping: " + latency, 735, 575, true)
 
@@ -182,7 +182,7 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
   
   def renderSky(g : Graphics) {
     if (null != skyImage) {
-      g.drawImage(skyImage, 0, 0)
+      skyImage.draw(0, 0, Main.WINDOW_WIDTH.toFloat, Main.WINDOW_HEIGHT.toFloat)
     }
   }
   

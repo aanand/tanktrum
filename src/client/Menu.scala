@@ -4,6 +4,7 @@ import shared._
 import org.newdawn.slick._
 import scala.collection.mutable.Stack
 import RichGraphics._
+import GL._
 
 object Menu {
   val defaultPositionX = Config("menu.defaultPositionX").toInt
@@ -55,18 +56,13 @@ class Menu(initTree: List[(String, MenuItem)], offsetX: Int, offsetY: Int) {
       
       val color = if (current) SELECTED_COLOR else UNSELECTED_COLOR
 
-      g.translate(x, y)
-      g.setColor(color)
+      translate(x, y) {
+        g.setColor(color)
 
-      g.drawString(key, 0, 0, true)
-      command.render(g, this, current)
-      
-      // g.drawRect(Menu.clickableItemOffsetX, Menu.clickableItemOffsetY, Menu.clickableItemWidth, Menu.clickableItemHeight)
-
-      g.resetTransform
+        g.drawString(key, 0, 0, true)
+        command.render(g, this, current)
+      }
     }
-    
-    g.scale(Main.GAME_WINDOW_RATIO, Main.GAME_WINDOW_RATIO)
   }
   
   def keyPressed(key : Int, char : Char) {

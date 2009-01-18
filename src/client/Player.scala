@@ -2,6 +2,7 @@ package client
 
 import shared._
 import RichGraphics._
+import GL._
 
 import scala.collection.mutable.HashMap
 
@@ -18,32 +19,30 @@ class Player extends shared.Player {
   val items = new HashMap[Items.Value, Int]
 
   def render(g: Graphics) {
-    g.resetTransform
     if (null == tank) {
       return
     }
 
-    g.translate(10 + id*110, 10)
-    g.setColor(color)
+    translate(10 + id*110, 10) {
+      g.setColor(color)
 
-    g.drawString(name, 0, 0, true)
+      g.drawString(name, 0, 0, true)
 
-    g.translate(0, 16)
-    g.fillRect(0, 0, tank.health, 10)
+      translate(0, 16) {
+        g.fillRect(0, 0, tank.health, 10)
     
-    g.translate(0, 12)
-    g.fillRect(0, 0, tank.fuelPercent, 5)
+        translate(0, 12) {
+          g.fillRect(0, 0, tank.fuelPercent, 5)
 
-    if (tank.isAlive) {
-      g.translate(10, 20)
-
-      Projectile.render(g, gun.selectedWeapon)
-
-      g.drawString(gun.ammo(gun.selectedWeapon).toString, 15, -9, true)
+          if (tank.isAlive) {
+            translate(10, 20) {
+              Projectile.render(g, gun.selectedWeapon)
+              g.drawString(gun.ammo(gun.selectedWeapon).toString, 15, -9, true)
+            }
+          }
+        }
+      }
     }
-
-    g.resetTransform
-    g.scale(Main.GAME_WINDOW_RATIO, Main.GAME_WINDOW_RATIO)
   }
 
   def loadFrom(data: Array[Byte]) = {

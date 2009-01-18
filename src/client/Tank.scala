@@ -144,10 +144,6 @@ class Tank(client: Client) extends GameObject {
         g.setAntiAlias(false)
       }
     }
-    
-    g.resetTransform
-    g.scale(Main.GAME_WINDOW_RATIO, Main.GAME_WINDOW_RATIO)
-    
   }
 
   def drawBase(g: Graphics) {

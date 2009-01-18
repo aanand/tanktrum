@@ -83,7 +83,7 @@ class Game(title: String) extends BasicGame(title) {
     g.setFont(font)
 
     if (menu != null && menu.showing) {
-      g.drawImage(titleImage, 0, 0)
+      titleImage.draw(0, 0, Main.WINDOW_WIDTH, Main.WINDOW_HEIGHT)
       menu.render(g)
       return
     }
