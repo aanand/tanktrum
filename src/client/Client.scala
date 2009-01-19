@@ -175,7 +175,7 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
     }
 
     g.setColor(new Color(1f, 1f, 1f))
-    g.drawString("Ping: " + latency, 735, 575, true)
+    g.drawString("Ping: " + latency, Main.windowWidth - 65, Main.windowHeight - 25, true)
 
     chat.render(g)
   }
