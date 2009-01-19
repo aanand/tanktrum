@@ -7,6 +7,9 @@ import org.newdawn.slick._
 import java.io._
 import java.util.Date
 
+import java.awt.GraphicsEnvironment
+import java.awt.DisplayMode
+
 class Game(title: String) extends BasicGame(title) {
   var client: Client = _
   var server: Server = _
@@ -17,7 +20,17 @@ class Game(title: String) extends BasicGame(title) {
   val serverList  = new ServerList(this)
   
   SoundPlayer.start
+
+  val graphicsDevice = GraphicsEnvironment.getLocalGraphicsEnvironment.getScreenDevices()(0)
   
+  def setMode(mode: DisplayMode, fullscreen: Boolean) = {
+    container.asInstanceOf[AppGameContainer].setDisplayMode(mode.getWidth, mode.getHeight, fullscreen)
+    container.getInput.clearKeyPressedRecord //Changing modes means releasing enter gets missed.
+    Prefs.save("window.width", mode.getWidth.toString)
+    Prefs.save("window.height", mode.getHeight.toString)
+    Prefs.save("window.fullscreen", fullscreen.toString)
+    menu.show
+  }
 
   var titleImage: Image = _
   var font: Font = _
@@ -40,12 +53,20 @@ class Game(title: String) extends BasicGame(title) {
     val storedServerPort = Prefs("serverPort", "server.port")
     val storedServerName = Prefs("serverName", "server.name")
     val storedServerPublic = Prefs("serverPublic", "server.public").toBoolean
+    val storedFullscreen = Prefs("window.fullscreen").toBoolean
 
     val userName = MenuEditable(storedUserName, Player.MAX_NAME_LENGTH)
     val serverPort = MenuEditable(storedServerPort, 5)
     val serverHostname = MenuEditable(storedHostname, 255)
     val serverName = MenuEditable(storedServerName, 127)
     val serverPublic = MenuToggle(storedServerPublic)
+    val fullscreen = MenuToggle(storedFullscreen)
+
+    //Generate list of display mode menu command items.
+    val displayModesMenuList = graphicsDevice.getDisplayModes().map(mode => {
+      (mode.getWidth + "x" + mode.getHeight, 
+       new MenuCommand(Unit => setMode(mode, fullscreen.value)))
+    }).toList
 
     titleImage = new Image("media/images/title.png")
 
@@ -61,7 +82,9 @@ class Game(title: String) extends BasicGame(title) {
         ("Hostname", serverHostname),
         ("Port", serverPort),
         ("Join", MenuCommand(Unit => startClient(serverHostname.value, serverPort.value.toInt, userName.value)))))),
-      ("Keys", Submenu(KeyCommands.toList)),
+      ("Options", Submenu(List(
+        ("Keys", Submenu(KeyCommands.toList)),
+        ("Display Mode", Submenu(List(("Fullscreen ", fullscreen)) ++ displayModesMenuList))))),
       ("Practice", MenuCommand(Unit => startPractice(userName.value))),
       ("Quit", MenuCommand(Unit => quit))))
   }

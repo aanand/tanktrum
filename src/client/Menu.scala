@@ -210,8 +210,8 @@ case class MenuToggle(var value: boolean) extends MenuItem {
 
 case class MenuCommand(callback : Unit => Unit) extends MenuItem {
   override def perform(menu : Menu) = {
-    callback(menu)
     menu.hide()
+    callback(menu)
   }
 }
 
