@@ -59,7 +59,13 @@ class MetaServer extends Session {
           val inetAddr = addr.asInstanceOf[InetSocketAddress]
           val host = inetAddr.getHostName
           val port = inetAddr.getPort
-          println("Updating server: " + name)
+
+          if (servers.isDefinedAt(inetAddr)) {
+            println("Updating server: " + name)
+          }
+          else {
+            println("Adding server: " + name)
+          }
           servers.put(inetAddr, new Server(name, host, port, players, maxPlayers))
         }
       }
