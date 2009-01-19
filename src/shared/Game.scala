@@ -20,8 +20,6 @@ class Game(title: String) extends BasicGame(title) {
   val serverList  = new ServerList(this)
   
   SoundPlayer.start
-
-  val graphicsDevice = GraphicsEnvironment.getLocalGraphicsEnvironment.getScreenDevices()(0)
   
   def setMode(mode: DisplayMode, fullscreen: Boolean) = {
     container.asInstanceOf[AppGameContainer].setDisplayMode(mode.getWidth, mode.getHeight, fullscreen)
@@ -63,6 +61,7 @@ class Game(title: String) extends BasicGame(title) {
     val fullscreen = MenuToggle(storedFullscreen)
 
     //Generate list of display mode menu command items.
+    val graphicsDevice = GraphicsEnvironment.getLocalGraphicsEnvironment.getScreenDevices()(0)
     val displayModesMenuList = graphicsDevice.getDisplayModes().map(mode => {
       (mode.getWidth + "x" + mode.getHeight, 
        new MenuCommand(Unit => setMode(mode, fullscreen.value)))

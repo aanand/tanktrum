@@ -4,7 +4,7 @@ import org.newdawn.slick
 
 object Main {
   val game = new Game("Boom Trapezoid")
-  val container = new slick.AppGameContainer(game)
+  var container: slick.AppGameContainer = _
   
   val INITIAL_WINDOW_WIDTH  = Prefs("window.width").toInt
   val INITIAL_WINDOW_HEIGHT = Prefs("window.height").toInt
@@ -26,6 +26,7 @@ object Main {
   val showFPS = Config("game.showFPS").toBoolean
 
   def main(args : Array[String]) {
+    container = new slick.AppGameContainer(game)
     container.setDisplayMode(INITIAL_WINDOW_WIDTH, INITIAL_WINDOW_HEIGHT, INITIAL_FULLSCREEN)
 
     if (logicUpdateInterval > 0) {
