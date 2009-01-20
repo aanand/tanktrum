@@ -10,6 +10,8 @@ import java.util.Date
 import java.awt.GraphicsEnvironment
 import java.awt.DisplayMode
 
+import scala.collection.mutable.HashSet
+
 class Game(title: String) extends BasicGame(title) {
   var client: Client = _
   var server: Server = _
@@ -21,11 +23,11 @@ class Game(title: String) extends BasicGame(title) {
   
   SoundPlayer.start
   
-  def setMode(mode: DisplayMode, fullscreen: Boolean) = {
-    container.asInstanceOf[AppGameContainer].setDisplayMode(mode.getWidth, mode.getHeight, fullscreen)
+  def setMode(width: Int, height: Int, fullscreen: Boolean) = {
+    container.asInstanceOf[AppGameContainer].setDisplayMode(width, height, fullscreen)
     container.getInput.clearKeyPressedRecord //Changing modes means releasing enter gets missed.
-    Prefs.save("window.width", mode.getWidth.toString)
-    Prefs.save("window.height", mode.getHeight.toString)
+    Prefs.save("window.width", width.toString)
+    Prefs.save("window.height", height.toString)
     Prefs.save("window.fullscreen", fullscreen.toString)
     menu.show
   }
@@ -62,9 +64,14 @@ class Game(title: String) extends BasicGame(title) {
 
     //Generate list of display mode menu command items.
     val graphicsDevice = GraphicsEnvironment.getLocalGraphicsEnvironment.getScreenDevices()(0)
-    val displayModesMenuList = graphicsDevice.getDisplayModes().map(mode => {
-      (mode.getWidth + "x" + mode.getHeight, 
-       new MenuCommand(Unit => setMode(mode, fullscreen.value)))
+    val modeSet = new HashSet[(Int, Int)]
+    for (mode <- graphicsDevice.getDisplayModes()) {
+      modeSet += ((mode.getWidth, mode.getHeight))
+    }
+
+    val displayModesMenuList = modeSet.map((mode) => {
+      (mode._1 + "x" + mode._2, 
+       new MenuCommand(Unit => setMode(mode._1, mode._2, fullscreen.value)))
     }).toList
 
     titleImage = new Image("media/images/title.png")
