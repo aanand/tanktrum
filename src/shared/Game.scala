@@ -69,7 +69,7 @@ class Game(title: String) extends BasicGame(title) {
       modeSet += ((mode.getWidth, mode.getHeight))
     }
 
-    val modeList = modeSet.toList.sort { (a,b) => a._1.toInt < b._1.toInt || (a._1 == b._1 && a._2.toInt < b._2.toInt) }
+    val modeList = modeSet.toList.sort { (a,b) => (a._1.toInt, a._2.toInt) < (b._1.toInt, b._2.toInt) }
 
     val displayModesMenuList = modeList.map((mode) => {
       (mode._1 + "x" + mode._2, 
