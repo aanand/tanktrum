@@ -69,10 +69,12 @@ class Game(title: String) extends BasicGame(title) {
       modeSet += ((mode.getWidth, mode.getHeight))
     }
 
-    val displayModesMenuList = modeSet.map((mode) => {
+    val modeList = modeSet.toList.sort { (a,b) => a._1.toInt < b._1.toInt || (a._1 == b._1 && a._2.toInt < b._2.toInt) }
+
+    val displayModesMenuList = modeList.map((mode) => {
       (mode._1 + "x" + mode._2, 
        new MenuCommand(Unit => setMode(mode._1, mode._2, fullscreen.value)))
-    }).toList
+    })
 
     titleImage = new Image("media/images/title.png")
 
