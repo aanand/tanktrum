@@ -69,9 +69,7 @@ class Game(title: String) extends BasicGame(title) {
       modeSet += ((mode.getWidth, mode.getHeight))
     }
 
-    val modeList = modeSet.toList.sort { (a,b) => (a._1.toInt, a._2.toInt) < (b._1.toInt, b._2.toInt) }
-
-    val displayModesMenuList = modeList.map((mode) => {
+    val displayModesMenuList = modeSet.toList.sort(_ < _).map((mode) => {
       (mode._1 + "x" + mode._2, 
        new MenuCommand(Unit => setMode(mode._1, mode._2, fullscreen.value)))
     })
