@@ -154,9 +154,7 @@ class Projectile(client: Client) extends GameObject {
     image = new Image(imagePath)
   }
   
-  def imageWidthScale = (imageSize.toFloat / image.getWidth) / Main.gameWindowWidthRatio
-  def imageHeightScale = (imageSize.toFloat / image.getHeight) / Main.gameWindowHeightRatio
- 
+  def imageScale = (imageSize.toFloat / image.getWidth) / Main.gameWindowWidthRatio
 
   def render(g : Graphics) {
     if (readyToInterpolate) {
@@ -200,7 +198,7 @@ class Projectile(client: Client) extends GameObject {
 
     translate(interpX, interpY) {
       rotate(0, 0, angle.toDegrees) {
-        scale(imageWidthScale, imageHeightScale) {
+        scale(imageScale, imageScale) {
           image.draw(-image.getWidth/2f, -image.getHeight/2f)
         }
       }
