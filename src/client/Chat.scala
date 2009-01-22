@@ -9,16 +9,16 @@ import GL._
 
 object ChatColor extends Color(1f, 1f, 1f, 0.9f)
 
-object Chat {
-  val height = 100
-  val width = 325
-}
-
 class Chat(client: Client) {
   val MAX_MESSAGES = Config("chat.maxMessages").toInt
+  val left = Config("chat.left").toInt
+  val bottom = Config("chat.bottom").toInt
+  val messageHeight = Config("chat.messageHeight").toInt
+  val menuOffsetX = Config("chat.menuOffsetX").toInt
+  val menuOffsetY = Config("chat.menuOffsetY").toInt
 
   val inputField = new ChatMenuEditable("", 64)
-  val inputMenu = new ChatMenu(List(("Chat: ", inputField)))
+  val inputMenu = new ChatMenu(List(("Chat: ", inputField)), menuOffsetX, menuOffsetY)
   var messages = List[String]()
   var input = false
 
@@ -43,21 +43,16 @@ class Chat(client: Client) {
   }
 
   def render(g: Graphics) {
-    g.setColor(new Color(0f, 0f, 0f, 0.7f))
-    //g.fillRect(0, Main.WINDOW_HEIGHT - Chat.height, Chat.width, Main.WINDOW_HEIGHT)
-    translate(0, 560) {
+    translate(left, Main.windowHeight - bottom - menuOffsetY) {
       if (input) {
         inputMenu.render(g)
       }
-      translate(20, -15*messages.length) {
-        g.setColor(ChatColor)
-      }
 
-      var i = 1
-      for (message <- messages) {
-        translate(0, 15 * i) {
-          i+=1
-          g.drawString(message, 0, 0, true)
+      translate(0, -(messageHeight * messages.length)) {
+        g.setColor(ChatColor)
+
+        for (i <- 0 until messages.length) {
+          g.drawString(messages(i), 0, messageHeight * i, true)
         }
       }
     }
@@ -70,7 +65,7 @@ class Chat(client: Client) {
   }
 }
 
-class ChatMenu(tree : List[(String, MenuItem)]) extends Menu(tree) {
+class ChatMenu(tree : List[(String, MenuItem)], offsetX: Int, offsetY: Int) extends Menu(tree, offsetX, offsetY) {
   override val SELECTED_COLOR = ChatColor
 }
 
