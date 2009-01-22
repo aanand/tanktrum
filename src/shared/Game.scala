@@ -115,7 +115,7 @@ class Game(title: String) extends BasicGame(title) {
       return
     }
     else if (serverList.showing) {
-      g.drawImage(titleImage, 0, 0, new Color(1f, 1f, 1f, 0.2f))
+      titleImage.draw(0, 0, Main.windowWidth, Main.windowHeight, new Color(1f, 1f, 1f, 0.2f))
       serverList.render(g)
     }
     else if (client != null && client.active) {
