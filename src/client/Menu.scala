@@ -16,7 +16,7 @@ object Menu {
   val clickableItemOffsetY = Config("menu.clickableItemOffsetY").toInt
 }
 
-class Menu(initTree: List[(String, MenuItem)], offsetX: Int, offsetY: Int) {
+class Menu(initTree: List[(Object, MenuItem)], offsetX: Int, offsetY: Int) {
   val SELECTED_COLOR = new Color(1.0f, 1.0f, 1.0f, 1.0f)
   val UNSELECTED_COLOR = new Color(1.0f, 1.0f, 1.0f, 0.5f)
   
@@ -28,9 +28,9 @@ class Menu(initTree: List[(String, MenuItem)], offsetX: Int, offsetY: Int) {
 
   var tree = buildTree(initTree)
 
-  def this(initTree: List[(String, MenuItem)]) = this(initTree, Menu.defaultPositionX, Menu.defaultPositionY)
+  def this(initTree: List[(Object, MenuItem)]) = this(initTree, Menu.defaultPositionX, Menu.defaultPositionY)
   
-  def buildTree(tree: List[(String, MenuItem)]): List[(Int, Int, String, MenuItem)] = {
+  def buildTree(tree: List[(Object, MenuItem)]): List[(Int, Int, Object, MenuItem)] = {
     var (x, y) = (offsetX, offsetY)
     
     tree.map { item =>
@@ -59,7 +59,7 @@ class Menu(initTree: List[(String, MenuItem)], offsetX: Int, offsetY: Int) {
       translate(x, y) {
         g.setColor(color)
 
-        g.drawString(key, 0, 0, true)
+        g.drawString(key.toString, 0, 0, true)
         command.render(g, this, current)
       }
     }
@@ -223,14 +223,14 @@ case class MenuCommandWithLabel(override val callback : Unit => Unit, label: Str
   }
 }
 
-case class Submenu(tree : List[(String, MenuItem)]) extends MenuItem {
+case class Submenu(tree : List[(Object, MenuItem)]) extends MenuItem {
   // This is probably bad.
   override def perform(menu : Menu) {
     throw new RuntimeException("Submenu#perform() should never be called")
   }
 }
 
-case class SubmenuWithPositions(tree: List[(Int, Int, String, MenuItem)]) extends MenuItem {
+case class SubmenuWithPositions(tree: List[(Int, Int, Object, MenuItem)]) extends MenuItem {
   override def perform(menu : Menu) {
     menu.path.push(this)
     menu.selection = 0

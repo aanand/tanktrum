@@ -27,7 +27,7 @@ class ServerList(game: Game) extends Menu(List()) with Session {
   var channel: DatagramChannel = _
   val data = ByteBuffer.allocate(10000)
   
-  var serverList: List[(String, MenuItem)] = List()
+  var serverList: List[(ServerItem, MenuItem)] = List()
 
   var userName: String = _
 
@@ -81,13 +81,15 @@ class ServerList(game: Game) extends Menu(List()) with Session {
   }
 
   def addServer(name: String, address: String, port: Int, players: Int, maxPlayers: Int) {
-    serverList = serverList + (name + "(" + address + ":" + port + ") " + players + "/" + maxPlayers, 
-                               new MenuCommand(Unit => connect(address, port)))
+    val server = new ServerItem(name, address, port, players, maxPlayers)
+    server.getPing
+
+    serverList = serverList + (server, new MenuCommand(Unit => connect(address, port)))
     rebuildMenu
   }
 
   def rebuildMenu() {
-    val list = ("Filter", filter) :: serverList.filter(item => item._1.indexOf(filter.value) != -1)
+    val list = ("Filter", filter) :: serverList.filter(item => item._1.toString.indexOf(filter.value) != -1)
     tree = buildTree(list)
   }
 
@@ -98,4 +100,41 @@ class ServerList(game: Game) extends Menu(List()) with Session {
   def send(data: Array[byte]) {
     channel.write(ByteBuffer.wrap(data))
   }
+
 }
+  
+class ServerItem(name: String, address: String, port: Int, players: Int, maxPlayers: Int) extends Session {
+  var ping = -1L
+  override def toString() = {
+    if (ping < 0) {
+      name + "(" + address + ":" + port + ") " + players + "/" + maxPlayers
+    }
+    else {
+      name + "(" + address + ":" + port + ") " + players + "/" + maxPlayers + " " + ping + "ms"
+    }
+  }
+
+  def getPing() = {
+    new Thread() {
+      override def run() = {
+        val data = ByteBuffer.allocate(10)
+        val startTime = System.currentTimeMillis;
+        val channel = DatagramChannel.open()
+        
+        try {
+          channel.connect(new InetSocketAddress(address, port))
+          channel.write(ByteBuffer.wrap(byteToArray(Commands.PING)))
+          channel.receive(data)
+          ping = System.currentTimeMillis - startTime;
+        }
+        catch {
+          case e: Exception => { 
+            ping = 999
+          }
+        }
+      }
+    }.start();
+  }
+}
+
+

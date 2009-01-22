@@ -213,8 +213,11 @@ class Server(port: Int, name: String, public: Boolean) extends Session with Acto
       if (command == Commands.HELLO) {
         addPlayer(addr)
       }
+      else if (command == Commands.PING) {
+        sendPong(addr)
+      }
       else {
-        if (players.isDefinedAt(addr) || command == Commands.PING) {
+        if (players.isDefinedAt(addr)) {
           processCommand(command, addr)
         }
       }
