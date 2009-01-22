@@ -43,19 +43,19 @@ class ReadyRoom (client: Client) {
 
     translate(20, 20) {
       g.setColor(new Color(0f, 1f, 0f))
-      g.drawString("Players", 450, 0, true)
+      g.drawString("Players", Main.windowWidth - 350, 0, true)
       translate(0, 20) {
         for (player <- client.players.values.toList.sort((p1, p2) => {p1.score > p2.score})) {
           val col = (player.color)
           if (player.ready) {
             g.setColor(new Color(col.getRed, col.getGreen, col.getBlue, 1f))
-            g.drawString(player.name + " is go.", 350, offset * 20, true)
+            g.drawString(player.name + " is go.", Main.windowWidth - 450, offset * 20, true)
           }
           else {
             g.setColor(new Color(col.getRed, col.getGreen, col.getBlue, 0.5f))
-            g.drawString(player.name, 350, offset * 20, true)
+            g.drawString(player.name, Main.windowWidth - 450, offset * 20, true)
           }
-          g.drawString(player.score.toString, 600, offset * 20, true)
+          g.drawString(player.score.toString, Main.windowWidth - 200, offset * 20, true)
           offset += 1
         }
       }
