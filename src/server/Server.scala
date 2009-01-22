@@ -215,6 +215,9 @@ class Server(port: Int, name: String, public: Boolean) extends Session with Acto
       }
       else if (command == Commands.PING) {
         sendPong(addr)
+        if (players.isDefinedAt(addr)) {
+          players(addr).resetTimeout
+        }
       }
       else {
         if (players.isDefinedAt(addr)) {
