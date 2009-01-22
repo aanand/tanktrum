@@ -95,9 +95,7 @@ class Ground(width: Int, height: Int) extends GameObject() {
     g.setColor(new Color(0f, 0f, 0f))
     g.setLineWidth(2)
     g.setAntiAlias(true)
-    for (i <- 0 until points.length-1) {
-      line(points(i).x, points(i).y, points(i+1).x, points(i+1).y)
-    }
+    lines(points.map(point => (point.x, point.y)))
     g.setAntiAlias(false)
   }
 

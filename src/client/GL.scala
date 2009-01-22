@@ -57,6 +57,19 @@ class GL {
     }
   }
 
+  def lines(points: Array[(Float, Float)]) = {
+    safe {
+      glBegin(SGL.GL_LINES)
+      for (i <- 0 until points.size-1) {
+        val (x1, y1) = points(i)
+        val (x2, y2) = points(i+1)
+        glVertex2f(x1, y1)
+        glVertex2f(x2, y2)
+      }
+      glEnd()
+    }
+  }
+
   def polygon(block: => Unit) = shape(GL11.GL_POLYGON)(block)
   def quadStrip(block: => Unit) = shape(GL11.GL_QUAD_STRIP)(block)
 
