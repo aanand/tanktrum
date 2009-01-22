@@ -96,7 +96,7 @@ class Projectile(client: Client) extends GameObject {
     
   def name = getClass.getName.split("\\.").last
   def imagePath = Config("projectile." + name + ".imagePath")
-  def imageSize = Config("projectile." + name + ".imageSize").toInt
+  def imageSize = Config("projectile." + name + ".radius").toFloat * 2
   
   /*Two updates containing a projectile are required before we can do
     interpolation on its position, if we draw it before then it will look like
@@ -154,7 +154,7 @@ class Projectile(client: Client) extends GameObject {
     image = new Image(imagePath)
   }
   
-  def imageScale = (imageSize.toFloat / image.getWidth) / Main.gameWindowWidthRatio
+  def imageScale = (imageSize.toFloat / image.getWidth)
 
   def render(g : Graphics) {
     if (readyToInterpolate) {

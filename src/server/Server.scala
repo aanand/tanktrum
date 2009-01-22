@@ -257,8 +257,11 @@ class Server(port: Int, name: String, public: Boolean) extends Session with Acto
     velocity.addLocal(tank.velocity)
 
     val position = new Vec2(x.toFloat, y.toFloat)
-    
+
     var p: Projectile = Projectile.create(this, tank, projectileType)
+    
+    position.x = position.x + p.radius * Math.cos(radians).toFloat
+    position.y = position.y + p.radius * Math.sin(radians).toFloat
 
     p.body.setXForm(position, 0f)
     p.body.setLinearVelocity(tank.velocity.add(velocity))
