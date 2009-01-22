@@ -49,6 +49,8 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
   val particleSystem = new slick.particles.ParticleSystem(makeParticleImage)
 
   var imageSetIndex = 0
+  var spriteColor = new Color(1f, 1f, 1f)
+  var lightIntensity = Config("texture.lightIntensity").toFloat
   var skyImage: Image = _
   var groundImage: Image = _
   
@@ -168,7 +170,7 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
           ground.render(g, groundImage)
         }
         
-        projectiles.values.foreach(_.render(g))
+        projectiles.values.foreach(_.render(g, spriteColor))
         explosions.foreach        (_.render(g))
         tanks.foreach             ((tank) => if (null != tank) {tank.render(g)})
       }
@@ -479,6 +481,12 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
     
     groundImage = new Image("media/ground/" + imageSetIndex.toString + ".jpg")
     skyImage = new Image("media/sky/" + imageSetIndex.toString + ".jpg")
+
+    val rgbArray = Config("texture." + imageSetIndex + ".lightColor").split(" ").map(_.toInt)
+
+    spriteColor = new Color(rgbArray(0), rgbArray(1), rgbArray(2))
+    spriteColor.scale(lightIntensity)
+    spriteColor.add(new Color(1f-lightIntensity, 1f-lightIntensity, 1f-lightIntensity))
 
     // force groundImage.init() (which is private) to be called. I know, wtf.
     // I don't get it, why don't we need to do this for skyImage too?  What? - N

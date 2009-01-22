@@ -156,12 +156,12 @@ class Projectile(client: Client) extends GameObject {
   
   def imageScale = (imageSize.toFloat / image.getWidth)
 
-  def render(g : Graphics) {
+  def render(g : Graphics, color: Color) {
     if (readyToInterpolate) {
       interpolatePosition
       renderTrail(g)
       if (!dead) {
-        renderBody(g)
+        renderBody(g, color)
       }
     }
   }
@@ -193,13 +193,13 @@ class Projectile(client: Client) extends GameObject {
     }
   }
 
-  def renderBody(g: Graphics) {
+  def renderBody(g: Graphics, color: Color) {
     import GL._
 
     translate(interpX, interpY) {
       rotate(0, 0, angle.toDegrees) {
         scale(imageScale, imageScale) {
-          image.draw(-image.getWidth/2f, -image.getHeight/2f)
+          image.draw(-image.getWidth/2f, -image.getHeight/2f, color)
         }
       }
     }
