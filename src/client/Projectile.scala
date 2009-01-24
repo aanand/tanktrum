@@ -59,7 +59,7 @@ object Projectile {
 
   def generateSprites {
     for (name <- classNames.values) {
-      val imageIcon = new javax.swing.ImageIcon(imagePathForName(name))
+      val imageIcon = Resource.getImageIcon(imagePathForName(name))
       val awtImage = imageIcon.getImage
 
       val targetWidth = (imageSizeForName(name) * Main.gameWindowWidthRatio).toInt
