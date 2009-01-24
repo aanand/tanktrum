@@ -11,6 +11,25 @@ import sbinary.Operations
 import GL._
 
 object Projectile {
+  val maxIconWidth = Config("projectile.maxIconWidth").toInt
+  val maxIconHeight = Config("projectile.maxIconHeight").toInt
+
+  val classNames = Map(
+    PROJECTILE -> nameForClass(classOf[Projectile]),
+    NUKE -> nameForClass(classOf[Nuke]),
+    ROLLER -> nameForClass(classOf[Roller]),
+    MIRV -> nameForClass(classOf[Mirv]),
+    MIRV_CLUSTER -> nameForClass(classOf[MirvCluster]),
+    CORBOMITE -> nameForClass(classOf[Corbomite]),
+    MACHINE_GUN -> nameForClass(classOf[MachineGun]),
+    DEATHS_HEAD -> nameForClass(classOf[DeathsHead]),
+    DEATHS_HEAD_CLUSTER -> nameForClass(classOf[DeathsHeadCluster]),
+    MISSILE -> nameForClass(classOf[Missile])
+  )
+
+  val sprites = new scala.collection.mutable.HashMap[String, Image]
+  val icons   = new scala.collection.mutable.HashMap[String, Image]
+
   def create(client: Client, projectileType: ProjectileTypes.Value): Projectile = {
     projectileType match {
       case PROJECTILE          => new Projectile(client)
@@ -38,55 +57,64 @@ object Projectile {
 
   def deserialise(data: Array[byte]) = Operations.fromByteArray[(Int, Float, Float, Float, Byte)](data)
 
-  def render(g: Graphics, value: Value) {
-    g.setColor(new Color(1f, 1f, 1f))
-    value match {
-      case PROJECTILE => {
-        g.fillOval(-3, -3, 6, 6)
-      }
+  def generateSprites {
+    for (name <- classNames.values) {
+      val imageIcon = new javax.swing.ImageIcon(imagePathForName(name))
+      val awtImage = imageIcon.getImage
 
-      case NUKE => {
-        g.fillOval(-6, -6, 12, 12)
-      }
+      val targetWidth = (imageSizeForName(name) * Main.gameWindowWidthRatio).toInt
+      val targetHeight = imageIcon.getIconHeight * targetWidth / imageIcon.getIconWidth
 
-      case ROLLER => {
-        g.fillOval(-3, -3, 6, 6)
-        g.fillRect(-7, 3, 14, 4)
-      }
+      val sprite = generateSprite(awtImage, targetWidth, targetHeight)
 
-      case MIRV => {
-        g.fillOval(-4, -4, 4, 4)
-        g.fillOval(0, 0, 4, 4)
-        g.fillOval(-4, 0, 4, 4)
-        g.fillOval(0, -4, 4, 4)
-      }
+      sprites.put(name, sprite)
 
-      case MACHINE_GUN => {
-        g.fillRect(-2, -4, 4, 8)
-      }
+      if (targetWidth < maxIconWidth && targetHeight < maxIconHeight) {
+        icons.put(name, sprite)
+      } else {
+        val iconScale = Math.min(maxIconWidth.toFloat / imageIcon.getIconWidth, maxIconHeight.toFloat / imageIcon.getIconHeight)
 
-      case DEATHS_HEAD =>  {
-        g.fillOval(-8, -8, 8, 8)
-        g.fillOval(0, 0, 8, 8)
-        g.fillOval(-8, 0, 8, 8)
-        g.fillOval(0, -8, 8, 8)
-      }
+        val targetIconWidth  = (imageIcon.getIconWidth * iconScale).toInt
+        val targetIconHeight = (imageIcon.getIconHeight * iconScale).toInt
 
-      case MISSILE => {
-        g.fillRect(-3, -6, 6, 12)
-        g.fillOval(-3, -9, 6, 6)
+        icons.put(name, generateSprite(awtImage, targetIconWidth, targetIconHeight))
       }
     }
+  }
+
+  def generateSprite(awtImage: java.awt.Image, targetWidth: Int, targetHeight: Int) = {
+    val bufferedAwtImage = new java.awt.image.BufferedImage(targetWidth, targetHeight, java.awt.image.BufferedImage.TYPE_INT_ARGB)
+    val graphics = bufferedAwtImage.createGraphics
+
+    graphics.setRenderingHint(java.awt.RenderingHints.KEY_INTERPOLATION, java.awt.RenderingHints.VALUE_INTERPOLATION_BICUBIC)
+    graphics.drawImage(awtImage, 0, 0, targetWidth, targetHeight, null)
+
+    val texture = util.BufferedImageUtil.getTexture("", bufferedAwtImage)
+    val slickImage = new Image(texture.getImageWidth, texture.getImageHeight)
+
+    slickImage.setTexture(texture)
+    slickImage
+  }
+
+  def nameForClass[T <: Object](klass: Class[T]) = klass.getName.split("\\.").last
+
+  def imageForName(name: String)      = sprites(name)
+  def imageScaleForName(name: String) = imageSizeForName(name).toFloat / imageForName(name).getWidth
+
+  def imagePathForName(name: String)  = Config("projectile." + name + ".imagePath")
+  def imageSizeForName(name: String)  = Config("projectile." + name + ".radius").toFloat * 2
+
+  def render(g: Graphics, value: Value, color: Color) {
+    val name = classNames(value)
+    val image = icons(name)
+
+    image.draw(-image.getWidth/2f, -image.getHeight/2f, color)
   }
 }
 
 class Projectile(client: Client) extends GameObject {
   var id: Int = -1
   
-  var image: Image = _
-  
-  initImage
-
   val trailLifetime = Config("projectile.trail.lifetime").toInt
   var trail: List[(Float, Float, Int)] = Nil
   var stationaryTime = 0
@@ -94,10 +122,10 @@ class Projectile(client: Client) extends GameObject {
 
   def trailDead = stationaryTime > trailLifetime
     
-  def name = getClass.getName.split("\\.").last
-  def imagePath = Config("projectile." + name + ".imagePath")
-  def imageSize = Config("projectile." + name + ".radius").toFloat * 2
-  
+  val name       = Projectile.nameForClass(getClass)
+  val image      = Projectile.imageForName(name)
+  val imageScale = Projectile.imageScaleForName(name)
+
   /*Two updates containing a projectile are required before we can do
     interpolation on its position, if we draw it before then it will look like
     it changes velocity oddly.*/
@@ -150,12 +178,6 @@ class Projectile(client: Client) extends GameObject {
     return true
   }
   
-  def initImage {
-    image = new Image(imagePath)
-  }
-  
-  def imageScale = (imageSize.toFloat / image.getWidth)
-
   def render(g : Graphics, color: Color) {
     if (readyToInterpolate) {
       interpolatePosition

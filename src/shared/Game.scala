@@ -3,6 +3,8 @@ package shared
 import client._
 import server._
 
+import client.{Projectile => ClientProjectile}
+
 import org.newdawn.slick._
 import java.io._
 import java.util.Date
@@ -13,6 +15,7 @@ import java.awt.DisplayMode
 import scala.collection.mutable.HashSet
 
 class Game(title: String) extends BasicGame(title) {
+
   var client: Client = _
   var server: Server = _
   
@@ -26,9 +29,13 @@ class Game(title: String) extends BasicGame(title) {
   def setMode(width: Int, height: Int, fullscreen: Boolean) = {
     container.asInstanceOf[AppGameContainer].setDisplayMode(width, height, fullscreen)
     container.getInput.clearKeyPressedRecord //Changing modes means releasing enter gets missed.
+
+    ClientProjectile.generateSprites
+
     Prefs.save("window.width", width.toString)
     Prefs.save("window.height", height.toString)
     Prefs.save("window.fullscreen", fullscreen.toString)
+
     menu.show
   }
 
@@ -46,6 +53,8 @@ class Game(title: String) extends BasicGame(title) {
     val baseFont  = startFont.deriveFont(java.awt.Font.PLAIN, Config("gui.fontSize").toInt)
 
     font = new TrueTypeFont(baseFont, Config("gui.fontSmooth").toBoolean)
+
+    ClientProjectile.generateSprites
 
     val storedUserName = Prefs("username", "default.username")
     val storedPort = Prefs("port", "default.port")

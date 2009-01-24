@@ -18,7 +18,7 @@ class Player extends shared.Player {
   def color = Colors(id)
   val items = new HashMap[Items.Value, Int]
 
-  def render(g: Graphics) {
+  def render(g: Graphics, spriteColor: Color) {
     if (null == tank) {
       return
     }
@@ -36,7 +36,7 @@ class Player extends shared.Player {
 
           if (tank.isAlive) {
             translate(10, 20) {
-              Projectile.render(g, gun.selectedWeapon)
+              Projectile.render(g, gun.selectedWeapon, spriteColor)
               g.drawString(gun.ammo(gun.selectedWeapon).toString, 15, -9, true)
             }
           }

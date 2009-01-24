@@ -163,7 +163,7 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
         renderSky(g)
       }
 
-      players.values.foreach    (_.render(g))
+      players.values.foreach    (_.render(g, spriteColor))
       scale(Main.gameWindowWidthRatio, Main.gameWindowHeightRatio) {
         if (ground.initialised && null != groundImage) {
           particleSystem.render()
