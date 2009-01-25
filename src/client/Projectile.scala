@@ -108,7 +108,7 @@ object Projectile {
     val name = classNames(value)
     val image = icons(name)
 
-    image.draw(-image.getWidth/2f, -image.getHeight/2f, color)
+    image.draw((-image.getWidth/2f).toInt, (-image.getHeight/2f).toInt, color)
   }
 }
 
