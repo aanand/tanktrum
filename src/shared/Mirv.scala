@@ -35,6 +35,7 @@ package server {
           p.body.setXForm(new Vec2(x, y), 0)
           p.body.setLinearVelocity(new Vec2(body.getLinearVelocity.x + (rand.nextFloat*2f - 1f) * distribution, 
                                             body.getLinearVelocity.y + (rand.nextFloat*2f - 1f) * distribution))
+          p.body.setAngularVelocity((rand.nextFloat*2f - 1f) * 2f * Math.Pi.toFloat)
           server.addProjectile(p)
         }
         server.removeProjectile(this)
