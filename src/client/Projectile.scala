@@ -96,7 +96,7 @@ object Projectile {
     slickImage
   }
 
-  def nameForClass[T <: Object](klass: Class[T]) = klass.getName.split("\\.").last
+  def nameForClass(klass: Class[_]) = klass.getName.split("\\.").last
 
   def imageForName(name: String)      = sprites(name)
   def imageScaleForName(name: String) = imageSizeForName(name).toFloat / imageForName(name).getWidth
