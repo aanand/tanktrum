@@ -133,9 +133,11 @@ class Projectile(client: Client) extends GameObject {
 
   var lastX = -1f
   var lastY = -1f
+  var lastAngle = -1f
 
   var interpX = 0f
   var interpY = 0f
+  var interpAngle = 0f
   
   val INTERPOLATION_TIME = Config("projectile.interpolationTime").toInt
   
@@ -195,23 +197,28 @@ class Projectile(client: Client) extends GameObject {
     if (x == lastX && y == lastY) {
       interpX = x
       interpY = y
+      interpAngle = angle
     }
     else if (interpTime > currentUpdate) {
       interpX = x
       interpY = y
+      interpAngle = angle
     }
     else if (interpTime < previousUpdate) {
       interpX = lastX
       interpY = lastY
+      interpAngle = lastAngle
     }
     else if (lastX != -1f && lastY != -1f) {
       val interpFactor = (currentUpdate - interpTime) / (currentUpdate - previousUpdate).toFloat
       interpX = lastX * interpFactor + x * (1-interpFactor)
       interpY = lastY * interpFactor + y * (1-interpFactor)
+      interpAngle = lastAngle * interpFactor + angle * (1-interpFactor)
     }
     else {
       interpX = x
       interpY = y
+      interpAngle = angle
     }
   }
 
@@ -219,7 +226,7 @@ class Projectile(client: Client) extends GameObject {
     import GL._
 
     translate(interpX, interpY) {
-      rotate(0, 0, angle.toDegrees) {
+      rotate(0, 0, interpAngle.toDegrees) {
         scale(imageScale, imageScale) {
           image.draw(-image.getWidth/2f, -image.getHeight/2f, color)
         }
@@ -256,6 +263,7 @@ class Projectile(client: Client) extends GameObject {
     
     lastX = x
     lastY = y
+    lastAngle = angle
     
     x = newX
     y = newY
