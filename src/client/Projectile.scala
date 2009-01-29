@@ -173,7 +173,7 @@ class Projectile(client: Client) extends GameObject {
     }
 
     //Stops trail drawing from top left of the screen before interpolation settles.
-    if (interpX < 0.01f || interpY < 0.01f) {
+    if (interpX < 0.01f && interpY < 0.01f) {
       return false
     }
     
