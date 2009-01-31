@@ -84,7 +84,7 @@ class ServerList(game: Game) extends Menu(List()) with Session {
     val server = new ServerItem(name, address, port, players, maxPlayers)
     server.getPing
 
-    serverList = serverList + (server, new MenuCommand(Unit => connect(address, port)))
+    serverList = serverList + (server, MenuCommand(Unit => connect(address, port)))
     rebuildMenu
   }
 

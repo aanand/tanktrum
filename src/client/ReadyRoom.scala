@@ -7,7 +7,10 @@ import GL._
 class ReadyRoom (client: Client) {
   val itemList = Items.map(itemVal => {
       val item = Items.items(itemVal)
-      (item.name, MenuCommandWithLabel(Unit => buy(item), "£" + item.cost.toString))
+      (item.name, MenuCommand(
+        Unit => buy(item),
+        "£" + item.cost.toString,
+        Unit => (null != client.me) && item.cost <= client.me.money))
   }).toList
 
   val menu = new Menu(

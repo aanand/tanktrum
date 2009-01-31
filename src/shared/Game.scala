@@ -80,7 +80,7 @@ class Game(title: String) extends BasicGame(title) {
 
     val displayModesMenuList = modeSet.toList.sort(_ < _).map((mode) => {
       (mode._1 + "x" + mode._2, 
-       new MenuCommand(Unit => setMode(mode._1, mode._2, fullscreen.value)))
+       MenuCommand(Unit => setMode(mode._1, mode._2, fullscreen.value)))
     })
 
     titleImage = new Image("media/images/title.png")

@@ -54,7 +54,8 @@ class Menu(initTree: List[(Object, MenuItem)], offsetX: Int, offsetY: Int) {
       val (x, y, key, command) = subTree(i)
       val current = (i == selection)
       
-      val color = if (current) SELECTED_COLOR else UNSELECTED_COLOR
+      val baseColor = if (current) SELECTED_COLOR else UNSELECTED_COLOR
+      val color = if (command.enabled) baseColor else new Color(baseColor.r, baseColor.g, baseColor.b, baseColor.a * 0.5f)
 
       translate(x, y) {
         g.setColor(color)
@@ -70,15 +71,29 @@ class Menu(initTree: List[(Object, MenuItem)], offsetX: Int, offsetY: Int) {
       currentItem.keyPressed(key, char, this)
     } else {
       key match {
-        case Input.KEY_UP => { 
-          selection = (selection-1) % subTree.length
-          //Java modulo on a negative number returns a negative number, stupidly.
-          if (selection < 0) {
-            selection = subTree.length - 1
-          }
+        case Input.KEY_UP => {
+          var newSelection = selection
+
+          do {
+            newSelection = (newSelection-1) % subTree.length
+            //Java modulo on a negative number returns a negative number, stupidly.
+            if (newSelection < 0) {
+              newSelection = subTree.length - 1
+            }
+          } while (!itemAtIndex(newSelection).enabled && newSelection != selection)
+
+          selection = newSelection
         }
 
-        case Input.KEY_DOWN => selection = (selection+1) % subTree.length 
+        case Input.KEY_DOWN => {
+          var newSelection = selection
+
+          do {
+            newSelection = (newSelection+1) % subTree.length
+          } while (!itemAtIndex(newSelection).enabled && newSelection != selection)
+
+          selection = newSelection
+        }
 
         case Input.KEY_RETURN => currentItem.perform(this)
 
@@ -127,6 +142,8 @@ class Menu(initTree: List[(Object, MenuItem)], offsetX: Int, offsetY: Int) {
     
     None
   }
+
+  def itemAtIndex(i: Int) = subTree(i)._4
   
   def show() {
     path.clear()
@@ -152,13 +169,14 @@ class Menu(initTree: List[(Object, MenuItem)], offsetX: Int, offsetY: Int) {
     }
   }
   
-  def currentItem = subTree(selection)._4
+  def currentItem = itemAtIndex(selection)
 }
 
 abstract class MenuItem {
   def perform(menu : Menu)
   def keyPressed(key : Int, char : Char, menu : Menu) = {}
   def render(graphics : Graphics, menu : Menu, current: Boolean) = {}
+  def enabled = true
 }
 
 case class MenuEditable(initValue : String, maxLength: Int) extends MenuItem {
@@ -208,18 +226,25 @@ case class MenuToggle(var value: boolean) extends MenuItem {
   }
 }
 
-case class MenuCommand(callback : Unit => Unit) extends MenuItem {
+object MenuCommand {
+  def apply(callback: Unit => Unit, label: String): MenuCommand = apply(callback, label, null)
+  def apply(callback: Unit => Unit): MenuCommand = apply(callback, null, null)
+}
+
+case class MenuCommand(callback : Unit => Unit, label: String, enabledFn: Unit => Boolean) extends MenuItem {
+  val offset = 100
+
   override def perform(menu : Menu) = {
     menu.hide()
     callback(menu)
   }
-}
 
-case class MenuCommandWithLabel(override val callback : Unit => Unit, label: String) extends MenuCommand(callback) {
-  val offset = 100
+  override def enabled = if (null == enabledFn) true else enabledFn()
   
   override def render(g: Graphics, menu: Menu, current: Boolean) {
-    g.drawString(label, offset, 0, true)
+    if (null != label) {
+      g.drawString(label, offset, 0, true)
+    }
   }
 }
 
