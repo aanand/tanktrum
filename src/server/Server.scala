@@ -56,7 +56,7 @@ class Server(port: Int, name: String, public: Boolean) extends Session with Acto
 
   var inReadyRoom = true
   
-  val imageSetCount = 7
+  val imageSetCount = 8
   var imageSetIndex = rand.nextInt(imageSetCount) + 1
   
   var endRoundTimer = 0
