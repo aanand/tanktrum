@@ -184,7 +184,7 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
   
   def renderSky(g : Graphics) {
     if (null != skyImage) {
-      skyImage.draw(0, 0, Main.windowWidth.toFloat, Main.windowWidth.toFloat)
+      skyImage.draw(0, 0, Main.windowWidth.toFloat, Main.windowHeight.toFloat)
     }
   }
   
