@@ -22,7 +22,7 @@ class MetaServer extends Session {
   var channel: DatagramChannel = _
   val port = Config("metaServer.port").toInt
 
-  var servers = new HashMap[InetSocketAddress, Server]
+  var servers = new HashMap[SocketAddress, Server]
 
   def start() {
     channel = DatagramChannel.open()
@@ -48,7 +48,14 @@ class MetaServer extends Session {
 
         if (command == Commands.REQUEST_SERVERS) {
           for (server <- servers.values) {
-            send(byteToArray(Commands.SERVER_INFO) ++ Operations.toByteArray(server.name, server.hostname, server.port, server.players, server.maxPlayers), addr)
+            if (server.gotPing) {
+              send(byteToArray(Commands.SERVER_INFO) ++ Operations.toByteArray(server.name, 
+                                                                               server.hostname, 
+                                                                               server.port, 
+                                                                               server.players, 
+                                                                               server.maxPlayers), 
+                   addr)
+            }
           }
 
         }
@@ -62,11 +69,24 @@ class MetaServer extends Session {
 
           if (servers.isDefinedAt(inetAddr)) {
             println("Updating server: " + name)
+            val server = servers(addr)
+            server.name = name
+            server.players = players
+            server.maxPlayers = maxPlayers
+            server.updateTimeout
+            if (!server.gotPing) {
+              send(byteToArray(Commands.PING), addr)
+            }
           }
           else {
             println("Adding server: " + name)
+            servers.put(inetAddr, new Server(name, host, port, players, maxPlayers))
+            send(byteToArray(Commands.PING), addr)
           }
-          servers.put(inetAddr, new Server(name, host, port, players, maxPlayers))
+        }
+        else if (command == Commands.PING) {
+          println("Got a ping.")
+          servers(addr).gotPing = true
         }
       }
       Thread.sleep(10)
