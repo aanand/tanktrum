@@ -7,6 +7,10 @@ import org.newdawn.slick
 import org.newdawn.slick._
 import org.newdawn.slick.geom._
 
+import org.newdawn.slick.opengl.renderer.Renderer
+import org.newdawn.slick.opengl.TextureImpl
+import org.lwjgl.opengl.GL11
+
 import sbinary.Instances._
 import sbinary.Operations
 
@@ -16,6 +20,8 @@ class Ground(width: Int, height: Int) extends GameObject() {
   var points : Array[Vector2f] = _
   var drawShape : Shape = _
   var initialised = false
+
+  val slickGL = Renderer.get
 
   def loadFrom(shortPoints: Array[Short]) = {
     var i = 0f
@@ -46,7 +52,21 @@ class Ground(width: Int, height: Int) extends GameObject() {
 
   def render(g: Graphics, image: Image) {
     g.setColor(new Color(1f, 1f, 1f))
-    g.texture(drawShape, image, image.getTextureWidth/Main.GAME_WIDTH, image.getTextureHeight/Main.GAME_HEIGHT)
+
+    image.bind
+
+    val texWidth = image.getTexture.getWidth
+    val texHeight = image.getTexture.getHeight
+
+    triStrip {
+      for (point <- points) {
+        texture(texWidth*point.x/width, texHeight*point.y/height)
+        vertex(point.x, point.y)
+
+        texture(texWidth*point.x/width, texHeight)
+        vertex(point.x, height)
+      }
+    }
 
     renderShading(g)
     renderOutline(g)
