@@ -1,5 +1,7 @@
 package client
 
+import GL._
+
 import shared.Config
 
 import sbinary.Instances._
@@ -24,8 +26,8 @@ class Explosion (client: Client) extends GameObject {
   }
   
   def render(g: Graphics) {
-    g.setColor(new Color(0.5f, 0.5f, 0.8f, animationTime/animationLifetime))
-    g.fillOval(x - radius, y - radius, radius*2, radius*2)
+    color(0.5f, 0.5f, 0.8f, animationTime/animationLifetime)
+    oval(x - radius, y - radius, radius*2, radius*2)
   }
 
   def loadFrom(data: Array[Byte]) = {

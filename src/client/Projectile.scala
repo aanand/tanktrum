@@ -228,7 +228,9 @@ class Projectile(client: Client) extends GameObject {
     translate(interpX, interpY) {
       rotate(0, 0, interpAngle.toDegrees) {
         scale(imageScale, imageScale) {
-          image.draw(-image.getWidth/2f, -image.getHeight/2f, color)
+          texture (image.getTexture.getTextureID) {
+            image.draw(-image.getWidth/2f, -image.getHeight/2f, color)
+          }
         }
       }
     }
