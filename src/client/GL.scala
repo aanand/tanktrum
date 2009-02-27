@@ -35,11 +35,9 @@ class GL {
   }
   
   def shape(id: Int)(block: => Unit) {
-    safe {
-      glBegin(id)
-      block
-      glEnd
-    }
+    glBegin(id)
+    block
+    glEnd
   }
   
   def safe(block: => Unit) {
@@ -72,8 +70,11 @@ class GL {
 
   def polygon(block: => Unit) = shape(GL11.GL_POLYGON)(block)
   def quadStrip(block: => Unit) = shape(GL11.GL_QUAD_STRIP)(block)
+  def triStrip(block: => Unit) = shape(GL11.GL_TRIANGLE_STRIP)(block)
 
   def color(c: org.newdawn.slick.Color): Unit = color(c.r, c.g, c.b, c.a)
   def color(r: Float, g: Float, b: Float, a: Float): Unit = glColor4f(r, g, b, a)
+  def color(r: Float, g: Float, b: Float): Unit = glColor4f(r, g, b, 1f)
   def vertex(x: Float, y: Float) = glVertex2f(x, y)
+  def texture(x: Float, y: Float) = glTexCoord2f(x, y)
 }
