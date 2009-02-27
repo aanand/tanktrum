@@ -30,17 +30,13 @@ class Tank(client: Client) extends GameObject {
 
   var player: Player = _
   
-  lazy val shapePoints = List[Vector2f] (
-                      new Vector2f(-(WIDTH/2-TAPER), -HEIGHT),
-                      new Vector2f(WIDTH/2-TAPER, -HEIGHT),
-                      new Vector2f(WIDTH/2, -BEVEL),
-                      new Vector2f(-WIDTH/2, -BEVEL)
-                    ).toArray
+  lazy val shapePoints = List[(Float, Float)] ( (-(WIDTH/2-TAPER), -HEIGHT),
+                                                (WIDTH/2-TAPER, -HEIGHT),
+                                                (WIDTH/2, 0f),
+                                                (-WIDTH/2, 0f),
+                                                (-(WIDTH/2-TAPER), -HEIGHT)
+                                              ).toArray
  
-  val drawShapePoints = shapePoints.foldLeft[List[Float]](List())((list, v) => list ++ List(v.getX(), v.getY())).toArray
-  val tankShape = new Polygon(drawShapePoints)
-  def wheelColor = color
-  
   var jetEmitter: ConfigurableEmitter = _
   var vapourEmitter: ConfigurableEmitter = _
   def particleEmitters = List(jetEmitter, vapourEmitter)
@@ -50,7 +46,7 @@ class Tank(client: Client) extends GameObject {
   
   val gun = new Gun(client)
 
-  def color = Colors(id)
+  def tankColor = Colors(id)
   
   var health = 100f
   def isAlive = health > 0
@@ -120,42 +116,26 @@ class Tank(client: Client) extends GameObject {
       return
     }
     
-    g.setColor(color)
-    
     translate(x, y) {
       rotate(0, 0, angle.toDegrees) {
-    
-        //Tank body
-        g.fill(tankShape)
-
         gun.render(g)
-
-        drawWheel(g, -WHEEL_OFFSET_X)
-        drawWheel(g, WHEEL_OFFSET_X)
-        drawBase(g)
-
+        
+        //Tank body
+        color(tankColor)
+        polygon {
+          for (point <- shapePoints) {
+            vertex(point._1, point._2)
+          }
+        }
+        
+        //Outline
         g.setAntiAlias(true)
-        g.setColor(new Color(0f, 0f, 0f, 0.5f))
+        color(0f, 0f, 0f, 0.5f)
         g.setLineWidth(1.3f)
-        GL.line(-(WIDTH/2-TAPER), -HEIGHT, WIDTH/2-TAPER, -HEIGHT)
-        GL.line(-WIDTH/2, 0f, WIDTH/2, 0f)
-        GL.line(-(WIDTH/2-TAPER), -HEIGHT, -WIDTH/2, 0f)
-        GL.line(WIDTH/2-TAPER, -HEIGHT, WIDTH/2, 0f)
+        lines(shapePoints)
         g.setAntiAlias(false)
+        
       }
-    }
-  }
-
-  def drawBase(g: Graphics) {
-    translate(BASE_OFFSET_X, BASE_OFFSET_Y) {
-      g.fillRect(-BASE_WIDTH/2, -BASE_HEIGHT/2, BASE_WIDTH, BASE_HEIGHT)
-    }
-  }
-
-  def drawWheel(g : Graphics, offsetX : Float) {
-    translate(offsetX, WHEEL_OFFSET_Y) {
-      g.setColor(wheelColor)
-      g.fillOval(-WHEEL_RADIUS, -WHEEL_RADIUS, WHEEL_RADIUS*2, WHEEL_RADIUS*2)
     }
   }
 
@@ -167,7 +147,6 @@ class Tank(client: Client) extends GameObject {
       gun.powerChange.toByte
     ))
   }
-
   
   def loadFrom(data: Array[Byte]) = {
     val values = Operations.fromByteArray[(
