@@ -7,10 +7,6 @@ import org.newdawn.slick
 import org.newdawn.slick._
 import org.newdawn.slick.geom._
 
-import org.newdawn.slick.opengl.renderer.Renderer
-import org.newdawn.slick.opengl.TextureImpl
-import org.lwjgl.opengl.GL11
-
 import sbinary.Instances._
 import sbinary.Operations
 
@@ -21,8 +17,6 @@ class Ground(width: Int, height: Int) extends GameObject() {
   var drawShape : Shape = _
   var initialised = false
 
-  val slickGL = Renderer.get
-
   def loadFrom(shortPoints: Array[Short]) = {
     var i = 0f
     points = shortPoints.map((s) => {
@@ -31,30 +25,12 @@ class Ground(width: Int, height: Int) extends GameObject() {
         v
       }
     )
-    initPoints()
-  }
-
-  def initPoints() {
-    val shapePoints = (List(new Vector2f(-5, height), new Vector2f(-1, -height)) ++
-                      points ++ 
-                      List(new Vector2f(width+1, -height), new Vector2f(width+5, height))).toArray
-    
-    val drawShapePoints = new Array[float](shapePoints.length*2)
-    for (i <- 0 until shapePoints.length) {
-      drawShapePoints(i*2) = shapePoints(i).getX
-      drawShapePoints(i*2+1) = shapePoints(i).getY
-    }
-    
-    drawShape = new Polygon(drawShapePoints.toArray)
-    
     initialised = true
   }
 
   def render(g: Graphics, image: Image) {
-    g.setColor(new Color(1f, 1f, 1f))
-
+    color(1f, 1f, 1f)
     image.bind
-
     val texWidth = image.getTexture.getWidth
     val texHeight = image.getTexture.getHeight
 
@@ -112,7 +88,7 @@ class Ground(width: Int, height: Int) extends GameObject() {
   }
   
   def renderOutline(g: Graphics) {
-    g.setColor(new Color(0f, 0f, 0f))
+    color(0f, 0f, 0f)
     g.setLineWidth(2)
     g.setAntiAlias(true)
     lines(points.map(point => (point.x, point.y)))
