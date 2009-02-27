@@ -247,7 +247,7 @@ class Projectile(client: Client) extends GameObject {
       }
 
       if (prevX > 0 && Math.abs(x-prevX) < Main.GAME_WIDTH/2) {
-        g.setColor(new Color(1f, 1f, 1f, 0.5f - (t.toFloat / trailLifetime)*0.5f))
+        color(1f, 1f, 1f, 0.5f - (t.toFloat / trailLifetime)*0.5f)
         line(x, y, prevX, prevY)
       }
     

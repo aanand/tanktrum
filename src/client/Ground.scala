@@ -30,30 +30,30 @@ class Ground(width: Int, height: Int) extends GameObject() {
 
   def render(g: Graphics, image: Image) {
     color(1f, 1f, 1f)
-    image.bind
     val texWidth = image.getTexture.getWidth
     val texHeight = image.getTexture.getHeight
 
-    triStrip {
-      for (point <- points) {
-        texture(texWidth*point.x/width, texHeight*point.y/height)
-        vertex(point.x, point.y)
+    texture(image.getTexture.getTextureID) {
+      triStrip {
+        for (point <- points) {
+          textureVertex(texWidth*point.x/width, texHeight*point.y/height)
+          vertex(point.x, point.y)
 
-        texture(texWidth*point.x/width, texHeight)
-        vertex(point.x, height)
+          textureVertex(texWidth*point.x/width, texHeight)
+          vertex(point.x, height)
+        }
       }
     }
 
-    renderShading(g)
+    renderShading
     renderOutline(g)
   }
   
-  def renderShading(g: Graphics) {
+  def renderShading {
     val lightAngle = Math.toRadians(135)
     val lightVector = new Vector2f(Math.sin(lightAngle).toFloat, -Math.cos(lightAngle).toFloat)
     val shadingDepth = 4f
     val shadingAlpha = 0.35f
-    
 
     val projections = new Array[Float](points.length)
     
