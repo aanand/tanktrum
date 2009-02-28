@@ -33,5 +33,8 @@ class PracticeServer(port : Int) extends Server(port, "", false) {
       player.tank.purchasedJumpFuel = players(addr).tank.maxJumpFuel
       player.tank.jumpFuel = player.tank.purchasedJumpFuel
     }
+
+    ground.flatten(player.tank.x)
+    broadcastGround
   }
 }

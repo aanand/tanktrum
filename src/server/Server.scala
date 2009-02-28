@@ -383,6 +383,11 @@ class Server(port: Int, name: String, public: Boolean) extends Session with Acto
     println("Starting game.")
     roundInProgress = true
     inReadyRoom = false
+
+    for (tank <- tanks) {
+      ground.flatten(tank.x)
+    }
+
     broadcastGround
     endRoundTimer = 0
   }
@@ -434,9 +439,6 @@ class Server(port: Int, name: String, public: Boolean) extends Session with Acto
       x = rand.nextFloat * (Main.GAME_WIDTH - tank.WIDTH * 2) + tank.WIDTH
     }
 
-    if (inReadyRoom) {
-      ground.flatten(x)
-    }
     tank.create(x)
     tank
   }
