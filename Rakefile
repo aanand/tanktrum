@@ -109,7 +109,7 @@ namespace :install do
     cp jar, 'lib/jbox2d.jar'
   end
 
-  file 'tmp/jbox2d' => 'tmp/jbox2d.zip' do
+  file 'tmp/jbox2d' => [:tmp, 'tmp/jbox2d.zip'] do
     raise "extraction of jbox2d.zip failed" unless sh "unzip tmp/jbox2d.zip -d tmp/jbox2d"
   end
 
