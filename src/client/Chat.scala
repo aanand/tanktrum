@@ -19,7 +19,7 @@ class Chat(client: Client) {
 
   val inputField = new ChatMenuEditable("", 64)
   val inputMenu = new ChatMenu(List(("Chat: ", inputField)), menuOffsetX, menuOffsetY)
-  var messages = List[String]()
+  var messages = List[(String, Player)]()
   var input = false
 
   def start {
@@ -35,8 +35,8 @@ class Chat(client: Client) {
     }
   }
 
-  def add(message: String) {
-    messages += message
+  def add(message: String, player: Player) {
+    messages += (message, player)
     if (messages.length > MAX_MESSAGES) {
       messages = messages.tail
     }
@@ -52,7 +52,22 @@ class Chat(client: Client) {
         g.setColor(ChatColor)
 
         for (i <- 0 until messages.length) {
-          g.drawString(messages(i), 0, messageHeight * i, true)
+          val (text, player) = messages(i)
+
+          var x = 0
+          val y = messageHeight * i
+
+          if (null != player) {
+            val playerNameString = player.name + ": "
+
+            g.setColor(player.color)
+            g.drawString(playerNameString, x, y, true)
+
+            x += g.getFont.getWidth(playerNameString)
+          }
+
+          g.setColor(new Color(1f, 1f, 1f))
+          g.drawString(text, x, y, true)
         }
       }
     }

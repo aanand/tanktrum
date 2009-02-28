@@ -512,9 +512,9 @@ class Server(port: Int, name: String, public: Boolean) extends Session with Acto
   def handleChat(player: Player) = {
     val messageArray = new Array[byte](data.remaining)
     data.get(messageArray)
-    val message = player.name + ": " + Operations.fromByteArray[String](messageArray)
+    val message = Operations.fromByteArray[String](messageArray)
     println("Broadcasting chat message: \"" + message+ "\"")
-    broadcastChat(message)
+    broadcastChat(message, player)
   }
 
   def handleBuy(player: Player) = {
@@ -586,12 +586,14 @@ class Server(port: Int, name: String, public: Boolean) extends Session with Acto
   }
 
   def broadcastChat (message: String) {
-    println("broadcastChat")
-    broadcast(byteToArray(Commands.CHAT_MESSAGE) ++ Operations.toByteArray(message))
+    broadcast(byteToArray(Commands.CHAT_MESSAGE) ++ Operations.toByteArray[(String, Short)]((message, -1)))
+  }
+  
+  def broadcastChat (message: String, player: Player) {
+    broadcast(byteToArray(Commands.CHAT_MESSAGE) ++ Operations.toByteArray[(String, Short)]((message, player.id)))
   }
   
   def broadcastNotice (message: String) {
-    println("broadcastNotice")
     broadcast(byteToArray(Commands.NOTICE) ++ Operations.toByteArray(message))
   }
   

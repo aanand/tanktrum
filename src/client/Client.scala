@@ -319,9 +319,12 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
   def addChatMessage = {
     val messageArray = new Array[byte](data.remaining)
     data.get(messageArray)
-    val message = Operations.fromByteArray[String](messageArray)
+    val (message, playerId) = Operations.fromByteArray[(String, Short)](messageArray)
     println("Got chat message: " + message)
-    chat.add(message)
+
+    val player = if (playerId == -1) null else players(playerId)
+
+    chat.add(message, player)
   }
   
   def ping = {
