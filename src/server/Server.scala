@@ -62,6 +62,8 @@ class Server(port: Int, name: String, public: Boolean) extends Session with Acto
   var endRoundTimer = 0
   val endRoundRunnoffTime = Config("server.roundRunoffTime").toInt
 
+  var roundInProgress = false
+
   val tankSequence = new Sequence
   val projectileSequence = new Sequence
   val groundSequence = new Sequence
@@ -175,8 +177,19 @@ class Server(port: Int, name: String, public: Boolean) extends Session with Acto
       }
     }
     else {
-      if (players.values.toList.filter(player => player.tank.isAlive).size <= 1) {
+      if (survivingPlayers.size <= 1) {
+        if (roundInProgress) {
+          roundInProgress = false
+
+          if (survivingPlayers.size > 0) {
+            broadcastNotice(survivingPlayers(0).name + " wins.")
+          } else {
+            broadcastNotice("Round is a draw.")
+          }
+        }
+
         endRoundTimer += delta
+
         if (endRoundTimer > endRoundRunnoffTime) {
           endRound
         }
@@ -226,6 +239,8 @@ class Server(port: Int, name: String, public: Boolean) extends Session with Acto
       }
     }
   }
+
+  def survivingPlayers = players.values.toList.filter(_.tank.isAlive)
 
   def createWorld = {
     val gravity = new Vec2(0.0f, Config("physics.gravity").toFloat)
@@ -366,6 +381,7 @@ class Server(port: Int, name: String, public: Boolean) extends Session with Acto
     numTankUpdates = 0
     
     println("Starting game.")
+    roundInProgress = true
     inReadyRoom = false
     broadcastGround
     endRoundTimer = 0
@@ -570,7 +586,13 @@ class Server(port: Int, name: String, public: Boolean) extends Session with Acto
   }
 
   def broadcastChat (message: String) {
+    println("broadcastChat")
     broadcast(byteToArray(Commands.CHAT_MESSAGE) ++ Operations.toByteArray(message))
+  }
+  
+  def broadcastNotice (message: String) {
+    println("broadcastNotice")
+    broadcast(byteToArray(Commands.NOTICE) ++ Operations.toByteArray(message))
   }
   
   def broadcastGround() = {
@@ -590,7 +612,6 @@ class Server(port: Int, name: String, public: Boolean) extends Session with Acto
       sendReadyRoom(addr)
     }
   }
-
 
   /***
    * Send methods.  These send a command to a single address.

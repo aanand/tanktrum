@@ -37,6 +37,9 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
   var errorState = false
   var errorMessage = ""
 
+  var noticeState = false
+  var noticeText = ""
+
   val readyRoom = new ReadyRoom(this)
   var inReadyRoom = true
   
@@ -174,6 +177,14 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
         explosions.foreach        (_.render(g))
         tanks.foreach             ((tank) => if (null != tank) {tank.render(g)})
       }
+
+      if (noticeState) {
+        val width = g.getFont.getWidth(noticeText)
+        val height = g.getFont.getHeight(noticeText)
+
+        g.setColor(new Color(1f, 1f, 1f))
+        g.drawString(noticeText, Main.windowWidth/2 - width/2, Main.windowHeight/2 - height/2, true)
+      }
     }
 
     g.setColor(new Color(1f, 1f, 1f))
@@ -207,6 +218,15 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
     errorMessage = message
     if (null == errorMessage) { errorMessage = "Unknown error." }
   }
+
+  def notice(message: String) {
+    noticeState = true
+    noticeText = message
+  }
+
+  def clearNotice {
+    noticeState = false
+  }    
  
   def processCommand(command: Char) {
     resetTimeout
@@ -222,6 +242,7 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
       case Commands.READY_ROOM   => processReadyRoomUpdate
       case Commands.IMAGE_SET    => processImageSetUpdate
       case Commands.CHAT_MESSAGE => addChatMessage
+      case Commands.NOTICE       => processNotice
       case _                     => println("Warning: Client got unknown command: " + command.toByte)
     }
   }
@@ -433,6 +454,8 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
         me.tank.gun.reset
       }
       inReadyRoom = false
+
+      clearNotice
     }
     
     val byteArray = new Array[byte](data.remaining)
@@ -471,6 +494,13 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
     if (!inReadyRoom) {
       inReadyRoom = true
     }
+  }
+
+  def processNotice {
+    val byteArray = new Array[byte](data.remaining)
+    data.get(byteArray)
+    val text = Operations.fromByteArray[String](byteArray)
+    notice(text)
   }
   
   def processImageSetUpdate {

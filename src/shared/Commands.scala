@@ -19,6 +19,7 @@ object Commands {
   val ERROR = nextI
   val READY_ROOM = nextI
   val CHAT_MESSAGE = nextI
+  val NOTICE = nextI
   val IMAGE_SET = nextI
 
   val MOVE_LEFT = nextI
