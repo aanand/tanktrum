@@ -98,7 +98,7 @@ class Game(title: String) extends BasicGame(title) {
         ("Port", serverPort),
         ("Join", MenuCommand(Unit => startClient(serverHostname.value, serverPort.value.toInt, userName.value)))))),
       ("Options", Submenu(List(
-        ("Keys", Submenu(KeyCommands.toList)),
+        ("Keys", KeyCommands.toMenu),
         ("Display Mode", Submenu(List(("Fullscreen ", fullscreen)) ++ displayModesMenuList))))),
       ("Practice", MenuCommand(Unit => startPractice(userName.value))),
       ("Quit", MenuCommand(Unit => quit))))

@@ -85,6 +85,17 @@ class Menu(initTree: List[(Object, MenuItem)], offsetX: Int, offsetY: Int) {
       }
     }
   }
+
+  // Pop an element from the path or cancel the menu if it's empty.
+  def popPath() = {
+    if (path.isEmpty) {
+      cancel()
+    }
+    else {
+      val subMenu = path.pop()
+      selection = subTree.indexOf(subTree.find((item) => {item._4 == subMenu}).get)
+    }
+  }
   
   def keyPressed(key : Int, char : Char) {
     if (editing) {
@@ -116,17 +127,7 @@ class Menu(initTree: List[(Object, MenuItem)], offsetX: Int, offsetY: Int) {
         }
 
         case Input.KEY_RETURN => currentItem.perform(this)
-
-        case Input.KEY_ESCAPE => {
-          if (path.isEmpty) {
-            cancel()
-          }
-          else {
-            val subMenu = path.pop()
-            selection = subTree.indexOf(subTree.find((item) => {item._4 == subMenu}).get)
-          }
-        }
-
+        case Input.KEY_ESCAPE => popPath
         case _ => 
       }
     }
@@ -281,3 +282,5 @@ case class SubmenuWithPositions(tree: List[(Int, Int, Object, MenuItem)]) extend
     menu.selection = 0
   }
 }
+
+
