@@ -28,6 +28,10 @@ class Menu(initTree: List[(Object, MenuItem)], offsetX: Int, offsetY: Int) {
 
   var tree = buildTree(initTree)
 
+  var scrollAmount = 0
+  
+  val fontSize = Config("gui.fontSize").toInt
+
   def this(initTree: List[(Object, MenuItem)]) = this(initTree, Menu.defaultPositionX, Menu.defaultPositionY)
   
   def buildTree(tree: List[(Object, MenuItem)]): List[(Int, Int, Object, MenuItem)] = {
@@ -49,7 +53,23 @@ class Menu(initTree: List[(Object, MenuItem)], offsetX: Int, offsetY: Int) {
   
   def render(g: Graphics) {
     if (!showing) return
+
+    //Scroll the menu if the selected item is off the screen.
+    val (_, selY, _, _) = subTree(selection)
     
+    if (selY + scrollAmount + fontSize*2 > Main.windowHeight) {
+      scrollAmount -= fontSize
+    }
+    else if (selY+scrollAmount < 0) {
+      scrollAmount += fontSize
+    }
+
+    translate(0, scrollAmount) {
+      renderMenu(g)
+    }
+  }
+    
+  def renderMenu(g: Graphics) {
     for (i <- 0 until subTree.length) {
       val (x, y, key, command) = subTree(i)
       val current = (i == selection)
