@@ -5,6 +5,7 @@ import org.newdawn.slick._
 import scala.collection.mutable.Stack
 import RichGraphics._
 import GL._
+import Menu._
 
 object Menu {
   val defaultPositionX = Config("menu.defaultPositionX").toInt
@@ -14,9 +15,13 @@ object Menu {
   val clickableItemHeight = Config("menu.clickableItemHeight").toInt
   val clickableItemOffsetX = Config("menu.clickableItemOffsetX").toInt
   val clickableItemOffsetY = Config("menu.clickableItemOffsetY").toInt
+
+  val scrollMarginSize = Config("menu.scrollMarginSize").toInt
+  val marginScrollingAmount = Config("menu.marginScrollingAmount").toInt
 }
 
 class Menu(initTree: List[(Object, MenuItem)], offsetX: Int, offsetY: Int) {
+
   val SELECTED_COLOR = new Color(1.0f, 1.0f, 1.0f, 1.0f)
   val UNSELECTED_COLOR = new Color(1.0f, 1.0f, 1.0f, 0.5f)
   
@@ -32,7 +37,11 @@ class Menu(initTree: List[(Object, MenuItem)], offsetX: Int, offsetY: Int) {
   
   val fontSize = Config("gui.fontSize").toInt
 
-  def this(initTree: List[(Object, MenuItem)]) = this(initTree, Menu.defaultPositionX, Menu.defaultPositionY)
+  var mouseX = 0
+  //Set initial mouse Y just low enough to not trigger scrolling.
+  var mouseY = scrollMarginSize + 1
+
+  def this(initTree: List[(Object, MenuItem)]) = this(initTree, defaultPositionX, defaultPositionY)
   
   def buildTree(tree: List[(Object, MenuItem)]): List[(Int, Int, Object, MenuItem)] = {
     var (x, y) = (offsetX, offsetY)
@@ -58,10 +67,26 @@ class Menu(initTree: List[(Object, MenuItem)], offsetX: Int, offsetY: Int) {
     val (_, selY, _, _) = subTree(selection)
     
     if (selY + scrollAmount + fontSize*2 > Main.windowHeight) {
-      scrollAmount -= fontSize
+      var scrollMagnitude = 0
+      scrollMagnitude = (selY + scrollAmount + fontSize*2 - Main.windowHeight)/5
+      if (scrollMagnitude < fontSize) scrollMagnitude = fontSize
+
+      scroll(-scrollMagnitude)
     }
     else if (selY+scrollAmount < 0) {
-      scrollAmount += fontSize
+      var scrollMagnitude = 0
+      scrollMagnitude = (-selY-scrollAmount)/5
+      if (scrollMagnitude < fontSize) scrollMagnitude = fontSize
+      
+      scroll(scrollMagnitude)
+    }
+    else if (mouseY < scrollMarginSize) {
+      scroll(marginScrollingAmount)
+      selectAtMouse
+    }
+    else if (mouseY > Main.windowHeight - scrollMarginSize) {
+      scroll(-marginScrollingAmount)
+      selectAtMouse
     }
 
     translate(0, scrollAmount) {
@@ -134,14 +159,22 @@ class Menu(initTree: List[(Object, MenuItem)], offsetX: Int, offsetY: Int) {
   }
   
   def mouseMoved(oldx: Int, oldy: Int, newx: Int, newy: Int) {
-    itemAt(newx, newy) match {
+    mouseX = newx
+    mouseY = newy
+
+    selectAtMouse
+  }
+
+  def selectAtMouse() = {
+    itemAt(mouseX, mouseY - scrollAmount) match {
       case Some((i, _)) => selection = i
       case None =>
     }
   }
   
   def mouseClicked(button: Int, x: Int, y: Int, clickCount: Int) {
-    itemAt(x, y) match {
+    println("Mouse button " + button + " clicked.")
+    itemAt(x, y - scrollAmount) match {
       case Some((i, item)) => {
         selection = i
         currentItem.perform(this)
@@ -150,13 +183,18 @@ class Menu(initTree: List[(Object, MenuItem)], offsetX: Int, offsetY: Int) {
       case None =>
     }
   }
+
+  def mouseWheelMoved(change: Int) {
+    scroll(change/2)
+    selectAtMouse
+  }
   
   def itemAt(x: Int, y: Int): Option[(Int, MenuItem)] = {
     for (i <- 0 until subTree.length) {
       val (itemX, itemY, _, item) = subTree(i)
       
-      if (x > itemX + Menu.clickableItemOffsetX && x < itemX + Menu.clickableItemOffsetX + Menu.clickableItemWidth &&
-          y > itemY + Menu.clickableItemOffsetY && y < itemY + Menu.clickableItemOffsetY + Menu.clickableItemHeight) {
+      if (x > itemX + clickableItemOffsetX && x < itemX + clickableItemOffsetX + clickableItemWidth &&
+          y > itemY + clickableItemOffsetY && y < itemY + clickableItemOffsetY + clickableItemHeight) {
         return Some(i, item)
       }
     }
@@ -191,6 +229,20 @@ class Menu(initTree: List[(Object, MenuItem)], offsetX: Int, offsetY: Int) {
   }
   
   def currentItem = itemAtIndex(selection)
+
+  def scroll(distance: Int) {
+    val (_, currentItemY, _, _) = subTree(selection)
+    
+    if (scrollAmount + distance < 0) {
+      scrollAmount += distance
+    }
+    else if (distance > 0) {
+      scrollAmount = 0
+    }
+    else if (scrollAmount + distance < -currentItemY) {
+      scrollAmount += distance
+    }
+  }
 }
 
 abstract class MenuItem {

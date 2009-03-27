@@ -223,6 +223,12 @@ class Game(title: String) extends BasicGame(title) {
     }
   }
 
+  override def mouseWheelMoved(change: Int) {
+    if (menu.showing) {
+      menu.mouseWheelMoved(change)
+    }
+  }
+
   def quit {
     if (client != null) {
       client.leave
