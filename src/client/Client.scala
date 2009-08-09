@@ -488,11 +488,13 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
   def processReadyRoomUpdate {
     val byteArray = new Array[byte](data.remaining)
     data.get(byteArray)
-    val items = Operations.fromByteArray[Array[(Byte, Short)]](byteArray)
+    val (timeToReadyRoomTimeout, items) = Operations.fromByteArray[(int, Array[(Byte, Short)])](byteArray)
 
     for ((value, number) <- items) {
       me.items.put(Items(value), number)
     }
+
+    readyRoom.timeToReadyRoomTimeout = timeToReadyRoomTimeout
 
     if (!inReadyRoom) {
       inReadyRoom = true

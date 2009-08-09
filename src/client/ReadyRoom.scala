@@ -13,6 +13,8 @@ class ReadyRoom (client: Client) {
         Unit => (null != client.me) && item.cost <= client.me.money))
   }).toList
 
+  var timeToReadyRoomTimeout = 0
+
   val menu = new Menu(
     itemList ++
     List(("Ready", MenuCommand(Unit => ready))), 40, 40)
@@ -61,6 +63,12 @@ class ReadyRoom (client: Client) {
           g.drawString(player.score.toString, Main.windowWidth - 200, offset * 20, true)
           offset += 1
         }
+        
+        offset += 1
+
+        g.setColor(Color.white)
+        g.drawString("Time left: ", Main.windowWidth - 450, offset * 20, true)
+        g.drawString((timeToReadyRoomTimeout/1000).toString, Main.windowWidth - 200, offset * 20, true)
       }
     }
   }

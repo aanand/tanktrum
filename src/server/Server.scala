@@ -27,6 +27,7 @@ class Server(port: Int, name: String, public: Boolean) extends Session with Acto
   val READY_ROOM_BROADCAST_INTERVAL = Config("server.readyRoomBroadcastInterval").toInt
   val STATUS_UPDATE_INTERVAL        = Config("server.statusBroadcastInterval").toInt
   val MAX_PLAYERS                   = Config("server.maxPlayers").toInt
+  val READY_ROOM_TIMEOUT            = Config("server.readyRoomTimeout").toInt
   val metaServerHostname            = Config("metaServer.hostname")
   val metaServerPort                = Config("metaServer.port").toInt
   
@@ -49,6 +50,7 @@ class Server(port: Int, name: String, public: Boolean) extends Session with Acto
   var timeToPlayerUpdate = PLAYER_BROADCAST_INTERVAL
   var timeToReadyRoomUpdate = READY_ROOM_BROADCAST_INTERVAL
   var timeToStatusUpdate = STATUS_UPDATE_INTERVAL
+  var timeToReadyRoomTimeout = READY_ROOM_TIMEOUT
 
   var supposedRunTime = 0
   var numTankUpdates = 0
@@ -174,6 +176,16 @@ class Server(port: Int, name: String, public: Boolean) extends Session with Acto
         broadcastReadyRoom
         broadcastPlayers
         timeToReadyRoomUpdate = READY_ROOM_BROADCAST_INTERVAL
+      }
+
+      //If more than one player is in the game, count down the ready room timer.
+      if (players.size > 1) {
+        timeToReadyRoomTimeout -= delta
+        if (timeToReadyRoomTimeout < 0) {
+          for (player <- players.values) {
+            player.ready = true
+          }
+        }
       }
     }
     else {
@@ -373,6 +385,8 @@ class Server(port: Int, name: String, public: Boolean) extends Session with Acto
         player.tank.corbomite = oldTank.corbomite
       }
     }
+
+    timeToReadyRoomTimeout = READY_ROOM_TIMEOUT
   }
   
   def startRound {
@@ -633,7 +647,7 @@ class Server(port: Int, name: String, public: Boolean) extends Session with Acto
   }
 
   def sendReadyRoom(addr: SocketAddress) = {
-    send(byteToArray(Commands.READY_ROOM) ++ Operations.toByteArray(players(addr).itemsAsArray), addr)
+    send(byteToArray(Commands.READY_ROOM) ++ Operations.toByteArray((timeToReadyRoomTimeout, players(addr).itemsAsArray)), addr)
   }
 
   def sendStatus() = {
