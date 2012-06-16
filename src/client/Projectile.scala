@@ -112,7 +112,7 @@ object Projectile {
   }
 }
 
-class Projectile(client: Client, playerID: Byte) extends GameObject {
+class Projectile(client: Client, val playerID: Byte) extends GameObject {
   var id: Int = -1
   
   val trailLifetime = Config("projectile.trail.lifetime").toInt

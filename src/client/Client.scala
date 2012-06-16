@@ -168,6 +168,12 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
 
       players.values.foreach    (_.render(g, spriteColor))
 
+      val (followX, followY): (Float, Float) =
+        projectiles.values
+          .find(p => !p.dead && p.isInstanceOf[Missile] && p.playerID == me.id)
+          .map(p => (p.interpX, p.interpY))
+          .getOrElse((me.tank.x, me.tank.y))
+
       scale(Main.GAME_SCALE, Main.GAME_SCALE) {
         val transX = if (Main.windowWidth > Main.GAME_WIDTH * Main.GAME_SCALE) {
           (Main.windowWidth/Main.GAME_SCALE - Main.GAME_WIDTH)/2
@@ -175,7 +181,7 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
           val maxTransX = 0
           val minTransX = -Main.GAME_WIDTH + Main.windowWidth/Main.GAME_SCALE
 
-          val transXUnclamped = Main.windowWidth/(2*Main.GAME_SCALE) - me.tank.x
+          val transXUnclamped = Main.windowWidth/(2*Main.GAME_SCALE) - followX
           Math.max(minTransX, Math.min(maxTransX, transXUnclamped))
         }
 
@@ -185,7 +191,7 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
           val maxTransY = Main.GAME_HEIGHT
           val minTransY = -Main.GAME_HEIGHT + Main.windowHeight/Main.GAME_SCALE
 
-          val transYUnclamped = Main.windowHeight/(2*Main.GAME_SCALE) - me.tank.y
+          val transYUnclamped = Main.windowHeight/(2*Main.GAME_SCALE) - followY
           Math.max(minTransY, Math.min(maxTransY, transYUnclamped))
         }
 
