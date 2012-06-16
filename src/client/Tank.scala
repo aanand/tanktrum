@@ -12,7 +12,9 @@ import org.newdawn.slick._
 import SwitchableParticleEmitter._
 
 object Tank {
-  val image = new Image("media/tanks/1.png")
+  val images = new scala.collection.mutable.HashMap[Int, Image]
+
+  def image(id: Int) = images.getOrElseUpdate(id, new Image("media/tanks/" + id + ".png"))
 }
 
 class Tank(client: Client) extends GameObject {
@@ -51,6 +53,8 @@ class Tank(client: Client) extends GameObject {
   val gun = new Gun(client)
 
   def tankColor = Colors(id)
+  def imageID = Colors.cycle(id) + 1
+  def image = Tank.image(imageID)
   
   var health = 100f
   def isAlive = health > 0
@@ -124,8 +128,6 @@ class Tank(client: Client) extends GameObject {
       rotate(0, 0, angle.toDegrees) {
         gun.render(g)
         
-        val image = Tank.image
-
         //Tank body
         texture (image.getTexture.getTextureID) {
           image.draw(-WIDTH/2f, -HEIGHT, WIDTH, HEIGHT, tankColor)

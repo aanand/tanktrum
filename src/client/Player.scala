@@ -65,7 +65,8 @@ class Player extends shared.Player {
 }
 
 object Colors {
-  def apply(i: Int) = colors(i%colors.length)
+  def apply(i: Int) = colors(cycle(i))
+  def cycle(i: Int) = i%colors.length
 
   val colors = Array(
     new Color(1f, 0f, 0f),
