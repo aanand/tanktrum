@@ -43,7 +43,7 @@ TARGETS.each do |target|
 end
 
 desc "compile .class files"
-task :compile => (['install:deps', 'classes'] + TARGETS)
+task :compile => (['classes'] + TARGETS)
 
 desc "start the game"
 task :run => :compile do
@@ -82,91 +82,6 @@ file GAME_JAR_FILE => [:compile] + Dir['media/**'] do
   sh "jar -cf #{GAME_JAR_FILE} -C classes ."
   sh "jar -uf #{GAME_JAR_FILE} media "
   sh "jar -uf #{GAME_JAR_FILE} config.properties "
-end
-
-namespace :install do
-  desc "install dependencies"
-  task :deps => LIB_JAR_FILES
-
-  desc "remove dependencies and temporary files"
-  task :clobber do
-    rm_rf 'lib'
-    rm_rf 'tmp'
-  end
-  
-  file 'lib/scala-library.jar' => :lib do
-    cp File.join(File.dirname(`which scala`), '..', 'lib', 'scala-library.jar'), 'lib/'
-  end
-  
-  file 'lib/slick.jar' => :lib do
-    download_file 'lib/slick.jar', 'http://slick.cokeandcode.com/demos/slick.jar'
-    system "zip -q -d lib/slick.jar *.SF *.RSA *.DSA"
-  end
-  
-  file 'lib/jbox2d.jar' => [:lib, 'tmp/jbox2d'] do
-    raise "couldn't find appropriate jar file in Jbox2d distribution" unless jar = Dir['tmp/jbox2d/*/jbox2d-*-library-only.jar'].first
-    
-    cp jar, 'lib/jbox2d.jar'
-  end
-
-  file 'tmp/jbox2d' => [:tmp, 'tmp/jbox2d.zip'] do
-    raise "extraction of jbox2d.zip failed" unless sh "unzip tmp/jbox2d.zip -d tmp/jbox2d"
-  end
-
-  file 'tmp/jbox2d.zip' do
-    download_file 'tmp/jbox2d.zip', 'http://garr.dl.sourceforge.net/sourceforge/jbox2d/JBox2d-2.0.1.zip'
-  end
-
-  file 'lib/sbinary.jar' => :lib do
-    download_file 'lib/sbinary.jar', 'http://sbinary.googlecode.com/files/sbinary-0.2.1.jar'
-  end
-
-  def vorbis_dir 
-    Dir.glob("tmp/vorbisspi/*").first
-  end
-
-  file 'tmp/vorbisspi' do
-    rm_rf 'tmp/vorbisspi'
-    download_file "tmp/vorbisspi.zip", 'http://www.javazoom.net/vorbisspi/sources/vorbisspi1.0.3.zip'
-    raise "extraction of vorbisspi.zip failed" unless sh "unzip tmp/vorbisspi.zip -d tmp/vorbisspi"
-  end
-
-  file 'lib/vorbisspi.jar' => 'tmp/vorbisspi' do
-    vorbis_jar = Dir.glob("#{vorbis_dir}/vorbisspi*.jar").first
-    cp vorbis_jar, "lib/vorbisspi.jar"
-  end
-
-  file 'lib/jogg.jar' => 'tmp/vorbisspi' do
-    jogg_jar = Dir.glob("#{vorbis_dir}/lib/jogg*.jar").first
-    cp jogg_jar, "lib/jogg.jar"
-  end
-
-  file 'lib/jorbis.jar' => 'tmp/vorbisspi' do
-    jorbis_jar = Dir.glob("#{vorbis_dir}/lib/jorbis*.jar").first
-    cp jorbis_jar, "lib/jorbis.jar"
-  end
-
-  file 'lib/tritonus_share.jar' => 'tmp/vorbisspi' do
-    tritonus_share_jar = Dir.glob("#{vorbis_dir}/lib/tritonus_share*.jar").first
-    cp tritonus_share_jar, "lib/tritonus_share.jar"
-  end
-  
-  file 'lib/lwjgl.jar' => ['tmp', 'lib'] do
-    download_file 'lib/lwjgl.jar', 'http://slick.cokeandcode.com/demos/lwjgl.jar'
-    system "zip -q -d lib/lwjgl.jar *.SF *.RSA *.DSA"
-  end
-
-  %w{linux mac win32}.each do |os|
-    file "lib/natives-#{os}.jar" => :lib do
-      download_file "lib/natives-#{os}.jar", "http://slick.cokeandcode.com/demos/natives-#{os}.jar"
-      system "zip -q -d lib/natives-#{os}.jar *.SF *.RSA *.DSA"
-      system "unzip lib/natives-#{os}.jar -d lib/natives-#{os}"
-    end
-  end
-end
-
-def download_file path, url
-  raise "download failed" unless File.exist?(path) or sh "curl -o #{path} #{url}"
 end
 
 directory "dist/webstart"

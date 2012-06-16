@@ -1,0 +1,18 @@
+Manifest-Version: 1.0
+Created-By: 1.5.0_04 (Sun Microsystems Inc.)
+
+Name: libopenal.so
+SHA1-Digest: 1cOoqCP9ZDzja6lLnP1orSD0Xlw=
+
+Name: liblwjgl.so
+SHA1-Digest: lNcPt1GU4yUARBRjn4SvVjVeGLc=
+
+Name: liblwjgl64.so
+SHA1-Digest: xtLvQbDe2RyUCGVUiD5WMY1Aq9Y=
+
+Name: libjinput-linux64.so
+SHA1-Digest: EdfEKXTXVEtcn1oBWMNtPWXOqjo=
+
+Name: libjinput-linux.so
+SHA1-Digest: qG4z48PXGNsRmbh2iJ1ODEmxWYY=
+

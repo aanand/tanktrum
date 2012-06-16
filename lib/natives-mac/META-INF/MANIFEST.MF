@@ -1,0 +1,12 @@
+Manifest-Version: 1.0
+Created-By: 1.5.0_04 (Sun Microsystems Inc.)
+
+Name: liblwjgl.jnilib
+SHA1-Digest: gYcz5Qo7XDq3HGW4cHVonCEh0q8=
+
+Name: openal.dylib
+SHA1-Digest: mR85FPlG3va0U82r/eShIBU3+e4=
+
+Name: libjinput-osx.jnilib
+SHA1-Digest: wrm25/HwNraUNJ8lVUYAyEHD0Kc=
+
