@@ -182,13 +182,12 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
         val transY = if (Main.windowHeight > Main.GAME_HEIGHT * Main.GAME_SCALE) {
           (Main.windowHeight - (Main.GAME_HEIGHT * Main.GAME_SCALE))/2
         } else {
-          val maxTransY = 0
+          val maxTransY = Main.GAME_HEIGHT
           val minTransY = -Main.GAME_HEIGHT + Main.windowHeight/Main.GAME_SCALE
 
           val transYUnclamped = Main.windowHeight/(2*Main.GAME_SCALE) - me.tank.y
           Math.max(minTransY, Math.min(maxTransY, transYUnclamped))
         }
-
 
         translate(transX, transY) {
           if (ground.initialised && null != groundImage) {
