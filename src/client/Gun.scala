@@ -1,4 +1,5 @@
 package client
+import shared.ProjectileTypes
 import org.newdawn.slick.geom._
 import org.newdawn.slick._
 
@@ -23,7 +24,9 @@ class Gun(client: Client) extends shared.Gun(client) {
 
   def setTimer(newVal: float) = {
     if (newVal <= 0 && timer > 0) {
-      SoundPlayer ! PlaySound("reload.wav")
+      if (selectedWeapon != ProjectileTypes.MACHINE_GUN) {
+        SoundPlayer ! PlaySound("reload.wav")
+      }
     }
     timer = newVal
   }

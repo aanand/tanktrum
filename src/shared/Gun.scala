@@ -46,7 +46,4 @@ class Gun(session: Session) {
     angle = 0f
     power = POWER_RANGE.end/2f
   }
-
-  def onReady = {
-  }
 }
