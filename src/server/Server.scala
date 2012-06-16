@@ -560,7 +560,7 @@ class Server(port: Int, name: String, public: Boolean) extends Session with Acto
       p.tank.previousValues = p.tank.currentValues
       changed
     })
-    val tankDataList = movedPlayers.map(p => (p.tank.id, p.tank.serialise)).toList
+    val tankDataList = movedPlayers.map(p => (p.tank.playerID, p.tank.serialise)).toList
     byteToArray(Commands.TANKS) ++ Operations.toByteArray((tankSequence.next.toShort, tankDataList))
   }
 

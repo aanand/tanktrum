@@ -14,7 +14,7 @@ import org.jbox2d.dynamics.contacts._
 import org.jbox2d.common._
 import org.jbox2d.collision._
 
-class Tank(val server: Server, val id: Byte) extends GameObject(server) {
+class Tank(val server: Server, val playerID: Byte) extends GameObject(server) {
   lazy val WIDTH  = Config("tank.width").toFloat
   lazy val HEIGHT = Config("tank.height").toFloat
   lazy val TAPER  = Config("tank.taper").toFloat
@@ -354,7 +354,7 @@ class Tank(val server: Server, val id: Byte) extends GameObject(server) {
       gun.selectedWeapon.id.toByte,
       gun.ammo(gun.selectedWeapon).toShort,
       jumpFuel.toShort,
-      id
+      playerID
     ))
   }
 
