@@ -169,17 +169,26 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
       players.values.foreach    (_.render(g, spriteColor))
 
       scale(Main.GAME_SCALE, Main.GAME_SCALE) {
-        val maxTransX = 0
-        val minTransX = -Main.GAME_WIDTH + Main.windowWidth/Main.GAME_SCALE
+        val transX = if (Main.windowWidth > Main.GAME_WIDTH * Main.GAME_SCALE) {
+          (Main.windowWidth/Main.GAME_SCALE - Main.GAME_WIDTH)/2
+        } else {
+          val maxTransX = 0
+          val minTransX = -Main.GAME_WIDTH + Main.windowWidth/Main.GAME_SCALE
 
-        val transXUnclamped = Main.windowWidth/(2*Main.GAME_SCALE) - me.tank.x
-        val transX = Math.max(minTransX, Math.min(maxTransX, transXUnclamped))
+          val transXUnclamped = Main.windowWidth/(2*Main.GAME_SCALE) - me.tank.x
+          Math.max(minTransX, Math.min(maxTransX, transXUnclamped))
+        }
 
-        val maxTransY = 0
-        val minTransY = -Main.GAME_HEIGHT + Main.windowHeight/Main.GAME_SCALE
+        val transY = if (Main.windowHeight > Main.GAME_HEIGHT * Main.GAME_SCALE) {
+          (Main.windowHeight - (Main.GAME_HEIGHT * Main.GAME_SCALE))/2
+        } else {
+          val maxTransY = 0
+          val minTransY = -Main.GAME_HEIGHT + Main.windowHeight/Main.GAME_SCALE
 
-        val transYUnclamped = Main.windowHeight/(2*Main.GAME_SCALE) - me.tank.y
-        val transY = Math.max(minTransY, Math.min(maxTransY, transYUnclamped))
+          val transYUnclamped = Main.windowHeight/(2*Main.GAME_SCALE) - me.tank.y
+          Math.max(minTransY, Math.min(maxTransY, transYUnclamped))
+        }
+
 
         translate(transX, transY) {
           if (ground.initialised && null != groundImage) {
@@ -208,9 +217,21 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
     chat.render(g)
   }
   
-  def renderSky(g : Graphics) {
+  def renderSky(g : Graphics) = {
     if (null != skyImage) {
-      skyImage.draw(0, 0, Main.windowWidth.toFloat, Main.windowHeight.toFloat)
+      var xOffset = 0f
+      var yOffset = 0f
+      var width = Main.windowWidth.toFloat
+      var height = Main.windowHeight.toFloat
+      if (Main.windowWidth > Main.GAME_WIDTH * Main.GAME_SCALE) {
+        xOffset = (Main.windowWidth - (Main.GAME_WIDTH * Main.GAME_SCALE))/2
+        width = Main.GAME_WIDTH * Main.GAME_SCALE.toFloat
+      }
+      if (Main.windowHeight > Main.GAME_HEIGHT * Main.GAME_SCALE) {
+        yOffset = (Main.windowHeight - (Main.GAME_HEIGHT * Main.GAME_SCALE))/2
+        height = Main.GAME_HEIGHT * Main.GAME_SCALE.toFloat
+      }
+      skyImage.draw(xOffset, yOffset, width, height)
     }
   }
   
