@@ -30,32 +30,32 @@ object Projectile {
   val sprites = new scala.collection.mutable.HashMap[String, Image]
   val icons   = new scala.collection.mutable.HashMap[String, Image]
 
-  def create(client: Client, projectileType: ProjectileTypes.Value): Projectile = {
+  def create(client: Client, projectileType: ProjectileTypes.Value, playerID: Byte): Projectile = {
     projectileType match {
-      case PROJECTILE          => new Projectile(client)
-      case NUKE                => new Nuke(client)
-      case ROLLER              => new Roller(client)
-      case MIRV                => new Mirv(client)
-      case MIRV_CLUSTER        => new MirvCluster(client)
-      case CORBOMITE           => new Corbomite(client)
-      case MACHINE_GUN         => new MachineGun(client)
-      case DEATHS_HEAD         => new DeathsHead(client)
-      case DEATHS_HEAD_CLUSTER => new DeathsHeadCluster(client)
-      case MISSILE             => new Missile(client)
+      case PROJECTILE          => new Projectile(client, playerID)
+      case NUKE                => new Nuke(client, playerID)
+      case ROLLER              => new Roller(client, playerID)
+      case MIRV                => new Mirv(client, playerID)
+      case MIRV_CLUSTER        => new MirvCluster(client, playerID)
+      case CORBOMITE           => new Corbomite(client, playerID)
+      case MACHINE_GUN         => new MachineGun(client, playerID)
+      case DEATHS_HEAD         => new DeathsHead(client, playerID)
+      case DEATHS_HEAD_CLUSTER => new DeathsHeadCluster(client, playerID)
+      case MISSILE             => new Missile(client, playerID)
     }
   }
 
-  def newFromTuple(client: Client, tuple: (Int, Float, Float, Float, Byte)) = {
-    val (id, _, _, _, projectileType) = tuple
+  def newFromTuple(client: Client, tuple: (Int, Float, Float, Float, Byte, Byte)) = {
+    val (id, _, _, _, projectileType, playerID) = tuple
     
-    val p = create(client, ProjectileTypes(projectileType))
+    val p = create(client, ProjectileTypes(projectileType), playerID)
     p.id = id
     p.updateFromTuple(tuple)
     
     p
   }
 
-  def deserialise(data: Array[byte]) = Operations.fromByteArray[(Int, Float, Float, Float, Byte)](data)
+  def deserialise(data: Array[byte]) = Operations.fromByteArray[(Int, Float, Float, Float, Byte, Byte)](data)
 
   def generateSprites {
     for (name <- classNames.values) {
@@ -112,7 +112,7 @@ object Projectile {
   }
 }
 
-class Projectile(client: Client) extends GameObject {
+class Projectile(client: Client, playerID: Byte) extends GameObject {
   var id: Int = -1
   
   val trailLifetime = Config("projectile.trail.lifetime").toInt
@@ -260,8 +260,8 @@ class Projectile(client: Client) extends GameObject {
     g.setAntiAlias(false)
   }
   
-  def updateFromTuple(tuple: (Int, Float, Float, Float, Byte)) {
-    val (id, newX, newY, newAngle, projectileType) = tuple
+  def updateFromTuple(tuple: (Int, Float, Float, Float, Byte, Byte)) {
+    val (id, newX, newY, newAngle, projectileType, _) = tuple
     
     lastX = x
     lastY = y
@@ -278,16 +278,16 @@ class Projectile(client: Client) extends GameObject {
 
 }
 
-class Nuke(client: Client) extends Projectile(client)
+class Nuke(client: Client, playerID: Byte) extends Projectile(client, playerID)
 
-class Mirv(client: Client) extends Projectile(client)
-class MirvCluster(client: Client) extends Projectile(client)
+class Mirv(client: Client, playerID: Byte) extends Projectile(client, playerID)
+class MirvCluster(client: Client, playerID: Byte) extends Projectile(client, playerID)
 
-class DeathsHead(client: Client) extends Mirv(client)
-class DeathsHeadCluster(client: Client) extends Projectile(client)
+class DeathsHead(client: Client, playerID: Byte) extends Mirv(client, playerID)
+class DeathsHeadCluster(client: Client, playerID: Byte) extends Projectile(client, playerID)
 
-class MachineGun(client: Client) extends Projectile(client)
-class Roller(client: Client) extends Projectile(client)
-class Missile(client: Client) extends MachineGun(client)
+class MachineGun(client: Client, playerID: Byte) extends Projectile(client, playerID)
+class Roller(client: Client, playerID: Byte) extends Projectile(client, playerID)
+class Missile(client: Client, playerID: Byte) extends MachineGun(client, playerID)
 
-class Corbomite(client: Client) extends Projectile(client)
+class Corbomite(client: Client, playerID: Byte) extends Projectile(client, playerID)

@@ -119,7 +119,8 @@ class Projectile(server: Server, val tank: Tank) extends GameObject(server) {
       x,
       y,
       body.getAngle,
-      projectileType.id.toByte
+      projectileType.id.toByte,
+      tank.playerID
     ))
   }
 }
