@@ -20,7 +20,11 @@ object SoundPlayer extends Actor {
   val sounds = new HashMap[String, (AudioFormat, Array[Byte])]()
   
   for (file <- files) {
-    sounds(file) = decodeFile("media/sounds/" + file)
+    try {
+      sounds(file) = decodeFile("media/sounds/" + file)
+    } catch {
+      case e: Exception => println("Warning: Couldn't load sound: " + file)
+    }
   }
 
   def act {
