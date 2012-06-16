@@ -8,8 +8,6 @@ class Gun(session: Session) {
   val ANGLE_RANGE = new Range(Config("gun.angleMin").toInt, Config("gun.angleMax").toInt, 1)
   val POWER_RANGE = new Range(Config("gun.powerMin").toInt, Config("gun.powerMax").toInt, 1)
 
-  val POWER_SCALE = Config("gun.powerScale").toFloat
-
   val OFFSET_X = 0f
   val OFFSET_Y = Config("gun.offsetY").toFloat * Config("tank.height").toFloat
   

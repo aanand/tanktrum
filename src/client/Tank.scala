@@ -14,7 +14,10 @@ import SwitchableParticleEmitter._
 object Tank {
   val images = new scala.collection.mutable.HashMap[Int, Image]
 
-  def image(id: Int) = images.getOrElseUpdate(id, new Image("media/tanks/" + id + ".png"))
+  def image(playerID: Int) = {
+    val id = Colors.cycle(playerID) + 1
+    images.getOrElseUpdate(id, new Image("media/tanks/" + id + ".png"))
+  }
 }
 
 class Tank(client: Client) extends GameObject {
@@ -50,11 +53,10 @@ class Tank(client: Client) extends GameObject {
 
   var wasAlive = false
   
-  val gun = new Gun(client)
+  val gun = new Gun(client, id)
 
   def tankColor = Colors(id)
-  def imageID = Colors.cycle(id) + 1
-  def image = Tank.image(imageID)
+  def image = Tank.image(id)
   
   var health = 100f
   def isAlive = health > 0
