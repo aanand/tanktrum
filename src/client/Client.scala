@@ -166,8 +166,6 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
         renderSky(g)
       }
 
-      players.values.foreach    (_.render(g, spriteColor))
-
       val (followX, followY): (Float, Float) =
         projectiles.values
           .find(p => !p.dead && p.isInstanceOf[Missile] && p.playerID == me.id)
@@ -206,6 +204,8 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
           tanks.foreach             ((tank) => if (null != tank) {tank.render(g)})
         }
       }
+
+      players.values.foreach (_.render(g, spriteColor))
 
       if (noticeState) {
         val width = g.getFont.getWidth(noticeText)
