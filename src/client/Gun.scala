@@ -20,9 +20,6 @@ object Gun {
 }
 
 class Gun(client: Client, playerID: Short) extends shared.Gun(client) {
-  val lowerHeight = Config("gun.lower.height").toFloat
-  val upperHeight = Config("gun.upper.height").toFloat
-  
   val lowerImage = Gun.lowerImage(playerID)
   val upperImage = Gun.upperImage(playerID)
 
@@ -38,13 +35,6 @@ class Gun(client: Client, playerID: Short) extends shared.Gun(client) {
   def render(g: Graphics) {
     import GL._
     
-    val powerFraction  = (power-POWER_RANGE.start) / (POWER_RANGE.end - POWER_RANGE.start)
-    val lowerExtension = Math.min(1, 2*powerFraction)
-    val upperExtension = Math.max(0, 2*powerFraction - 1)
-
-    val lowerOffsetY = lowerHeight * (lowerExtension-1)
-    val upperOffsetY = upperHeight * upperExtension
-
     translate(OFFSET_X, OFFSET_Y) {
       rotate(0, 0, angle) {
         scale(1, -1) {

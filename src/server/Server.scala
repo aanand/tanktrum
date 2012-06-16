@@ -293,8 +293,8 @@ class Server(port: Int, name: String, public: Boolean) extends Session with Acto
 
     var p: Projectile = Projectile.create(this, tank, projectileType)
     
-    position.x = position.x + p.radius * Math.cos((tank.angle-90).toRadians).toFloat
-    position.y = position.y + p.radius * Math.sin((tank.angle-90).toRadians).toFloat
+    position.x = position.x + Math.cos(radians).toFloat * tank.gun.length
+    position.y = position.y + Math.sin(radians).toFloat * tank.gun.length
 
     p.body.setXForm(position, 0f)
     p.body.setLinearVelocity(tank.velocity.add(velocity))

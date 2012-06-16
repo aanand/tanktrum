@@ -11,6 +11,17 @@ class Gun(session: Session) {
   val OFFSET_X = 0f
   val OFFSET_Y = Config("gun.offsetY").toFloat * Config("tank.height").toFloat
   
+  val lowerHeight = Config("gun.lower.height").toFloat
+  val upperHeight = Config("gun.upper.height").toFloat
+  
+  def powerFraction  = (power-POWER_RANGE.start) / (POWER_RANGE.end - POWER_RANGE.start)
+  def lowerExtension = Math.min(1, 2*powerFraction)
+  def upperExtension = Math.max(0, 2*powerFraction - 1)
+
+  def lowerOffsetY = lowerHeight * (lowerExtension-1)
+  def upperOffsetY = upperHeight * upperExtension
+  def length       = lowerOffsetY + upperOffsetY + upperHeight
+
   var selectedWeapon = ProjectileTypes.PROJECTILE
   
   var firing = false
