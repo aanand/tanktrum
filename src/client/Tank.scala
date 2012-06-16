@@ -132,14 +132,6 @@ class Tank(client: Client) extends GameObject {
         texture (image.getTexture.getTextureID) {
           image.draw(-WIDTH/2f, -HEIGHT, WIDTH, HEIGHT, tankColor)
         }
-        
-        //Outline
-        g.setAntiAlias(true)
-        color(0f, 0f, 0f, 0.5f)
-        g.setLineWidth(1.3f)
-        lines(shapePoints)
-        g.setAntiAlias(false)
-        
       }
     }
   }
