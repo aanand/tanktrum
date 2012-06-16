@@ -62,7 +62,7 @@ object Projectile {
       val imageIcon = Resource.getImageIcon(imagePathForName(name))
       val awtImage = imageIcon.getImage
 
-      val targetWidth = (imageSizeForName(name) * Main.gameWindowWidthRatio).toInt
+      val targetWidth = (imageSizeForName(name) * Main.GAME_SCALE).toInt
       val targetHeight = imageIcon.getIconHeight * targetWidth / imageIcon.getIconWidth
 
       val sprite = generateSprite(awtImage, targetWidth, targetHeight)

@@ -12,11 +12,10 @@ object Main {
   
   val GAME_WIDTH = Config("game.width").toFloat
   val GAME_HEIGHT = Config("game.height").toFloat
+  val GAME_SCALE = Config("game.scale").toFloat
 
   def windowWidth = container.getWidth
   def windowHeight = container.getHeight
-  def gameWindowWidthRatio = windowWidth/GAME_WIDTH
-  def gameWindowHeightRatio = windowHeight/GAME_HEIGHT
 
   val VERSION = 2
 

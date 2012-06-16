@@ -167,15 +167,30 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
       }
 
       players.values.foreach    (_.render(g, spriteColor))
-      scale(Main.gameWindowWidthRatio, Main.gameWindowHeightRatio) {
-        if (ground.initialised && null != groundImage) {
-          particleSystem.render()
-          ground.render(g, groundImage)
+
+      scale(Main.GAME_SCALE, Main.GAME_SCALE) {
+        val maxTransX = 0
+        val minTransX = -Main.GAME_WIDTH + Main.windowWidth/Main.GAME_SCALE
+
+        val transXUnclamped = Main.windowWidth/(2*Main.GAME_SCALE) - me.tank.x
+        val transX = Math.max(minTransX, Math.min(maxTransX, transXUnclamped))
+
+        val maxTransY = 0
+        val minTransY = -Main.GAME_HEIGHT + Main.windowHeight/Main.GAME_SCALE
+
+        val transYUnclamped = Main.windowHeight/(2*Main.GAME_SCALE) - me.tank.y
+        val transY = Math.max(minTransY, Math.min(maxTransY, transYUnclamped))
+
+        translate(transX, transY) {
+          if (ground.initialised && null != groundImage) {
+            particleSystem.render()
+            ground.render(g, groundImage)
+          }
+          
+          projectiles.values.foreach(_.render(g, spriteColor))
+          explosions.foreach        (_.render(g))
+          tanks.foreach             ((tank) => if (null != tank) {tank.render(g)})
         }
-        
-        projectiles.values.foreach(_.render(g, spriteColor))
-        explosions.foreach        (_.render(g))
-        tanks.foreach             ((tank) => if (null != tank) {tank.render(g)})
       }
 
       if (noticeState) {
