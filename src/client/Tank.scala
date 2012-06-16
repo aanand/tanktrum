@@ -11,6 +11,10 @@ import org.newdawn.slick._
 
 import SwitchableParticleEmitter._
 
+object Tank {
+  val image = new Image("media/tanks/1.png")
+}
+
 class Tank(client: Client) extends GameObject {
   var id: Short = _
   
@@ -120,12 +124,11 @@ class Tank(client: Client) extends GameObject {
       rotate(0, 0, angle.toDegrees) {
         gun.render(g)
         
+        val image = Tank.image
+
         //Tank body
-        color(tankColor)
-        polygon {
-          for (point <- shapePoints) {
-            vertex(point._1, point._2)
-          }
+        texture (image.getTexture.getTextureID) {
+          image.draw(-WIDTH/2f, -HEIGHT, WIDTH, HEIGHT, tankColor)
         }
         
         //Outline
