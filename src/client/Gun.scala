@@ -20,4 +20,11 @@ class Gun(client: Client) extends shared.Gun(client) {
       }
     }
   }
+
+  def setTimer(newVal: float) = {
+    if (newVal <= 0 && timer > 0) {
+      SoundPlayer ! PlaySound("reload.wav")
+    }
+    timer = newVal
+  }
 }

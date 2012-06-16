@@ -30,6 +30,9 @@ class Gun(server: Server, tank: Tank) extends shared.Gun(server) {
   override def update(delta: Int) {
     if (firing) fire
     super.update(delta)
+    if (!ready) {
+      timer -= delta / 1000.0f
+    }
   }
   
   def fire {

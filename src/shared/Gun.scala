@@ -40,14 +40,13 @@ class Gun(session: Session) {
       
       power = Math.max(POWER_RANGE.start, Math.min(POWER_RANGE.end, newPower))
     }
-    
-    if (!ready) {
-      timer -= delta / 1000.0f
-    }
   }
 
   def reset {
     angle = 0f
     power = POWER_RANGE.end/2f
+  }
+
+  def onReady = {
   }
 }

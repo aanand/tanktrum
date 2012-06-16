@@ -13,8 +13,9 @@ case class PlaySound(s: String) {}
 
 object SoundPlayer extends Actor {
   var files = List(
-    "explosion.ogg",
-    "explosion1.wav"
+    "explosion.wav",
+    "explosion1.wav",
+    "reload.wav"
   )
   
   val sounds = new HashMap[String, (AudioFormat, Array[Byte])]()

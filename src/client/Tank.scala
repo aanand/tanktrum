@@ -87,7 +87,7 @@ class Tank(client: Client) extends GameObject {
     }
     
     if (wasAlive && !isAlive) {
-      SoundPlayer ! PlaySound("explosion.ogg")
+      SoundPlayer ! PlaySound("explosion.wav")
     }
     
     wasAlive = isAlive
@@ -170,7 +170,7 @@ class Tank(client: Client) extends GameObject {
     x = newX
     y = newY
     angle = newAngle.toFloat.toRadians
-    gun.timer = newGunTimer
+    gun.setTimer(newGunTimer)
     health = newHealth
     jumping = newJumping
     gun.selectedWeapon = ProjectileTypes(newSelectedWeapon)
