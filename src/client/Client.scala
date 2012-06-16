@@ -63,6 +63,10 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
   var previousProjectileUpdate = 0L
   var currentProjectileUpdate = 0L
 
+  val shakeRandom = new Random()
+  var shakeTime = 0f
+  def shakePower = shakeTime/1000
+
   def enter {
     active = true
     ground = new Ground(Main.GAME_WIDTH.toInt, Main.GAME_HEIGHT.toInt)
@@ -97,6 +101,10 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
     try {
       ping
       checkTimeout
+
+      if (shakeTime > 0) {
+        shakeTime -= delta*5
+      }
       
       for (p <- projectiles.values) {
         p.update(delta)
@@ -194,14 +202,25 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
         }
 
         translate(transX, transY) {
-          if (ground.initialised && null != groundImage) {
-            particleSystem.render()
-            ground.render(g, groundImage)
+
+          var shakeX = 0f
+          var shakeY = 0f
+          if (shakeTime > 0) {
+            shakeX = shakeRandom.nextFloat() * shakePower
+            shakeY = shakeRandom.nextFloat() * shakePower
           }
-          
-          projectiles.values.foreach(_.render(g, spriteColor))
-          explosions.foreach        (_.render(g))
-          tanks.foreach             ((tank) => if (null != tank) {tank.render(g)})
+
+          translate(shakeX, shakeY) {
+
+            if (ground.initialised && null != groundImage) {
+              particleSystem.render()
+              ground.render(g, groundImage)
+            }
+            
+            projectiles.values.foreach(_.render(g, spriteColor))
+            explosions.foreach        (_.render(g))
+            tanks.foreach             ((tank) => if (null != tank) {tank.render(g)})
+          }
         }
       }
 
@@ -279,6 +298,7 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
       case Commands.PROJECTILE   => loadProjectile
       case Commands.PROJECTILES  => loadProjectiles
       case Commands.EXPLOSION    => loadExplosion
+      case Commands.IMPACT       => loadImpact
       case Commands.PLAYERS      => loadPlayers
       case Commands.READY_ROOM   => processReadyRoomUpdate
       case Commands.IMAGE_SET    => processImageSetUpdate
@@ -452,6 +472,16 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
     val e = new Explosion(this)
     e.loadFrom(explosionArray)
     explosions += e
+  }
+
+
+  def loadImpact = {
+    val impactArray = new Array[byte](data.remaining)
+    data.get(impactArray)
+    val (x, y, power) = Operations.fromByteArray[(Float, Float, Float)](impactArray)
+    if (shakeTime < power) {
+      shakeTime = power
+    }
   }
 
   def loadPlayers = {

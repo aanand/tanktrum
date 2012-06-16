@@ -598,6 +598,10 @@ class Server(port: Int, name: String, public: Boolean) extends Session with Acto
     broadcast(byteToArray(Commands.EXPLOSION) ++ e.serialise)
   }
 
+  def broadcastImpact(x: Float, y: Float, power: Float) {
+    broadcast(byteToArray(Commands.IMPACT) ++ Operations.toByteArray[(Float, Float, Float)]((x, y, power)))
+  }
+
   def broadcastFrags() {
   }
 

@@ -15,6 +15,7 @@ object Commands {
   val PROJECTILE = nextI
   val PROJECTILES = nextI
   val EXPLOSION = nextI
+  val IMPACT = nextI
   val PLAYERS = nextI
   val ERROR = nextI
   val READY_ROOM = nextI

@@ -4,12 +4,14 @@ import shared._
 
 import scala.collection.mutable.Queue
 
-import org.jbox2d.collision.ShapeDef
-import org.jbox2d.collision.PolygonDef
+import org.jbox2d.dynamics._
+import org.jbox2d.dynamics.contacts._
 import org.jbox2d.common._
+import org.jbox2d.collision._
 
 import sbinary.Instances._
 import sbinary.Operations
+
 
 class Ground(server: Server, width: Int, height: Int) extends GameObject(server) {
   val MIN_HEIGHT = Config("ground.minHeight").toFloat
@@ -149,5 +151,16 @@ class Ground(server: Server, width: Int, height: Int) extends GameObject(server)
     val factor = dist/granularity //Interpolation factor.
 
     h1*(1-factor) + h2*factor
+  }
+
+  override def collide(other: GameObject, contact: ContactPoint) {
+    var power = other.body.getLinearVelocity.length * other.body.getMass
+    //println("Impact with ground of power: " + power)
+    if (other.isInstanceOf[Projectile]) {
+      power *= 4
+    }
+    if (power > 500) {
+      server.broadcastImpact(contact.position.x, contact.position.y, power)
+    }
   }
 }

@@ -17,6 +17,7 @@ class Ground(width: Int, height: Int) extends GameObject() {
   var drawShape : Shape = _
   var initialised = false
 
+
   def loadFrom(shortPoints: Array[Short]) = {
     var i = 0f
     points = shortPoints.map((s) => {
@@ -86,7 +87,7 @@ class Ground(width: Int, height: Int) extends GameObject() {
       }
     }
   }
-  
+
   def renderOutline(g: Graphics) {
     color(0f, 0f, 0f)
     g.setLineWidth(2)
