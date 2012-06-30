@@ -470,7 +470,11 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
   def loadImpact = {
     val impactArray = new Array[byte](data.remaining)
     data.get(impactArray)
-    val (x, y, power) = Operations.fromByteArray[(Float, Float, Float)](impactArray)
+    var (x, y, power) = Operations.fromByteArray[(Float, Float, Float)](impactArray)
+
+    val dist = me.tank.dist(x, y)
+    power = power * Math.max(0, 1f - dist/Main.GAME_WIDTH).toFloat
+
     if (shakeTime < power) {
       shakeTime = power
     }
