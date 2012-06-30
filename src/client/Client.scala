@@ -174,34 +174,26 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
         renderSky(g)
       }
 
-      val (followX, followY): (Float, Float) =
+      val followY: Float =
         projectiles.values
           .find(p => !p.dead && p.isInstanceOf[Missile] && p.playerID == me.id)
-          .map(p => (p.interpX, p.interpY))
-          .getOrElse((me.tank.x, me.tank.y))
+          .map(p => p.interpY)
+          .getOrElse(me.tank.y)
 
-      scale(Main.GAME_SCALE, Main.GAME_SCALE) {
-        val transX = if (Main.windowWidth > Main.GAME_WIDTH * Main.GAME_SCALE) {
-          (Main.windowWidth/Main.GAME_SCALE - Main.GAME_WIDTH)/2
-        } else {
-          val maxTransX = 0
-          val minTransX = -Main.GAME_WIDTH + Main.windowWidth/Main.GAME_SCALE
+      val gameScale = Main.windowWidth / Main.GAME_WIDTH
+      scale(gameScale, gameScale) {
 
-          val transXUnclamped = Main.windowWidth/(2*Main.GAME_SCALE) - followX
-          Math.max(minTransX, Math.min(maxTransX, transXUnclamped))
-        }
-
-        val transY = if (Main.windowHeight > Main.GAME_HEIGHT * Main.GAME_SCALE) {
-          (Main.windowHeight - (Main.GAME_HEIGHT * Main.GAME_SCALE))/2
+        val transY = if (Main.windowHeight > Main.GAME_HEIGHT * gameScale) {
+          (Main.windowHeight - (Main.GAME_HEIGHT * gameScale))/2
         } else {
           val maxTransY = Main.GAME_HEIGHT
-          val minTransY = -Main.GAME_HEIGHT + Main.windowHeight/Main.GAME_SCALE
+          val minTransY = -Main.GAME_HEIGHT + Main.windowHeight/gameScale
 
-          val transYUnclamped = Main.windowHeight/(2*Main.GAME_SCALE) - followY
+          val transYUnclamped = Main.windowHeight/(2*gameScale) - followY
           Math.max(minTransY, Math.min(maxTransY, transYUnclamped))
         }
 
-        translate(transX, transY) {
+        translate(0, transY) {
 
           var shakeX = 0f
           var shakeY = 0f
