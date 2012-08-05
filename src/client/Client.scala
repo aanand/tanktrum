@@ -68,10 +68,18 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
   def shakePower = shakeTime/1000
 
   var loading = false
+  var loadingMessage = "Loading..."
 
   def enter {
     active = true
     loading = true
+    val messages = List(
+      "Loading...", 
+      "Tank Recharging...", 
+      "Repairing Dents...", 
+      "Fixing Paintwork...", 
+      "Awaiting Tank License...")
+    loadingMessage = messages(shakeRandom.nextInt(messages.size))
     ground = new Ground(Main.GAME_WIDTH.toInt, Main.GAME_HEIGHT.toInt)
     channel = DatagramChannel.open()
     try {
@@ -173,7 +181,8 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
         g.setColor(new Color(0f, 0f, 0f, 0.5f))
         g.fillRect(0, 0, Main.windowWidth, Main.windowHeight)
         g.setColor(new Color(1f, 1f, 1f))
-        g.drawString("Loading...", Main.windowWidth/2 - 20, Main.windowHeight/2, true)
+
+        g.drawString(loadingMessage, Main.windowWidth/2 - 20, Main.windowHeight/2, true)
       } else {
         renderSky(g)
         readyRoom.render(g)
