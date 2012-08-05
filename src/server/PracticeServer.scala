@@ -9,10 +9,21 @@ import java.net._
 class PracticeServer(port : Int) extends Server(port, "", false) {
   override def enter() {
     super.enter
+    for (i <- 0 until 5) {addBotPlayer()}
     startRound
   }
   
   override def endRound { }
+
+  def addBotPlayer() = {
+    findNextID
+    
+    val addr = new InetSocketAddress("example.com", playerID)
+    val tank = createTank(playerID)
+    val player = new Bot(tank, "Bot " + playerID, playerID)
+    tank.player = player
+    players.put(addr, player)
+  }
   
   override def addPlayer(addr: SocketAddress) {
     val newPlayer = !players.isDefinedAt(addr)
