@@ -35,8 +35,6 @@ class PracticeServer(port : Int) extends Server(port, "", false) {
 
     if (newPlayer) giveAmmo(player)
 
-    ground.flatten(player.tank.x)
-    broadcastGround
     for (i <- 0 until 5) {addBotPlayer()}
     startRound
   }
