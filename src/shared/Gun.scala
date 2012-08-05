@@ -18,7 +18,7 @@ class Gun(session: Session) {
   def upperMinOffsetFraction = Config("gun.upper.minOffsetFraction").toFloat
 
   def lowerOffsetY = 0
-  def upperOffsetY = upperHeight * (upperMinOffsetFraction + powerFraction * (1f-upperMinOffsetFraction))
+  def upperOffsetY = lowerHeight - upperHeight + upperHeight * (upperMinOffsetFraction + powerFraction * (1f-upperMinOffsetFraction))
   def length       = lowerOffsetY + upperOffsetY + upperHeight
 
   var selectedWeapon = ProjectileTypes.PROJECTILE
