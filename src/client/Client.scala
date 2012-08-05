@@ -67,8 +67,11 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
   var shakeTime = 0f
   def shakePower = shakeTime/1000
 
+  var loading = false
+
   def enter {
     active = true
+    loading = true
     ground = new Ground(Main.GAME_WIDTH.toInt, Main.GAME_HEIGHT.toInt)
     channel = DatagramChannel.open()
     try {
@@ -166,8 +169,15 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
     }
 
     if (inReadyRoom) {
-      renderSky(g)
-      readyRoom.render(g)
+      if (loading) {
+        g.setColor(new Color(0f, 0f, 0f, 0.5f))
+        g.fillRect(0, 0, Main.windowWidth, Main.windowHeight)
+        g.setColor(new Color(1f, 1f, 1f))
+        g.drawString("Loading...", Main.windowWidth/2 - 20, Main.windowHeight/2, true)
+      } else {
+        renderSky(g)
+        readyRoom.render(g)
+      }
     }
     else { 
       if (ground.initialised) {
@@ -197,6 +207,7 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
           Math.max(minTransY, Math.min(maxTransY, transYUnclamped))
         }
 
+        //Letterbox the game if the window is wider than the max supported texture width.
         val transX = if (Main.windowWidth > Main.GAME_WIDTH * Main.GAME_SCALE) {
           (Main.windowWidth/Main.GAME_SCALE - Main.GAME_WIDTH)/2
         } else {
@@ -249,6 +260,7 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
       var yOffset = 0f
       var width = Main.windowWidth.toFloat
       var height = Main.windowHeight.toFloat
+      //Letterbox the sky if the window is wider than the max supported texture width.
       if (Main.windowWidth > Main.GAME_WIDTH * Main.GAME_SCALE) {
         xOffset = (Main.windowWidth - (Main.GAME_WIDTH * Main.GAME_SCALE))/2
         width = Main.GAME_WIDTH * Main.GAME_SCALE.toFloat
@@ -599,10 +611,7 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
     spriteColor = new Color(rgbArray(0), rgbArray(1), rgbArray(2))
     spriteColor.scale(lightIntensity)
     spriteColor.add(new Color(1f-lightIntensity, 1f-lightIntensity, 1f-lightIntensity))
-
-    // force groundImage.init() (which is private) to be called. I know, wtf.
-    // I don't get it, why don't we need to do this for skyImage too?  What? - N
-    groundImage.toString
+    loading = false
   }
 
   def sendTankUpdate {
