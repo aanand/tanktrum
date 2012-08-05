@@ -18,7 +18,7 @@ class PracticeServer(port : Int) extends Server(port, "", false) {
   def addBotPlayer() = {
     findNextID
     
-    val addr = new InetSocketAddress("example.com", playerID)
+    val addr = new InetSocketAddress("localhost", playerID + 1024)
     val tank = createTank(playerID)
     val player = new Bot(tank, "Bot " + playerID, playerID)
     tank.player = player
