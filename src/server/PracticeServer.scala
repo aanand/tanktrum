@@ -9,7 +9,6 @@ import java.net._
 class PracticeServer(port : Int) extends Server(port, "", false) {
   override def enter() {
     super.enter
-    startRound
   }
   
   override def endRound { }
@@ -39,6 +38,7 @@ class PracticeServer(port : Int) extends Server(port, "", false) {
     ground.flatten(player.tank.x)
     broadcastGround
     for (i <- 0 until 5) {addBotPlayer()}
+    startRound
   }
 
   def giveAmmo(player: Player) {
