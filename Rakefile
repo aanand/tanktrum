@@ -10,7 +10,7 @@ def jar_files dir, names
   names.map{ |name| "#{dir}/#{name}.jar" }
 end
 
-LIB_JAR_NAMES = %w(scala-library slick jbox2d lwjgl sbinary jogg vorbisspi jorbis tritonus_share natives-linux natives-mac natives-win32)
+LIB_JAR_NAMES = %w(scala-library slick jbox2d lwjgl sbinary jogg vorbisspi jorbis tritonus_share natives-linux natives-mac natives-win32 natives-win64)
 LIB_JAR_FILES = jar_files('lib', LIB_JAR_NAMES)
 
 GAME_JAR_NAME = 'tank'
@@ -135,6 +135,15 @@ namespace :build do
   desc "build webstart"
   task :webstart => ["dist/webstart"] + WEBSTART_JAR_FILES do
     cp_r "packaging/webstart/.", "dist/webstart"
+  end
+
+  task :natives do
+    %w(linux mac win32 win64).each do |suffix|
+      dir_name = "lib/natives-#{suffix}"
+      jar_name = "lib/natives-#{suffix}.jar"
+      flag = File.exist?(jar_name) ? "u" : "c"
+      sh "jar -#{flag}f #{jar_name} -C #{dir_name}/ ."
+    end
   end
 end
 
