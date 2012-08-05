@@ -63,10 +63,10 @@ class Player(var tank: Tank, playerName: String, playerId: Byte) extends shared.
     }
 
     //Don't allow negative score or money.
-    if (score + pointsAwarded > 0) {
+    if (score + pointsAwarded >= 0) {
       score += pointsAwarded
     }
-    if (money + pointsAwarded > 0) {
+    if (money + pointsAwarded >= 0) {
       money  += pointsAwarded
     }
   }
