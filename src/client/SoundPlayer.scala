@@ -12,21 +12,13 @@ import scala.collection.mutable.HashMap
 case class PlaySound(s: String) {}
 
 object SoundPlayer extends Actor {
-  var files = List(
-    "explosion.wav",
-    "explosion1.wav",
-    "reload.wav",
-    "fire1.wav",
-    "fire2.wav",
-    "fire3.wav",
-    "fire4.wav"
-  )
-  
+  val dir    = "media/sounds"
+  val files  = new File(dir).list()
   val sounds = new HashMap[String, (AudioFormat, Array[Byte])]()
   
   for (file <- files) {
     try {
-      sounds(file) = decodeFile("media/sounds/" + file)
+      sounds(file) = decodeFile(dir + "/" + file)
     } catch {
       case e: Exception => println("Warning: Couldn't load sound: " + file)
     }
