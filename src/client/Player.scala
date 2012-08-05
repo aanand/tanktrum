@@ -18,17 +18,24 @@ class Player extends shared.Player {
   def color = Colors(id)
   val items = new HashMap[Items.Value, Int]
 
+  var flashScore = 0f
+
   def render(g: Graphics, spriteColor: Color) {
+    if (flashScore > 0.01f) flashScore -= 0.01f
+    if (flashScore < -0.01f) flashScore += 0.01f
     if (null == tank) {
       return
     }
 
     translate(10 + id*110, 10) {
+      val scoreColor = new Color(flashScore + color.r, flashScore + color.g, flashScore + color.b, color.a)
+      g.setColor(scoreColor)
+      g.drawString(score.toString, 0, 16, true);
+      
       g.setColor(color)
-
       g.drawString(name, 0, 0, true)
 
-      translate(0, 16) {
+      translate(0, 32) {
         g.fillRect(0, 0, tank.health, 10)
     
         translate(0, 12) {
@@ -58,6 +65,7 @@ class Player extends shared.Player {
     }
     me = newMe
     ready = newReady
+    if (score != newScore) flashScore += (newScore-score)/5
     score = newScore
     money = newMoney
     id = newID

@@ -284,6 +284,7 @@ class Tank(val server: Server, val playerID: Byte) extends GameObject(server) {
     
     if (null != source) {
       source.tank.player.awardHit(this, damageDone.toInt)
+      server.broadcastPlayers
     }
     
     if (isDead && oldHealth > 0) {

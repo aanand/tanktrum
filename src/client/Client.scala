@@ -484,6 +484,7 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
       projectiles(id).updateFromTuple(tuple)
     } else {
       projectiles.put(id, Projectile.newFromTuple(this, tuple))
+      projectiles(id).playSound("fire")
     }
     
     id
