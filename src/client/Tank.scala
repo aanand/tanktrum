@@ -67,7 +67,8 @@ class Tank(client: Client) extends GameObject {
   var maxJumpFuel = Config("tank.jumpjet.maxFuel").toInt
   var jumpFuel = 0f
   
-  var jetSoundTimer = 500
+  val maxJetSoundTimer = Config("tank.jumpjet.soundRepeat").toInt
+  var jetSoundTimer = 0
 
   def fuelPercent = (jumpFuel.toFloat/maxJumpFuel) * 100
 
@@ -90,8 +91,8 @@ class Tank(client: Client) extends GameObject {
       startEmitting
 
       if (jetSoundTimer <= 0) {
+        jetSoundTimer = maxJetSoundTimer
         SoundPlayer ! PlaySound(Config("tank.sound.jet"))
-        jetSoundTimer = 500
       }
 
       for (e <- particleEmitters) {
