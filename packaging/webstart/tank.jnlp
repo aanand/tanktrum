@@ -20,20 +20,8 @@
     <jar href="jorbis.jar"/>
     <jar href="vorbisspi.jar"/>
     <jar href="slick.jar"/>
-    <jar href="lwjgl.jar"/>
+    <extension name="lwjgl" href="http://lwjgl.org/webstart/2.8.4/extension.jnlp" />
   </resources>
-  <resources os="Windows" arch="x86_64">
-    <nativelib href="natives-win64.jar"/>      
-  </resources>  
-  <resources os="Windows" arch="x86">
-    <nativelib href="natives-win32.jar"/>      
-  </resources>  
-  <resources os="Linux">
-    <nativelib href="natives-linux.jar"/>      
-  </resources>
-  <resources os="Mac">
-    <nativelib href="natives-mac.jar"/>  
-  </resources>  
 
   <security>
     <all-permissions/>
