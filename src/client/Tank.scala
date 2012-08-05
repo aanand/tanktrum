@@ -93,7 +93,8 @@ class Tank(client: Client) extends GameObject {
     }
     
     if (wasAlive && !isAlive) {
-      SoundPlayer ! PlaySound("explosion.wav")
+      val sound = Config("tank.sound.death")
+      SoundPlayer ! PlaySound(sound)
     }
     
     wasAlive = isAlive
