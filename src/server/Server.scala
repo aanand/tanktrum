@@ -316,8 +316,8 @@ class Server(port: Int, name: String, public: Boolean) extends Session with Acto
     projectiles -= p.id
   }
 
-  def addExplosion(x: Float, y: Float, radius: Float, projectile: Projectile, damageFactor: Float) {
-    val e = new Explosion(x, y, radius, this, projectile, damageFactor)
+  def addExplosion(x: Float, y: Float, radius: Float, projectile: Projectile, victim: GameObject, damageFactor: Float) {
+    val e = new Explosion(x, y, radius, this, projectile, victim, damageFactor)
     explosions += e
     broadcastExplosion(e)
   }

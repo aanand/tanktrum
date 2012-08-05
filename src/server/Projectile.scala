@@ -96,7 +96,7 @@ class Projectile(server: Server, val tank: Tank) extends GameObject(server) {
     
     destroy = true
 
-    server.addExplosion(x, y, explosionRadius, this, explosionDamageFactor)
+    server.addExplosion(x, y, explosionRadius, this, obj, explosionDamageFactor)
     server.ground.deform(x, y, explosionRadius)
     
     if (obj.isInstanceOf[Tank]) {

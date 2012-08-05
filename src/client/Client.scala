@@ -495,6 +495,7 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
     data.get(explosionArray)
     val e = new Explosion(this)
     e.loadFrom(explosionArray)
+    e.playSound
     explosions += e
   }
 
