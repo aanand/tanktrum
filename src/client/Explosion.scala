@@ -12,11 +12,9 @@ import org.newdawn.slick._
 class Explosion (client: Client) extends GameObject {
   val animationLifetime = Config("explosion.animationLifetime").toFloat
   var animationTime = animationLifetime
-  
-  val sound = "explosion1.wav"
-  SoundPlayer ! PlaySound(sound)
 
   var radius: Float = _
+  var isTankExplosion = false
   
   def update(delta: Int) {
     animationTime -= delta/1000f
@@ -31,10 +29,16 @@ class Explosion (client: Client) extends GameObject {
   }
 
   def loadFrom(data: Array[Byte]) = {
-    val (newX, newY, newRadius) = Operations.fromByteArray[(Float, Float, Float)](data)
+    val (newX, newY, newRadius, newIsTankExplosion) = Operations.fromByteArray[(Float, Float, Float, Boolean)](data)
     x = newX
     y = newY
     radius = newRadius
+    isTankExplosion = newIsTankExplosion
+  }
+
+  def playSound {
+    val sound = if (isTankExplosion) "explosion.tank1.wav" else "explosion.ground1.wav"
+    SoundPlayer ! PlaySound(sound)
   }
 }
 

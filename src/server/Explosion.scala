@@ -13,7 +13,7 @@ import org.jbox2d.dynamics.contacts._
 import org.jbox2d.common._
 import org.jbox2d.collision._
 
-class Explosion (x: Float, y: Float, var radius: Float, server: Server, projectile: Projectile, damageFactor: Float) extends GameObject(server) {
+class Explosion (x: Float, y: Float, var radius: Float, server: Server, projectile: Projectile, victim: GameObject, damageFactor: Float) extends GameObject(server) {
   val damageLifetime = Config("explosion.damageLifetime").toFloat
   var damageTime = damageLifetime
 
@@ -35,11 +35,14 @@ class Explosion (x: Float, y: Float, var radius: Float, server: Server, projecti
     }
   }
 
+  def isTankExplosion = victim.isInstanceOf[Tank]
+
   def serialise = {
     Operations.toByteArray((
       x,
       y,
-      radius
+      radius,
+      isTankExplosion
     ))
   }
 
