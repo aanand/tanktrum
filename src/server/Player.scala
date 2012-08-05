@@ -26,6 +26,8 @@ class Player(var tank: Tank, playerName: String, playerId: Byte) extends shared.
     (System.currentTimeMillis - lastPing) > TIMEOUT
   }
 
+  def update = {}
+
   def buy(item: Item) = {
     if (money >= item.cost) { 
       money -= item.cost

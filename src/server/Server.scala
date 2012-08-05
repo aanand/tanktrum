@@ -156,6 +156,9 @@ class Server(port: Int, name: String, public: Boolean) extends Session with Acto
     for (e <- explosions) {
       e.update(delta)
     }
+    for (player <- players.values) {
+      player.update
+    }
 
     checkTimeouts()
     
