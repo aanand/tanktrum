@@ -276,6 +276,26 @@ class Projectile(client: Client, val playerID: Byte) extends GameObject {
     }
   }
 
+  def playSound(event: String) {
+    val sound = getSound(event)
+
+    if (!sound.equals("")) {
+      SoundPlayer ! PlaySound(sound)
+    }
+  }
+
+  def getSound(event: String): String = {
+    val className = Projectile.nameForClass(this.getClass)
+
+    val specificSoundKey = "projectile." + className + ".sound." + event
+    val genericSoundKey  = "projectile.Projectile.sound." + event 
+
+    if (Config.getProperty(specificSoundKey) != null) {
+      Config(specificSoundKey)
+    } else {
+      Config(genericSoundKey)
+    }
+  }
 }
 
 class Nuke(client: Client, playerID: Byte) extends Projectile(client, playerID)

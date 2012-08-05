@@ -15,7 +15,11 @@ object SoundPlayer extends Actor {
   var files = List(
     "explosion.wav",
     "explosion1.wav",
-    "reload.wav"
+    "reload.wav",
+    "fire1.wav",
+    "fire2.wav",
+    "fire3.wav",
+    "fire4.wav"
   )
   
   val sounds = new HashMap[String, (AudioFormat, Array[Byte])]()
