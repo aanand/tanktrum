@@ -23,18 +23,9 @@ class PracticeServer(port : Int) extends Server(port, "", false) {
     tank.player = player
     players.put(addr, player)
 
-    for (projectileType <- ProjectileTypes) {
-      player.gun.ammo(projectileType) = 999
-    }
-    player.gun.ammo(ProjectileTypes.MIRV_CLUSTER) = 0
-    player.gun.ammo(ProjectileTypes.DEATHS_HEAD_CLUSTER) = 0
-    player.gun.ammo(ProjectileTypes.CORBOMITE) = 0
-    player.tank.corbomite = 20
-    player.tank.purchasedJumpFuel = players(addr).tank.maxJumpFuel
-    player.tank.jumpFuel = player.tank.purchasedJumpFuel
-
+    giveAmmo(player)
   }
-  
+
   override def addPlayer(addr: SocketAddress) {
     val newPlayer = !players.isDefinedAt(addr)
     
@@ -43,20 +34,23 @@ class PracticeServer(port : Int) extends Server(port, "", false) {
     
     player.tank.destroy = false
 
-    if (newPlayer) {
-      for (projectileType <- ProjectileTypes) {
-        player.gun.ammo(projectileType) = 999
-      }
-      player.gun.ammo(ProjectileTypes.MIRV_CLUSTER) = 0
-      player.gun.ammo(ProjectileTypes.DEATHS_HEAD_CLUSTER) = 0
-      player.gun.ammo(ProjectileTypes.CORBOMITE) = 0
-      player.tank.corbomite = 20
-      player.tank.purchasedJumpFuel = players(addr).tank.maxJumpFuel
-      player.tank.jumpFuel = player.tank.purchasedJumpFuel
-    }
+    if (newPlayer) giveAmmo(player)
 
     ground.flatten(player.tank.x)
     broadcastGround
     for (i <- 0 until 5) {addBotPlayer()}
+  }
+
+  def giveAmmo(player: Player) {
+    player.gun.ammo(ProjectileTypes.NUKE) = 1
+    player.gun.ammo(ProjectileTypes.ROLLER) = 3
+    player.gun.ammo(ProjectileTypes.MIRV) = 1
+    player.gun.ammo(ProjectileTypes.MACHINE_GUN) = 20
+    player.gun.ammo(ProjectileTypes.DEATHS_HEAD) = 1
+    player.gun.ammo(ProjectileTypes.MISSILE) = 3
+    
+    player.tank.corbomite = 10
+    player.tank.purchasedJumpFuel = player.tank.maxJumpFuel/2
+    player.tank.jumpFuel = player.tank.purchasedJumpFuel
   }
 }
