@@ -66,8 +66,11 @@ class Tank(client: Client) extends GameObject {
   
   var maxJumpFuel = Config("tank.jumpjet.maxFuel").toInt
   var jumpFuel = 0f
+  
+  var jetSoundTimer = 500
+
   def fuelPercent = (jumpFuel.toFloat/maxJumpFuel) * 100
- 
+
   def create(x: Float) {
     jetEmitter = ParticleIO.loadEmitter("media/particles/jet.xml")
     vapourEmitter = ParticleIO.loadEmitter("media/particles/vapour.xml")
@@ -80,9 +83,17 @@ class Tank(client: Client) extends GameObject {
 
   def update(delta: Int) {
     gun.update(delta)
+    
+    if (jetSoundTimer > 0) jetSoundTimer -= delta
 
     if (jumping && isAlive) {
       startEmitting
+
+      if (jetSoundTimer <= 0) {
+        SoundPlayer ! PlaySound(Config("tank.sound.jet"))
+        jetSoundTimer = 500
+      }
+
       for (e <- particleEmitters) {
         e.setPosition(x, y)
         e.setRotation(angle.toDegrees)
