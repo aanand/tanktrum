@@ -180,7 +180,11 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
           .map(p => p.interpY)
           .getOrElse(me.tank.y)
 
-      val gameScale = Main.windowWidth / Main.GAME_WIDTH
+      val gameScale = if (Main.windowWidth > Main.GAME_WIDTH * Main.GAME_SCALE) {
+        Main.GAME_SCALE
+      } else {
+        Main.windowWidth / Main.GAME_WIDTH
+      }
       scale(gameScale, gameScale) {
 
         val transY = if (Main.windowHeight > Main.GAME_HEIGHT * gameScale) {
@@ -193,7 +197,13 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
           Math.max(minTransY, Math.min(maxTransY, transYUnclamped))
         }
 
-        translate(0, transY) {
+        val transX = if (Main.windowWidth > Main.GAME_WIDTH * Main.GAME_SCALE) {
+          (Main.windowWidth/Main.GAME_SCALE - Main.GAME_WIDTH)/2
+        } else {
+          0f
+        }
+
+        translate(transX, transY) {
 
           var shakeX = 0f
           var shakeY = 0f

@@ -31,10 +31,11 @@ class Ground(width: Int, height: Int) extends GameObject() {
 
   def render(g: Graphics, image: Image) {
     color(1f, 1f, 1f)
-    val texWidth = image.getTexture.getWidth
-    val texHeight = image.getTexture.getHeight
+    val imageTexture = image.getTexture
+    val texWidth = imageTexture.getWidth
+    val texHeight = imageTexture.getHeight
 
-    texture(image.getTexture.getTextureID) {
+    texture(imageTexture.getTextureID) {
       triStrip {
         for (point <- points) {
           textureVertex(texWidth*point.x/width, texHeight*point.y/height)
