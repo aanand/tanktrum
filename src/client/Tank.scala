@@ -55,7 +55,6 @@ class Tank(client: Client) extends GameObject {
   
   val gun = new Gun(client, id)
 
-  def tankColor = Colors(id)
   def image = Tank.image(id)
   
   var health = 100f
@@ -145,7 +144,7 @@ class Tank(client: Client) extends GameObject {
         
         //Tank body
         texture (image.getTexture.getTextureID) {
-          image.draw(-WIDTH/2f, -HEIGHT, WIDTH, HEIGHT, tankColor)
+          image.draw(-WIDTH/2f, -HEIGHT, WIDTH, HEIGHT)
         }
       }
     }
