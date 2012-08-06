@@ -19,21 +19,26 @@ object Gun {
   }
 }
 
-class Gun(client: Client, playerID: Short) extends shared.Gun(client) {
-  val lowerImage = Gun.lowerImage(playerID)
-  val upperImage = Gun.upperImage(playerID)
+class Gun(client: Client, var playerID: Short) extends shared.Gun(client) {
+  /*
+    These are lazy so that they don't use the value of playerID until after 
+    it has been initialised from a Tank update
+  */
+  lazy val lowerImage = Gun.lowerImage(playerID)
+  lazy val upperImage = Gun.upperImage(playerID)
 
-  val lowerScale = lowerHeight / lowerImage.getHeight
-  val upperScale = upperHeight / upperImage.getHeight
+  lazy val lowerScale = lowerHeight / lowerImage.getHeight
+  lazy val upperScale = upperHeight / upperImage.getHeight
 
-  val lowerWidth = lowerImage.getWidth * lowerScale
-  val upperWidth = upperImage.getWidth * upperScale
+  lazy val lowerWidth = lowerImage.getWidth * lowerScale
+  lazy val upperWidth = upperImage.getWidth * upperScale
 
   val READY_COLOR   = new Color(0.0f, 1.0f, 0.0f, 0.8f)
   val LOADING_COLOR = new Color(1.0f, 0.0f, 0.0f, 0.8f)
 
   def render(g: Graphics) {
     import GL._
+    
     
     translate(OFFSET_X, OFFSET_Y) {
       rotate(0, 0, angle) {

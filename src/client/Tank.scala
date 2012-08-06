@@ -186,6 +186,7 @@ class Tank(client: Client) extends GameObject {
     jumpFuel = newFuel
     
     id = newID
+    gun.playerID = newID
     
     if (null != client.me && id != client.me.id) {
       gun.angle = newGunAngle
