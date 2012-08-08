@@ -70,6 +70,8 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
   var loading = false
   var loadingMessage = "Loading..."
 
+  var gameScale: Float = 0
+
   def enter {
     active = true
     loading = true
@@ -199,7 +201,7 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
           .map(p => p.interpY)
           .getOrElse(me.tank.y)
 
-      val gameScale = if (Main.windowWidth > Main.GAME_WIDTH * Main.GAME_SCALE) {
+      gameScale = if (Main.windowWidth > Main.GAME_WIDTH * Main.GAME_SCALE) {
         Main.GAME_SCALE
       } else {
         Main.windowWidth / Main.GAME_WIDTH

@@ -30,7 +30,9 @@ class Player extends shared.Player {
     translate(10 + id*110, 10) {
       val scoreColor = new Color(flashScore + color.r, flashScore + color.g, flashScore + color.b, color.a)
       g.setColor(scoreColor)
-      g.drawString(score.toString, 0, 16, true);
+
+      tank.render(g, 10, 28, 0, 4, false)
+      g.drawString(score.toString, 28, 16, true);
       
       g.setColor(color)
       g.drawString(name, 0, 0, true)

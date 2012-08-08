@@ -134,17 +134,23 @@ class Tank(client: Client) extends GameObject {
   import GL._
 
   def render(g: Graphics) {
+    render(g, x, y, angle, 1, true)
+  }
+
+  def render(g: Graphics, x: Float, y: Float, angle: Float, scaleTo: Float, drawGun: Boolean) {
     if (isDead) {
       return
     }
     
     translate(x, y) {
       rotate(0, 0, angle.toDegrees) {
-        gun.render(g)
-        
-        //Tank body
-        texture (image.getTexture.getTextureID) {
-          image.draw(-WIDTH/2f, -HEIGHT, WIDTH, HEIGHT)
+        scale(scaleTo, scaleTo) {
+          if (drawGun) {gun.render(g)}
+          
+          //Tank body
+          texture (image.getTexture.getTextureID) {
+            image.draw(-WIDTH/2f, -HEIGHT, WIDTH, HEIGHT)
+          }
         }
       }
     }
