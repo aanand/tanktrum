@@ -1,0 +1,15 @@
+@import susy
+@import compass/typography/text/replacement
+
+@import normalize.css
+
+$total-columns: 12
+$column-width: 60px
+$gutter-width: 10px
+$grid-padding: $gutter-width
+
+.container
+  +container
+
+h1
+  +replace-text-with-dimensions('logo.png')
