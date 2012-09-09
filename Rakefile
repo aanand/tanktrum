@@ -87,6 +87,10 @@ end
 directory "dist/webstart"
 jarsigner_passphrase = nil
 
+file "dist/www" do
+  ln_s "../packaging/www/build", "dist/www"
+end
+
 WEBSTART_JAR_FILES.each do |target|
   source = "lib/#{File.basename(target)}"
   
@@ -126,10 +130,10 @@ namespace :build do
   end
   
   desc "build website"
-  task :www do
-    sh "webgen -d packaging/www"
-    rm_rf "dist/www"
-    cp_r "packaging/www/out", "dist/www"
+  task :www => ["deps:www", "dist/www"] do
+    Dir.chdir("packaging/www") do
+      sh "middleman build"
+    end
   end
   
   desc "build webstart"
@@ -143,6 +147,23 @@ namespace :build do
       jar_name = "lib/natives-#{suffix}.jar"
       flag = File.exist?(jar_name) ? "u" : "c"
       sh "jar -#{flag}f #{jar_name} -C #{dir_name}/ ."
+    end
+  end
+end
+
+namespace :serve do
+  desc "serve website locally"
+  task :www => "deps:www" do
+    Dir.chdir("packaging/www") do
+      sh "middleman"
+    end
+  end
+end
+
+namespace :deps do
+  task :www do
+    Dir.chdir("packaging/www") do
+      sh "bundle check || bundle install"
     end
   end
 end
