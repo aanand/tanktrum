@@ -14,8 +14,11 @@ $grid-padding: $gutter-width
 
 body
   background-image: image-url('asfalt.png')
-  color: white
+  color: #aaa
   font-family: 'Lato', sans-serif
+
+a
+  color: #fff
 
 .container
   +container
@@ -67,3 +70,18 @@ h2
       width: 60%
       text-align: left
       padding-left: 8px
+
+.info
+  +span-columns(12 omega)
+  margin-top: 30px
+  text-align: center
+
+  & > div
+    display: inline
+
+    &:before
+      content: "\00B7"
+      margin: 0 1em
+
+    &:first-child:before
+      display: none
