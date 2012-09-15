@@ -61,6 +61,9 @@ class ReadyRoom (client: Client) {
             g.drawString(player.name, Main.windowWidth - 450, offset * 20, true)
           }
           g.drawString(player.score.toString, Main.windowWidth - 200, offset * 20, true)
+          
+          player.tank.render(g, Main.windowWidth-470, 14+offset*20, 0, 5f, false)
+          
           offset += 1
         }
         

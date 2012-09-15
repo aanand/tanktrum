@@ -533,9 +533,13 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
       p.loadFrom(playerData)
       if (players.isDefinedAt(p.id) && players(p.id).name == p.name) {
         players(p.id).loadFrom(playerData)
-      }
-      else {
+      } else {
         players.put(p.id, p)
+        val t = new Tank(this)
+        t.create(0)
+        p.tank = t
+        t.player = p
+        t.id = p.id
       }
       players(p.id).updated = true
     }
@@ -580,16 +584,7 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
     for (tankDataMap <- tankDataList) {
       val (id, tankData) = tankDataMap
       if (players.isDefinedAt(id)) {
-        if (null != players(id).tank) {
-          players(id).tank.loadFrom(tankData)
-        }
-        else {
-          val t = new Tank(this)
-          t.create(0)
-          t.loadFrom(tankData)
-          players(t.id).tank = t
-          t.player = players(t.id)
-        }
+        players(id).tank.loadFrom(tankData)
       }
     }
   }
