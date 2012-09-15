@@ -72,6 +72,9 @@ class Tank(client: Client) extends GameObject {
 
   var showPower = 0
 
+  val maxShowIndicator = Config("tank.showIndicatorTime").toInt
+  var showIndicator = maxShowIndicator
+
   def fuelPercent = (jumpFuel.toFloat/maxJumpFuel) * 100
 
   def create(x: Float) {
@@ -90,6 +93,12 @@ class Tank(client: Client) extends GameObject {
     if (jetSoundTimer > 0) jetSoundTimer -= delta
 
     if (showPower > 0) showPower -= delta
+    
+    if (player != null && player.me && showIndicator > 0) {
+      showIndicator -= delta
+    }
+    
+
     if (gun != null && gun.powerChange != 0) showPower = 1000
 
     if (jumping && isAlive) {
@@ -147,11 +156,22 @@ class Tank(client: Client) extends GameObject {
     translate(x, y) {     
       rotate(0, 0, angle.toDegrees) {
         scale(scaleTo, scaleTo) {
-          if (drawGun) {gun.render(g)}
+
+          if (drawGun) {
+            gun.render(g)
+          }
           
           //Tank body
           texture (image.getTexture.getTextureID) {
             image.draw(-WIDTH/2f, -HEIGHT, WIDTH, HEIGHT)
+          }
+
+          if (drawGun) {
+            //Indicate which tank is the player
+            if (player != null && player.me && showIndicator > 0) {
+              g.setColor(new Color(0.1f, 0.5f, 0.1f, 0.7f))
+              g.fillRect(-WIDTH/2f, -HEIGHT/2-HEIGHT*showIndicator/maxShowIndicator.toFloat/2, WIDTH, HEIGHT*showIndicator/maxShowIndicator.toFloat)
+            }
           }
         }
       }
