@@ -3,7 +3,7 @@ package shared
 import org.newdawn.slick
 
 object Main {
-  val game = new Game("Boom Trapezoid")
+  val game = new Game("Tanktrum")
   var container: slick.AppGameContainer = _
   
   val INITIAL_WINDOW_WIDTH  = Prefs("window.width").toInt

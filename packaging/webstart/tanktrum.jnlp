@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <jnlp spec="1.0+"
-      codebase="http://boomtrapezoid.com/webstart"
+      codebase="http://tanktrum.com/webstart"
       href="tanktrum.jnlp">
 
   <information>
-    <title>Boom Trapezoid</title>
-    <vendor>boomtrapezoid.com</vendor>
+    <title>Tanktrum</title>
+    <vendor>tanktrum.com</vendor>
   </information> 
 
   <resources>
