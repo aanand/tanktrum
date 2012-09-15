@@ -7,3 +7,4 @@ packaging/www/out
 classes
 dist
 tmp
+lib/tank.jar
