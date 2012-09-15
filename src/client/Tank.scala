@@ -169,8 +169,9 @@ class Tank(client: Client) extends GameObject {
           if (drawGun) {
             //Indicate which tank is the player
             if (player != null && player.me && showIndicator > 0) {
-              g.setColor(new Color(0.1f, 0.5f, 0.1f, 0.7f))
-              g.fillRect(-WIDTH/2f, -HEIGHT/2-HEIGHT*showIndicator/maxShowIndicator.toFloat/2, WIDTH, HEIGHT*showIndicator/maxShowIndicator.toFloat)
+              g.setColor(new Color(0.1f, 0.5f, 0.1f, 0.85f))
+              val mult = Math.pow(showIndicator/maxShowIndicator.toFloat, 2).toFloat
+              g.fillOval(-mult*WIDTH, -HEIGHT/2f-mult*HEIGHT/2f, 2f*WIDTH*mult, 2f*HEIGHT*mult);
             }
           }
         }
