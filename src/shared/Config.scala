@@ -19,7 +19,7 @@ object Config extends Properties {
 }
 
 object Prefs {
-  val prefs = Preferences.userRoot.node("boomtrapezoid")
+  val prefs = Preferences.userRoot.node("tanktrum")
   
   def apply (name: String, defaultProperty: String) = {
     prefs.get(name, Config(defaultProperty))

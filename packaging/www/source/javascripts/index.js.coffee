@@ -1,0 +1,1 @@
+$('.team a').shuffle()

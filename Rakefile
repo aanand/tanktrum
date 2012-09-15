@@ -99,7 +99,7 @@ WEBSTART_JAR_FILES.each do |target|
     
     require 'highline'
     jarsigner_passphrase ||= HighLine.new.ask("Enter jarsigner passphrase: ") { |q| q.echo = false }
-    unless system "jarsigner -keystore boomtrapezoid.ks -storepass '#{jarsigner_passphrase}' #{target} boomtrapezoid"
+    unless system "jarsigner -keystore tanktrum.ks -storepass '#{jarsigner_passphrase}' #{target} boomtrapezoid"
       rm target
       raise "jarsigner failed"
     end
@@ -179,21 +179,25 @@ namespace :upload do
   
   desc "upload #{GAME_JAR_NAME}.jar"
   task :game do
-    upload "dist/webstart/#{GAME_JAR_NAME}.jar"
+    upload "dist/webstart/#{GAME_JAR_NAME}.jar", "webstart"
   end
   
   desc "upload webstart files - .jnlp, index.html, etc"
   task :files do
-    upload(Dir["dist/webstart/*"] - WEBSTART_JAR_FILES)
+    upload(Dir["dist/webstart/*"] - WEBSTART_JAR_FILES, "webstart")
   end
   
   desc "upload dependencies"
   task :libs do
-    upload(WEBSTART_JAR_FILES - ["dist/webstart/#{GAME_JAR_NAME}.jar"])
+    upload(WEBSTART_JAR_FILES - ["dist/webstart/#{GAME_JAR_NAME}.jar"], "webstart")
   end
   
-  def upload files
+  def upload(files, path="")
     files = [files].flatten
-    sh "scp -r #{files.join(" ")} boomtrapezoid@norgg.org:/var/www/boomtrapezoid.com/htdocs/"
+
+    full_path = "/var/www/boomtrapezoid.com/htdocs/#{path}"
+    full_path += "/" unless full_path =~ /\/$/
+
+    sh "scp -r #{files.join(" ")} boomtrapezoid@norgg.org:#{full_path}"
   end
 end
