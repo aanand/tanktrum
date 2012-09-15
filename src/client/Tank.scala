@@ -10,6 +10,7 @@ import org.newdawn.slick.particles._
 import org.newdawn.slick._
 
 import SwitchableParticleEmitter._
+import RichGraphics._
 
 object Tank {
   val images = new scala.collection.mutable.HashMap[Int, Image]
@@ -69,6 +70,8 @@ class Tank(client: Client) extends GameObject {
   val maxJetSoundTimer = Config("tank.jumpjet.soundRepeat").toInt
   var jetSoundTimer = 0
 
+  var showPower = 0
+
   def fuelPercent = (jumpFuel.toFloat/maxJumpFuel) * 100
 
   def create(x: Float) {
@@ -85,6 +88,9 @@ class Tank(client: Client) extends GameObject {
     gun.update(delta)
     
     if (jetSoundTimer > 0) jetSoundTimer -= delta
+
+    if (showPower > 0) showPower -= delta
+    if (gun != null && gun.powerChange != 0) showPower = 1000
 
     if (jumping && isAlive) {
       startEmitting
@@ -138,7 +144,7 @@ class Tank(client: Client) extends GameObject {
   }
 
   def render(g: Graphics, x: Float, y: Float, angle: Float, scaleTo: Float, drawGun: Boolean) {
-    translate(x, y) {
+    translate(x, y) {     
       rotate(0, 0, angle.toDegrees) {
         scale(scaleTo, scaleTo) {
           if (drawGun) {gun.render(g)}
@@ -149,6 +155,20 @@ class Tank(client: Client) extends GameObject {
           }
         }
       }
+
+      //Display power percentage
+      if (player != null && player.me) {
+        if (showPower > 0) {
+          val textScale = 1/client.gameScale
+          scale(textScale, textScale) {
+            g.setColor(new Color(1f, 1f, 1f, 1f))
+            val powerPercent = (100 * gun.power / gun.POWER_RANGE.end).toInt
+            g.drawString(powerPercent.toString, (-WIDTH - 2).toInt, HEIGHT.toInt, true)
+          }
+        }
+      }
+
+
     }
   }
 
