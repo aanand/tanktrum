@@ -183,8 +183,11 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
         g.setColor(new Color(0f, 0f, 0f, 0.5f))
         g.fillRect(0, 0, Main.windowWidth, Main.windowHeight)
         g.setColor(new Color(1f, 1f, 1f))
-
-        g.drawString(loadingMessage, Main.windowWidth/2 - 20, Main.windowHeight/2, true)
+        
+        var loadingX: Int = (Main.windowWidth/2 - Main.game.font.getWidth(loadingMessage)/2).toInt
+        var loadingY: Int = (Main.windowHeight/2).toInt
+  
+        g.drawString(loadingMessage, loadingX, loadingY, true)
       } else {
         renderSky(g)
         readyRoom.render(g)
