@@ -117,18 +117,23 @@ class Game(title: String) extends BasicGame(title) {
 
   def render(container: GameContainer, g: Graphics) = {
     g.setFont(font)
+    
+    var alpha = 1f;
+    
+    if (client != null && client.active) {
+      client.render(g)
+      alpha = 0.95f;
+    }
+
+    if ((menu != null && menu.showing) || serverList.showing) {
+      titleImage.draw(0, 0, Main.windowWidth, Main.windowHeight, new Color(1f, 1f, 1f, alpha))
+    }
 
     if (menu != null && menu.showing) {
-      titleImage.draw(0, 0, Main.windowWidth, Main.windowHeight)
       menu.render(g)
-    }
-    else if (serverList.showing) {
-      titleImage.draw(0, 0, Main.windowWidth, Main.windowHeight, new Color(1f, 1f, 1f, 0.2f))
+    } else if (serverList.showing) {
       serverList.render(g)
-    }
-    else if (client != null && client.active) {
-      client.render(g)
-    } else if (menu != null) {
+    } else if (menu != null && (client == null || !client.active)) {
       //Avoid just showing a blank screen otherwise.
       menu.showing = true
       titleImage.draw(0, 0, Main.windowWidth, Main.windowHeight)
