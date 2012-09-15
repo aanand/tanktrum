@@ -8,6 +8,7 @@ import sbinary.Operations
 import org.newdawn.slick.geom._
 import org.newdawn.slick.particles._
 import org.newdawn.slick._
+import javax.sound.sampled.Clip
 
 import SwitchableParticleEmitter._
 import RichGraphics._
@@ -67,8 +68,7 @@ class Tank(client: Client) extends GameObject {
   var maxJumpFuel = Config("tank.jumpjet.maxFuel").toInt
   var jumpFuel = 0f
   
-  val maxJetSoundTimer = Config("tank.jumpjet.soundRepeat").toInt
-  var jetSoundTimer = 0
+  var jetClip: Option[Clip] = None
 
   var showPower = 0
 
@@ -91,8 +91,6 @@ class Tank(client: Client) extends GameObject {
   def update(delta: Int) {
     gun.update(delta)
     
-    if (jetSoundTimer > 0) jetSoundTimer -= delta
-
     if (showPower > 0) showPower -= delta
     
     if (player != null && player.me && showIndicator > 0) {
@@ -105,9 +103,8 @@ class Tank(client: Client) extends GameObject {
     if (jumping && isAlive) {
       startEmitting
 
-      if (jetSoundTimer <= 0) {
-        jetSoundTimer = maxJetSoundTimer
-        SoundPlayer ! PlaySound(Config("tank.sound.jet"))
+      if (jetClip == None) {
+        jetClip = Some(SoundPlayer.play(Config("tank.sound.jet"), true))
       }
 
       for (e <- particleEmitters) {
@@ -116,12 +113,16 @@ class Tank(client: Client) extends GameObject {
       }
     }
     else {
+      if (jetClip != None) {
+        jetClip.get.stop()
+        jetClip = None
+      }
       stopEmitting
     }
     
     if (wasAlive && !isAlive) {
       val sound = Config("tank.sound.death")
-      SoundPlayer ! PlaySound(sound)
+      SoundPlayer.play(sound)
     }
     
     wasAlive = isAlive

@@ -11,7 +11,7 @@ import scala.collection.mutable.HashMap
 
 case class PlaySound(s: String) {}
 
-object SoundPlayer extends Actor {
+object SoundPlayer {
   val files  = List(
     "death.wav",
     "explosion.ground1.wav",
@@ -35,15 +35,11 @@ object SoundPlayer extends Actor {
     }
   }
 
-  def act {
-    while (true) {
-      receive {
-        case PlaySound(sound) => play(sound)
-      }
-    }
+  def play(filename: String): Clip = {
+    play(filename, false)
   }
-  
-  def play(filename: String) = {
+
+  def play(filename: String, loop: Boolean): Clip = {
     val (format, data) = sounds(filename)
     val clip = AudioSystem.getClip
 
@@ -55,8 +51,14 @@ object SoundPlayer extends Actor {
     catch {
       case e:LineUnavailableException => println("Warning: no available sound lines.")
     }
+    
+    if (loop) {
+      clip.loop(Clip.LOOP_CONTINUOUSLY)
+    } else {
+      clip.start
+    }
 
-    clip.start
+    clip
   }
 
   def decodeFile(fileName: String) = {

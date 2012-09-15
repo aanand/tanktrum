@@ -53,7 +53,7 @@ class Explosion (client: Client) extends GameObject {
 
   def playSound {
     val sound = if (isTankExplosion) "explosion.tank1.wav" else "explosion.ground1.wav"
-    SoundPlayer ! PlaySound(sound)
+    SoundPlayer.play(sound)
   }
 }
 

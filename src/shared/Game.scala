@@ -24,8 +24,6 @@ class Game(title: String) extends BasicGame(title) {
   var menu : Menu = _
   val serverList  = new ServerList(this)
   
-  SoundPlayer.start
-  
   def setMode(width: Int, height: Int, fullscreen: Boolean) = {
     container.asInstanceOf[AppGameContainer].setDisplayMode(width, height, fullscreen)
     container.getInput.clearKeyPressedRecord //Changing modes means releasing enter gets missed.

@@ -280,7 +280,7 @@ class Projectile(client: Client, val playerID: Byte) extends GameObject {
     val sound = getSound(event)
 
     if (!sound.equals("")) {
-      SoundPlayer ! PlaySound(sound)
+      SoundPlayer.play(sound)
     }
   }
 

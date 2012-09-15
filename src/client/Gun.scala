@@ -58,7 +58,7 @@ class Gun(client: Client, var playerID: Short) extends shared.Gun(client) {
   def setTimer(newVal: float) = {
     if (newVal <= 0 && timer > 0) {
       if (playerID == client.me.id && selectedWeapon != ProjectileTypes.MACHINE_GUN) {
-        SoundPlayer ! PlaySound("reload.wav")
+        SoundPlayer.play("reload.wav")
       }
     }
     timer = newVal
