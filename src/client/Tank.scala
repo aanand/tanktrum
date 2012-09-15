@@ -138,10 +138,6 @@ class Tank(client: Client) extends GameObject {
   }
 
   def render(g: Graphics, x: Float, y: Float, angle: Float, scaleTo: Float, drawGun: Boolean) {
-    if (isDead) {
-      return
-    }
-    
     translate(x, y) {
       rotate(0, 0, angle.toDegrees) {
         scale(scaleTo, scaleTo) {

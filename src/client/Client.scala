@@ -243,7 +243,12 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
             
             projectiles.values.foreach(_.render(g, spriteColor))
             explosions.foreach        (_.render(g))
-            tanks.foreach             ((tank) => if (null != tank) {tank.render(g)})
+            
+            tanks.foreach((tank) => {
+              if (null != tank && tank.isAlive) {
+                tank.render(g)
+              }
+            })
           }
         }
       }
