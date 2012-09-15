@@ -74,6 +74,7 @@ class Tank(client: Client) extends GameObject {
 
   val maxShowIndicator = Config("tank.showIndicatorTime").toInt
   var showIndicator = maxShowIndicator
+  val arrowShape = new Polygon(List[Float](-1, 0, -1, -5, -2, -5, 0, -7, 2, -5, 1, -5, 1, 0).toArray)
 
   def fuelPercent = (jumpFuel.toFloat/maxJumpFuel) * 100
 
@@ -169,9 +170,13 @@ class Tank(client: Client) extends GameObject {
           if (drawGun) {
             //Indicate which tank is the player
             if (player != null && player.me && showIndicator > 0) {
-              g.setColor(new Color(0.1f, 0.5f, 0.1f, 0.85f))
-              val mult = Math.pow(showIndicator/maxShowIndicator.toFloat, 2).toFloat
-              g.fillOval(-mult*WIDTH, -HEIGHT/2f-mult*HEIGHT/2f, 2f*WIDTH*mult, 2f*HEIGHT*mult);
+              g.setColor(new Color(0.1f, 0.8f, 0.1f, 0.9f))
+              val arrowY = Math.sin(showIndicator/200f).toFloat
+              translate(0, -HEIGHT*3.5f + arrowY) {
+                scale(0.5f, -0.5f) {
+                  g.fill(arrowShape)
+                }
+              }
             }
           }
         }
