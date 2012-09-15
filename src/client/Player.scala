@@ -79,10 +79,10 @@ object Colors {
   def cycle(i: Int) = i%colors.length
 
   val colors = Array(
-    new Color(1f, 0f, 0f),
-    new Color(0f, 1f, 0f),
-    new Color(0f, 0f, 1f),
-    new Color(1f, 1f, 0f),
-    new Color(1f, 0f, 1f),
-    new Color(0f, 1f, 1f))
+    new Color(230,  230,  230),
+    new Color(236, 65,  0),
+    new Color(229, 205, 54),
+    new Color(0,   140, 170),
+    new Color(70,  97,  26),
+    new Color(92,  48,  110))
 }
