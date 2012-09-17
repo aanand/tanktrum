@@ -192,19 +192,19 @@ namespace :upload do
     upload(WEBSTART_JAR_FILES - ["dist/webstart/#{GAME_JAR_NAME}.jar"], "webstart")
   end
   
-  def upload(files, path="")
+  def upload(files, remote_dir="")
     files = [files].flatten
 
-    sh "scp -r #{files.join(" ")} #{remote_path(path)}"
+    sh "scp -r #{files.join(" ")} #{append_slash(remote_path(remote_dir))}"
   end
 
-  def sync(dir, path="")
-    sh "rsync --archive --compress --verbose #{append_slash(dir)} #{remote_path(path)}"
+  def sync(dir, remote_dir="")
+    sh "rsync --archive --compress --verbose #{append_slash(dir)} #{append_slash(remote_path(remote_dir))}"
   end
 
   def remote_path(path)
     full_path = "/var/www/boomtrapezoid.com/htdocs/#{path}"
-    "boomtrapezoid@norgg.org:#{append_slash(full_path)}"
+    "boomtrapezoid@norgg.org:#{full_path}"
   end
 
   def append_slash(path)
