@@ -87,10 +87,6 @@ end
 directory "dist/webstart"
 jarsigner_passphrase = nil
 
-file "dist/www" do
-  ln_s "../packaging/www/build", "dist/www"
-end
-
 WEBSTART_JAR_FILES.each do |target|
   source = "lib/#{File.basename(target)}"
   
@@ -130,7 +126,7 @@ namespace :build do
   end
   
   desc "build website"
-  task :www => ["deps:www", "dist/www"] do
+  task :www => ["deps:www"] do
     Dir.chdir("packaging/www") do
       sh "middleman build"
     end
