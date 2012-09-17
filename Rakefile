@@ -171,7 +171,7 @@ end
 namespace :upload do
   desc "upload website"
   task :www do
-    upload Dir["dist/www/*"]
+    sync "packaging/www/build"
   end
   
   desc "upload #{GAME_JAR_NAME}.jar and webstart files"
@@ -195,9 +195,21 @@ namespace :upload do
   def upload(files, path="")
     files = [files].flatten
 
-    full_path = "/var/www/boomtrapezoid.com/htdocs/#{path}"
-    full_path += "/" unless full_path =~ /\/$/
-
-    sh "scp -r #{files.join(" ")} boomtrapezoid@norgg.org:#{full_path}"
+    sh "scp -r #{files.join(" ")} #{remote_path(path)}"
   end
+
+  def sync(dir, path="")
+    sh "rsync --archive --compress --verbose #{append_slash(dir)} #{remote_path(path)}"
+  end
+
+  def remote_path(path)
+    full_path = "/var/www/boomtrapezoid.com/htdocs/#{path}"
+    "boomtrapezoid@norgg.org:#{append_slash(full_path)}"
+  end
+
+  def append_slash(path)
+    path += "/" unless path =~ /\/$/
+    path
+  end
+
 end
