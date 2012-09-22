@@ -42,10 +42,12 @@ class Player(client: Client) extends shared.Player {
       if (equals(client.me)) {
         tank.render(g, 20, 28, 0, 8, false)
         g.drawString(score.toString, 42, 16, true);
+        g.setColor(color)
         g.drawString(name, 42, 0, true)
       } else {
         tank.render(g, 10, 28, 0, 4, false)
         g.drawString(score.toString, 28, 16, true);
+        g.setColor(color)
         g.drawString(name, 0, 0, true)
       }
 
