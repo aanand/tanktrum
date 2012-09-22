@@ -10,11 +10,13 @@ import sbinary.Operations
 import org.newdawn.slick._
 
 object Explosion {
-  val images = new scala.collection.mutable.HashMap[Int, Image]
+  val images = new scala.collection.mutable.HashMap[String, Image]
   val frames = 6
 
-  def frame(frameNum: Int) = {
-    images.getOrElseUpdate(frameNum, new Image("media/explosions/boom" + frameNum + ".png"))
+  def frame(frameNum: Int, radius: Float) = {
+    val size = if (radius < 5) { "small" } else { "large" }
+    println(size)
+    images.getOrElseUpdate(size+frameNum, new Image("media/explosions/"+size+"/boom" + frameNum + ".png"))
   }
 }
 
@@ -36,7 +38,7 @@ class Explosion (client: Client) extends GameObject {
   def render(g: Graphics) {
     val frameNum = Math.min(6, (Explosion.frames * (1-animationTime/animationLifetime)).toInt + 1)
 
-    val image = Explosion.frame(frameNum)
+    val image = Explosion.frame(frameNum, radius)
     texture(image.getTexture.getTextureID) {
       color(1f, 1, 1f, 1f)
       image.draw(x - radius, y - radius, radius*2, radius*2)
