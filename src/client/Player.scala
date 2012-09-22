@@ -11,7 +11,7 @@ import java.net._
 import sbinary.Instances._
 import sbinary.Operations
 
-class Player extends shared.Player {
+class Player(client: Client) extends shared.Player {
 
   var tank: Tank = _
   def gun = tank.gun
@@ -27,15 +27,27 @@ class Player extends shared.Player {
       return
     }
 
-    translate(10 + id*110, 10) {
+    val position: Int = 
+      if (id > client.me.id) id-1 
+      else                   id
+
+    val translateX = 
+      if (equals(client.me)) 10  
+      else                   Main.windowWidth - 120 - position*110
+
+    translate(translateX, 10) {
       val scoreColor = new Color(flashScore + color.r, flashScore + color.g, flashScore + color.b, color.a)
       g.setColor(scoreColor)
 
-      tank.render(g, 10, 28, 0, 4, false)
-      g.drawString(score.toString, 28, 16, true);
-      
-      g.setColor(color)
-      g.drawString(name, 0, 0, true)
+      if (equals(client.me)) {
+        tank.render(g, 20, 28, 0, 8, false)
+        g.drawString(score.toString, 42, 16, true);
+        g.drawString(name, 42, 0, true)
+      } else {
+        tank.render(g, 10, 28, 0, 4, false)
+        g.drawString(score.toString, 28, 16, true);
+        g.drawString(name, 0, 0, true)
+      }
 
       translate(0, 32) {
         g.fillRect(0, 0, tank.health, 10)

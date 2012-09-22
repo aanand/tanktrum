@@ -257,7 +257,7 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
         }
       }
 
-      players.values.foreach (_.render(g, spriteColor))
+      players.values.foreach(_.render(g, spriteColor))
 
       if (noticeState) {
         val width = g.getFont.getWidth(noticeText)
@@ -532,7 +532,7 @@ class Client (hostname: String, port: Int, name: String, container: GameContaine
     for (player <- players.values) { player.updated = false }
 
     for (playerData <- playerDataList) {
-      val p = new Player
+      val p = new Player(this)
       p.loadFrom(playerData)
       if (players.isDefinedAt(p.id) && players(p.id).name == p.name) {
         players(p.id).loadFrom(playerData)

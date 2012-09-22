@@ -15,7 +15,6 @@ object Explosion {
 
   def frame(frameNum: Int, radius: Float) = {
     val size = if (radius < 5) { "small" } else { "large" }
-    println(size)
     images.getOrElseUpdate(size+frameNum, new Image("media/explosions/"+size+"/boom" + frameNum + ".png"))
   }
 }
