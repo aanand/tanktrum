@@ -10,7 +10,7 @@ def jar_files dir, names
   names.map{ |name| "#{dir}/#{name}.jar" }
 end
 
-LIB_JAR_NAMES = %w(scala-library slick jbox2d lwjgl sbinary jogg vorbisspi jorbis tritonus_share natives-linux natives-mac natives-win32 natives-win64)
+LIB_JAR_NAMES = %w(scala-library slick jbox2d lwjgl sbinary natives-linux natives-mac natives-win32 natives-win64)
 LIB_JAR_FILES = jar_files('lib', LIB_JAR_NAMES)
 
 GAME_JAR_NAME = 'tank'
@@ -87,10 +87,6 @@ end
 directory "dist/webstart"
 jarsigner_passphrase = nil
 
-file "dist/www" do
-  ln_s "../packaging/www/build", "dist/www"
-end
-
 WEBSTART_JAR_FILES.each do |target|
   source = "lib/#{File.basename(target)}"
   
@@ -130,7 +126,7 @@ namespace :build do
   end
   
   desc "build website"
-  task :www => ["deps:www", "dist/www"] do
+  task :www => ["deps:www"] do
     Dir.chdir("packaging/www") do
       sh "middleman build"
     end
@@ -171,7 +167,7 @@ end
 namespace :upload do
   desc "upload website"
   task :www do
-    upload Dir["dist/www/*"]
+    sync "packaging/www/build"
   end
   
   desc "upload #{GAME_JAR_NAME}.jar and webstart files"
@@ -192,12 +188,24 @@ namespace :upload do
     upload(WEBSTART_JAR_FILES - ["dist/webstart/#{GAME_JAR_NAME}.jar"], "webstart")
   end
   
-  def upload(files, path="")
+  def upload(files, remote_dir="")
     files = [files].flatten
 
-    full_path = "/var/www/boomtrapezoid.com/htdocs/#{path}"
-    full_path += "/" unless full_path =~ /\/$/
-
-    sh "scp -r #{files.join(" ")} boomtrapezoid@norgg.org:#{full_path}"
+    sh "scp -r #{files.join(" ")} #{append_slash(remote_path(remote_dir))}"
   end
+
+  def sync(dir, remote_dir="")
+    sh "rsync --archive --compress --verbose #{append_slash(dir)} #{append_slash(remote_path(remote_dir))}"
+  end
+
+  def remote_path(path)
+    full_path = "/var/www/boomtrapezoid.com/htdocs/#{path}"
+    "boomtrapezoid@norgg.org:#{full_path}"
+  end
+
+  def append_slash(path)
+    path += "/" unless path =~ /\/$/
+    path
+  end
+
 end

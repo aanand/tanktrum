@@ -5,7 +5,6 @@ import java.io._
 import java.net.URL
 import java.util.Properties
 import javax.sound.sampled._
-import javazoom.spi.PropertiesContainer
 import scala.actors.Actor
 import scala.collection.mutable.HashMap
 
