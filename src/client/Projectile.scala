@@ -31,6 +31,8 @@ object Projectile {
   val sprites = new scala.collection.mutable.HashMap[String, Image]
   val icons   = new scala.collection.mutable.HashMap[String, Image]
 
+  val gibColor = new Color(0.5f, 0.5f, 0.5f)
+
   def create(client: Client, projectileType: ProjectileTypes.Value, playerID: Byte): Projectile = {
     projectileType match {
       case PROJECTILE          => new Projectile(client, playerID)
@@ -228,13 +230,13 @@ class Projectile(client: Client, val playerID: Byte) extends GameObject {
     if (this.isInstanceOf[Gib]) {
       val image = Tank.image(playerID)
       val transX = (id % 2) * image.getWidth/2f;
-      val transY = ((id/2) % 2) * image.getWidth/2f;
+      val transY = (id % 2) * image.getHeight/2f;
       translate(interpX, interpY) {
         rotate(0, 0, interpAngle.toDegrees) {
           scale(imageScale, imageScale) {
-            texture(image.getTexture.getTextureID) {
-              image.draw(-image.getWidth/2f + transX, -image.getHeight/2f + transY, image.getWidth/2, image.getHeight/2, color)
-            }
+            image.draw(-image.getWidth/4f, -image.getHeight/4f, image.getWidth/4, image.getHeight/4, //Draw area
+                       transX, transY, image.getWidth/2 + transX, image.getHeight/2 + transY, //Source from texture
+                       Projectile.gibColor)
           }
         }
       }

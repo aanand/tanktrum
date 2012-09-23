@@ -47,7 +47,7 @@ class PracticeServer(port : Int) extends Server(port, "", false) {
     player.gun.ammo(ProjectileTypes.DEATHS_HEAD) = 1
     player.gun.ammo(ProjectileTypes.MISSILE) = 3
     
-    player.tank.corbomite = 10
+    player.tank.corbomite = 5
     player.tank.purchasedJumpFuel = player.tank.maxJumpFuel/2
     player.tank.jumpFuel = player.tank.purchasedJumpFuel
   }
