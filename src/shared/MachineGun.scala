@@ -2,9 +2,6 @@ import org.newdawn.slick
 import sbinary.Instances._
 import sbinary.Operations
 
-import org.jbox2d.dynamics._
-import org.jbox2d.dynamics.contacts._
-import org.jbox2d.common._
 import org.jbox2d.collision._
 
 package shared {

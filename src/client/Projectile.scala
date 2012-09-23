@@ -24,7 +24,8 @@ object Projectile {
     MACHINE_GUN -> nameForClass(classOf[MachineGun]),
     DEATHS_HEAD -> nameForClass(classOf[DeathsHead]),
     DEATHS_HEAD_CLUSTER -> nameForClass(classOf[DeathsHeadCluster]),
-    MISSILE -> nameForClass(classOf[Missile])
+    MISSILE -> nameForClass(classOf[Missile]),
+    GIB -> nameForClass(classOf[Gib])
   )
 
   val sprites = new scala.collection.mutable.HashMap[String, Image]
@@ -42,6 +43,7 @@ object Projectile {
       case DEATHS_HEAD         => new DeathsHead(client, playerID)
       case DEATHS_HEAD_CLUSTER => new DeathsHeadCluster(client, playerID)
       case MISSILE             => new Missile(client, playerID)
+      case GIB                 => new Gib(client, playerID)
     }
   }
 
@@ -106,8 +108,7 @@ object Projectile {
 
   def render(g: Graphics, value: Value, color: Color) {
     val name = classNames(value)
-    val image = icons(name)
-
+    val image = icons(name) 
     image.draw((-image.getWidth/2f).toInt, (-image.getHeight/2f).toInt, color)
   }
 }
@@ -123,7 +124,6 @@ class Projectile(client: Client, val playerID: Byte) extends GameObject {
   def trailDead = stationaryTime > trailLifetime
     
   val name       = Projectile.nameForClass(getClass)
-  val image      = Projectile.imageForName(name)
   val imageScale = Projectile.imageScaleForName(name)
 
   /*Two updates containing a projectile are required before we can do
@@ -225,11 +225,27 @@ class Projectile(client: Client, val playerID: Byte) extends GameObject {
   def renderBody(g: Graphics, color: Color) {
     import GL._
 
-    translate(interpX, interpY) {
-      rotate(0, 0, interpAngle.toDegrees) {
-        scale(imageScale, imageScale) {
-          texture (image.getTexture.getTextureID) {
-            image.draw(-image.getWidth/2f, -image.getHeight/2f, color)
+    if (this.isInstanceOf[Gib]) {
+      val image = Tank.image(playerID)
+      val transX = (id % 2) * image.getWidth/2f;
+      val transY = ((id/2) % 2) * image.getWidth/2f;
+      translate(interpX, interpY) {
+        rotate(0, 0, interpAngle.toDegrees) {
+          scale(imageScale, imageScale) {
+            texture(image.getTexture.getTextureID) {
+              image.draw(-image.getWidth/2f + transX, -image.getHeight/2f + transY, image.getWidth/2, image.getHeight/2, color)
+            }
+          }
+        }
+      }
+    } else {
+      val image      = Projectile.imageForName(name)
+      translate(interpX, interpY) {
+        rotate(0, 0, interpAngle.toDegrees) {
+          scale(imageScale, imageScale) {
+            texture (image.getTexture.getTextureID) {
+              image.draw(-image.getWidth/2f, -image.getHeight/2f, color)
+            }
           }
         }
       }
@@ -311,3 +327,5 @@ class Roller(client: Client, playerID: Byte) extends Projectile(client, playerID
 class Missile(client: Client, playerID: Byte) extends MachineGun(client, playerID)
 
 class Corbomite(client: Client, playerID: Byte) extends Projectile(client, playerID)
+
+class Gib(client: Client, playerID: Byte) extends Projectile(client, playerID)

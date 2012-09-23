@@ -26,6 +26,7 @@ object Projectile {
       case DEATHS_HEAD         => new DeathsHead(server, tank)
       case DEATHS_HEAD_CLUSTER => new DeathsHeadCluster(server, tank)
       case MISSILE             => new Missile(server, tank)
+      case GIB                 => new Gib(server, tank)
     }
   }
 }

@@ -181,6 +181,12 @@ class Tank(val server: Server, val playerID: Byte) extends GameObject(server) {
                                    rand.nextFloat*50f+body.getLinearVelocity.y*2, 
                               ProjectileTypes.CORBOMITE)
       }
+      for (i <- 0 until 4) {
+        server.addProjectile(this, x+sin(body.getAngle).toFloat*HEIGHT/2, y-cos(body.getAngle).toFloat*HEIGHT/2, 
+                              -40f+rand.nextFloat*80f, 
+                                   rand.nextFloat*50f+body.getLinearVelocity.y*2, 
+                              ProjectileTypes.GIB)
+      }
       remove
     }
     if (isDead) return
