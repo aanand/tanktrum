@@ -14,7 +14,9 @@ object Resource {
   }
 
   def getImageIcon(path: String) = {
-    if (new File(path).exists) {
+    if (path == "") {
+      new ImageIcon()
+    } else if (new File(path).exists) {
       new ImageIcon(path)
     } else {
       new ImageIcon(getClass.getClassLoader.getResource(path))
