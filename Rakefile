@@ -42,6 +42,11 @@ TARGETS.each do |target|
   end
 end
 
+desc "clear out build artifacts"
+task :clean do
+  sh "rm -rf packaging/www/out classes dist tmp #{GAME_JAR_FILE}"
+end
+
 desc "compile .class files"
 task :compile => (['classes'] + TARGETS)
 
