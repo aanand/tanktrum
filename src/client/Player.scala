@@ -60,7 +60,10 @@ class Player(client: Client) extends shared.Player {
           if (tank.isAlive) {
             translate(10, 20) {
               Projectile.render(g, gun.selectedWeapon, spriteColor)
-              g.drawString(gun.ammo(gun.selectedWeapon).toString, 15, -9, true)
+
+              if (gun.ammo.isDefinedAt(gun.selectedWeapon)) {
+                g.drawString(gun.ammo(gun.selectedWeapon).toString, 15, -9, true)
+              }
             }
           }
         }
